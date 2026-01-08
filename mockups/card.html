@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bookmark Manager - Accessible Card View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-fill {
+            font-variation-settings: 'FILL' 1;
+        }.card-focus-within:focus-within {
+            outline: 2px solid theme('colors.primary');
+            outline-offset: 4px;
+        }.primary-action-overlay {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .card-container:hover .primary-action-overlay {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<aside class="w-64 border-r border-slate-200 dark:border-slate-800 flex flex-col bg-white dark:bg-background-dark">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary size-8 rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">bookmarks</span>
+</div>
+<div>
+<h1 class="text-sm font-bold leading-none">Bookmarkly</h1>
+<p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 uppercase tracking-wider">Premium Plan</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+<div class="space-y-1 py-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary font-medium focus:ring-2 focus:ring-primary outline-none" href="#">
+<span class="material-symbols-outlined material-fill text-[20px]">inbox</span>
+<span class="text-sm">Inbox</span>
+<span class="ml-auto text-xs opacity-70">24</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-primary outline-none" href="#">
+<span class="material-symbols-outlined text-[20px]">star</span>
+<span class="text-sm">Starred</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:ring-2 focus:ring-primary outline-none" href="#">
+<span class="material-symbols-outlined text-[20px]">archive</span>
+<span class="text-sm">Archive</span>
+</a>
+</div>
+<div class="py-4 border-t border-slate-100 dark:border-slate-800">
+<p class="px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Collections</p>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">folder</span>
+<span class="text-sm">Design Inspiration</span>
+</a>
+</div>
+</nav>
+<div class="p-4 border-t border-slate-100 dark:border-slate-800 space-y-1">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-2.5 rounded-lg text-sm transition-all flex items-center justify-center gap-2 mb-4 focus:ring-2 focus:ring-primary focus:ring-offset-2 outline-none">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Bookmark
+            </button>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                Settings
+            </a>
+</div>
+</aside>
+<main class="flex-1 flex flex-col min-w-0 bg-background-light dark:bg-background-dark">
+<header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark flex items-center justify-between px-8 shrink-0">
+<div class="flex-1 max-w-xl">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm placeholder:text-slate-500" placeholder="Search bookmarks..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<button class="p-1.5 rounded-md hover:bg-white dark:hover:bg-slate-700 text-slate-400">
+<span class="material-symbols-outlined text-[18px]">list</span>
+</button>
+<button class="p-1.5 rounded-md bg-white dark:bg-slate-600 text-primary shadow-sm">
+<span class="material-symbols-outlined text-[18px] material-fill">grid_view</span>
+</button>
+</div>
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden ring-2 ring-slate-100 dark:ring-slate-800 shadow-sm" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCG550zJfM6kQR5IxuWs1JYtUq7Bt-iFaQpSGuUUV4HWQNla4IBvdJycOWjpokIhKedyYMiw1qS_qXm7j3lXoMEpBMTQV0tGxAQ3odRxeP9APZgvm_qYMwaOd7q5ZsQDio_olDWCO7w-g6e9z4BfbCl82dZ1bVkd5HxjPt4gk8UrCsOWK08tEa3HN4pzur6kw2LoR18_oCRPif3itrWR8qi-LCDamHtEIfuuEChFiAcRcp8wz-s2pkoSjFDGoHkVKEBEth2_i34S4Xw"); background-size: cover;'></div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-8">
+<div class="flex items-center justify-between mb-8">
+<div class="flex gap-6 border-b border-slate-200 dark:border-slate-800">
+<button class="pb-3 text-sm font-semibold border-b-2 border-primary text-primary">All Bookmarks</button>
+<button class="pb-3 text-sm font-medium text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Recently Added</button>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6" role="list">
+<article class="card-container group relative bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col card-focus-within" role="listitem">
+<div class="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+<div class="absolute inset-0 bg-center bg-cover transition-transform duration-500 group-hover:scale-105" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBs4IaIN9Q1lE55ninRp_2VfAfV7yQxoRl1xNClzK4XffrY8chFqvx01bIJfq4XQJrlORPAAUYMOZx-zJitRTNvU8U4-ir88EsmswCfcmFZEXmuxixYG3Sk0Ol9c55AtZpibKkyCVPdAbZljZvM83x9bhA0W8lHk8Nd9XZnqD2UT1zNt3E15VohCgjspQtVcMTFe9JNoa1clYYF2ijS4IoKnD707SRW-od3ROAKGW5nPkIGw7l1e2OD6Y20nUlCjcTRz09jBYXGdR7-");'></div>
+<div class="primary-action-overlay absolute inset-0 bg-black/40 flex items-center justify-center">
+<span class="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold shadow-lg">View Archived Copy</span>
+</div>
+<div class="absolute top-2 right-2 flex gap-1 z-20">
+<button aria-label="Favorite bookmark" class="size-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-primary transition-colors focus:outline-none focus:ring-2 focus:ring-white">
+<span class="material-symbols-outlined text-[18px]">star</span>
+</button>
+<button aria-label="More options" class="size-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-white">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-2">
+<div class="size-5 rounded bg-slate-100 flex items-center justify-center overflow-hidden shrink-0" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBwJzPq9aJV52_JZQrc2rVuOal7-7H38bbDJycjRp5bLcUoOqTho5BtLgT583pKOVC25O8jlG8q1x3aUhbVbu1nhujN8yujjf4oVo-uD5GkVh_UJcPfvxlPxDNwm9hfAzqlf45hcsQxwwpAv6L0csav_l3R56SDEf5WyB-4A8itid-u412OJMoZDP68MnxwQ-07S4saXrExiIcDCV1AMuFMiZyiBD6Fn9C1Ln-M-qOX7mlDyU5VGcKSJRDP83Tv60KefL7yDgnVDYT3"); background-size: cover;'></div>
+<span class="text-[11px] font-medium text-slate-500 uppercase tracking-tight truncate">smashingmagazine.com</span>
+</div>
+<div class="mb-4">
+<a aria-label="View archived copy of 10 Best UI Trends for 2024" class="block group/title focus:outline-none after:absolute after:inset-0 after:z-10" href="#singlefile_url">
+<h3 class="font-bold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors group-hover/title:underline decoration-2 underline-offset-2">
+                                    10 Best UI Trends for 2024: The Future of Visual Interfaces
+                                </h3>
+</a>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">Explore the latest visual styles taking over the web this year, from Bento grids to spatial design.</p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1 mb-6">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase">#design</span>
+<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-bold rounded uppercase">#trends</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 relative z-20">
+<a class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded py-1 px-1 -mx-1" href="https://smashingmagazine.com" target="_blank">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">language</span>
+                                    Visit Live Site
+                                </span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+</div>
+</article>
+<article class="card-container group relative bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col card-focus-within" role="listitem">
+<div class="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+<div class="absolute inset-0 bg-center bg-cover transition-transform duration-500 group-hover:scale-105" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAMm39tQzavKdOymmiva8MAShZjP4_8zQ63Sz-veHzAdGQnR7cMQZ4gDKPrDBHs684N_U1m8OtUHmWnTlU0JiXmjTFnGcf8P-dQYWjG9cmGr7JIh6RIuVB1pkoeJjsiPUEoNPG2w9KRenFeHgr4i93iEC2nCyrc0C2SDlJmQxMacgEl-YOJTZfMNoyG9WXB3Qg79AA-ROgXIHTB-D4AH_BnXYjBKffChzhkOXg9WqnR2kTymaSo_ore_OS5viOanNS1KnF44vbLug8D");'></div>
+<div class="primary-action-overlay absolute inset-0 bg-black/40 flex items-center justify-center">
+<span class="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold shadow-lg">View Archived Copy</span>
+</div>
+<div class="absolute top-2 right-2 flex gap-1 z-20">
+<button aria-label="Favorite" class="size-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-primary focus:outline-none focus:ring-2 focus:ring-white">
+<span class="material-symbols-outlined text-[18px]">star</span>
+</button>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-2">
+<div class="size-5 rounded bg-slate-100 flex items-center justify-center overflow-hidden shrink-0" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDCz_YJNfoiYMfddjp2NYPGD84Tr2-TUylEaPPQPwEX-zfUNV-q-uDI54cDXUDVaRwlK2i1OkQfjbKRzHrxAryCwRKtkWz4TKm-9k63WrlyVYoW8BoFzkwC9drLuxIGrOiUVHU7Xn94WHlkUCsOQhCBmZ-IOGwjNPIpt2S6l04jsIJlDKIW_on6Bue6rkFhzXfdfSHxXhzA7J4Zp3cF54HGck-wtOuyZSLq1G8hvWFZ0WqH1NLDoDJYZWpymmJWumUmAoS7i0QTxsun"); background-size: cover;'></div>
+<span class="text-[11px] font-medium text-slate-500 uppercase tracking-tight truncate">react.dev</span>
+</div>
+<div class="mb-4">
+<a aria-label="View archived copy of React Design Patterns" class="block group/title focus:outline-none after:absolute after:inset-0 after:z-10" href="#singlefile_url">
+<h3 class="font-bold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors group-hover/title:underline decoration-2 underline-offset-2">
+                                    React Design Patterns and Hooks Mastery
+                                </h3>
+</a>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">Advanced techniques for building scalable React components and state.</p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1 mb-6">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase">#dev</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 relative z-20">
+<a class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded py-1 px-1 -mx-1" href="https://react.dev" target="_blank">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">language</span>
+                                    Visit Live Site
+                                </span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+</div>
+</article>
+<article class="card-container group relative bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col card-focus-within" role="listitem">
+<div class="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+<div class="absolute inset-0 bg-center bg-cover transition-transform duration-500 group-hover:scale-105" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCJiQsrs-rUZk9krh6fN_igYg9mtYiWL2-k02NVuZ9QiKOyX8mpbnkQRSapu_zAWMFpUO9XmVQ90Eo7Y-_Ax79qrKMvHgOE-si5S1kFjuBSVTKGYaCloizqSNiVD-SpXTomCASl2lL5MUfiHYpHRNwy02ZsuWesU3YJiaw14EV9TWiAE4O14jhphLE_j5D3YJmhkvfDBVBO5Bjo9dAt_VPQn9jLBqP9NYuq2xkqt_RKRYE6Y5vaBvXI0uSIaZ7rPNgDcGoCj8P052Dm");'></div>
+<div class="primary-action-overlay absolute inset-0 bg-black/40 flex items-center justify-center">
+<span class="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold shadow-lg">View Archived Copy</span>
+</div>
+<div class="absolute top-2 right-2 flex gap-1 z-20">
+<button aria-label="Favorite" class="size-8 rounded-full bg-black/60 backdrop-blur-md text-white flex items-center justify-center hover:bg-primary focus:outline-none focus:ring-2 focus:ring-white">
+<span class="material-symbols-outlined text-[18px]">star</span>
+</button>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-2">
+<div class="size-5 rounded bg-slate-100 flex items-center justify-center overflow-hidden shrink-0" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB0my80PWqQm5i2-FrFYBOScc34qkfQTV-cqx2z9HLZV2eDnUjJvSicvVtyAv3LkCCEfdwPB08VFuA-6xvkdR3ntLCmI0L1D-wspTxZ3annGK2-iWpmW7gdA7sGlH89nLkkUPx5Oi962s9S6DH3UiAIV-dLDWA0VLi18kl63XwkgesphBAYdhqE_KdALsEzdenh1dDaICcFXSl89Kx86RBk5QAghw80ubc-LzKWrBsB8zq2U9lLMPoB1lnfFUU0kKSWEUdoXgtczC6N"); background-size: cover;'></div>
+<span class="text-[11px] font-medium text-slate-500 uppercase tracking-tight truncate">medium.com</span>
+</div>
+<div class="mb-4">
+<a aria-label="View archived copy of Mastering Typography" class="block group/title focus:outline-none after:absolute after:inset-0 after:z-10" href="#singlefile_url">
+<h3 class="font-bold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors group-hover/title:underline decoration-2 underline-offset-2">
+                                    Mastering Typography: A Comprehensive Guide
+                                </h3>
+</a>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">How to choose the perfect typeface for your interface and improve readability.</p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1 mb-6">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase">#ui</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 relative z-20">
+<a class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded py-1 px-1 -mx-1" href="https://medium.com" target="_blank">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">language</span>
+                                    Visit Live Site
+                                </span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+</div>
+</article>
+<article class="card-container group relative bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col card-focus-within" role="listitem">
+<div class="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+<div class="absolute inset-0 bg-center bg-cover transition-transform duration-500 group-hover:scale-105" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCT1pPe7CMlymR0yvYpX_0ctFAkwkrKG2Xh6teTitV2DU7QiASXGGrGUz6LR4oN3PKn2KEDVqS_HnQHxJaor98D315WCVOvJiKj9Ncvyj6PKqGsVabp7rSA5VBThz_QGVtonI1uN4xnQsQPOYMlFOWSvbW3UPRpVJMQsrENDrG2u9mbimyIbmY3J8J9RBeeIm4zV-1ybSlG0fB_mf4BAPyYXOZxkBIuV8UKi0QBg_whuaOZlq3PKZFtwpFwPhAqvefkytniIQJN85gy");'></div>
+<div class="primary-action-overlay absolute inset-0 bg-black/40 flex items-center justify-center">
+<span class="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold shadow-lg">View Archived Copy</span>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-2">
+<div class="size-5 rounded bg-slate-100 flex items-center justify-center overflow-hidden shrink-0" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCoKf5_LPDdDqRMWuXaM2Pzt6kPwl9ZB-hsGXSkPepmRBaz11FMeSIA7ZntLf1nijnfJyfHHKLNINRC2PGh7u60vMOIeJMHoYmLtdoCOH3PgPCHAkJKe-7o461ZrxTf2Ke0GQ6dW2qgV0xA-0g9pxR2ttYS0t38ekEG_wqtF8hVJE3bRtDjC3vNr44_nEs71KVY09wLvkcdjnmsOF9Jc06NHF8dyGPx06ffM5S8zPEqcrPvOv6GdviuTvtLDUlB93H865ugeL5r3tDs"); background-size: cover;'></div>
+<span class="text-[11px] font-medium text-slate-500 uppercase tracking-tight truncate">dribbble.com</span>
+</div>
+<div class="mb-4">
+<a aria-label="View archived copy of Color Palettes" class="block group/title focus:outline-none after:absolute after:inset-0 after:z-10" href="#singlefile_url">
+<h3 class="font-bold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors group-hover/title:underline decoration-2 underline-offset-2">
+                                    Modern Color Palettes for Web Applications
+                                </h3>
+</a>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">A collection of trending color schemes for light and dark modes.</p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1 mb-6">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase">#color</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 relative z-20">
+<a class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded py-1 px-1 -mx-1" href="https://dribbble.com" target="_blank">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">language</span>
+                                    Visit Live Site
+                                </span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+</div>
+</article>
+<article class="card-container group relative bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col card-focus-within" role="listitem">
+<div class="relative aspect-video w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+<div class="absolute inset-0 bg-center bg-cover transition-transform duration-500 group-hover:scale-105" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAKjmRqkyerkKwxmhHL10icxlm2x-AVbhpYFfD2uSvF0eAFWmdnIa_RKn_JiW43C8gWY9oqDETys1SmbXJGv-6_fRdXiqM-NlORB750T8p3cck03xKzRjaH-mVpSq5RfcSHQvkFT0cFvh85eauh5FPFIb9_fjS3adX0WuAzZst8uKFCGJiyU8SaS-FzmSeS2sdYk5z_Da6MmzQePn1ph8kMsu4e317Sua3IJpmy4Cl9iTeosZn-_yqXAjCU7xPwD2jh8VYOp0TJTLuv");'></div>
+<div class="primary-action-overlay absolute inset-0 bg-black/40 flex items-center justify-center">
+<span class="px-4 py-2 bg-white text-slate-900 rounded-lg text-xs font-bold shadow-lg">View Archived Copy</span>
+</div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<div class="flex items-center gap-2 mb-2">
+<div class="size-5 rounded bg-slate-100 flex items-center justify-center overflow-hidden shrink-0" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA5R1NuGxYH8NZviDS1lUxTSWSTxKMimmqjvpYUhciGJC8F3x7LDtrWHOzh0uOQDeWr_cRynix3ClofVGVzyJGf40nqjCkyBPuW-Mc3-UWo81YVfSZyHeVCa1hQ1Kbbg0WZUUi-HBHrhfBe1lZBUZI2diH95bXPaPxiZ9nENFRJ7adNBB56q2LTgk7cz25a987VfPd5Um1GWKwQeW9XmlTrcudoOYRfIhAXL7jKHb3TsVJp381ke3OWZ9HvCMTf464_GIazwfNrRmV0"); background-size: cover;'></div>
+<span class="text-[11px] font-medium text-slate-500 uppercase tracking-tight truncate">figma.com</span>
+</div>
+<div class="mb-4">
+<a aria-label="View archived copy of UX Research Methods" class="block group/title focus:outline-none after:absolute after:inset-0 after:z-10" href="#singlefile_url">
+<h3 class="font-bold text-sm leading-snug line-clamp-2 group-hover:text-primary transition-colors group-hover/title:underline decoration-2 underline-offset-2">
+                                    Effective UX Research Methods for Teams
+                                </h3>
+</a>
+<p class="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">Meaningful product improvements through better user interviewing.</p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-1 mb-6">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded uppercase">#ux</span>
+</div>
+<div class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 relative z-20">
+<a class="flex items-center justify-between text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary rounded py-1 px-1 -mx-1" href="https://figma.com" target="_blank">
+<span class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">language</span>
+                                    Visit Live Site
+                                </span>
+<span class="material-symbols-outlined text-[16px]">open_in_new</span>
+</a>
+</div>
+</div>
+</article>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

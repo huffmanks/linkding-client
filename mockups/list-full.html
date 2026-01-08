@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bookmark Manager - Accessible Full List View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+        }
+        .active-nav {
+            background-color: #283039
+        }.action-button {
+            @apply flex items-center gap-0 overflow-hidden max-w-[40px] hover:max-w-[120px] transition-all duration-300 ease-in-out px-2 py-2 rounded-lg text-slate-400 dark:text-[#9dabb9] hover:bg-slate-200 dark:hover:bg-[#3b4754] hover:text-slate-900 dark:hover:text-white;
+        }
+        .action-button span.label-text {
+            @apply opacity-0 whitespace-nowrap text-xs font-bold uppercase ml-0 transition-all duration-300;
+        }
+        .action-button:hover span.label-text {
+            @apply opacity-100 ml-2;
+        }
+        .delete-button:hover {
+            @apply bg-red-50 dark:bg-red-900/20 text-red-500 !important;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col">
+<header class="flex items-center justify-between border-b border-solid border-slate-200 dark:border-[#283039] px-6 py-3 bg-white dark:bg-background-dark sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined">bookmarks</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">LinkVault</h2>
+</div>
+<div class="relative w-80">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-[#9dabb9]">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input block w-full pl-10 border-none bg-slate-100 dark:bg-[#283039] focus:ring-2 focus:ring-primary text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-[#9dabb9] rounded-lg text-sm font-normal h-10" placeholder="Search your bookmarks..." type="search"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-white text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Shared</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Collections</a>
+</nav>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center rounded-lg h-10 px-5 bg-primary text-white text-sm font-bold shadow-sm hover:bg-primary/90 transition-all">
+<span class="material-symbols-outlined mr-2 text-lg">add</span>
+<span>Add New</span>
+</button>
+<button aria-label="Notifications" class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-[#283039] text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-[#3b4754] transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-slate-200 dark:bg-[#283039] flex items-center justify-center overflow-hidden border border-slate-300 dark:border-slate-700">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjM35v6A0Xyhu29xXc4kKiihOa90CYJZKuqRUaJik9dTZZW9siUgLAZ-cjpOa89noA2ErOpJ-eJe_ds6pxmiyj88qIpaXuUBAjkeA_VUBvyvsTyuThgHjYztOyDkQ17uHDvgBT3sWb9mtQlsBTl1tEx3lhfcTIko7Di845Dgx1ucqyoaFIWhYBp185V9OrzZAw2q5agrwHb7HHmMXRIBfIFWfsPTMYEiVT5yQgyss0gijzQO2L57xnlysq8sGJV3tp_iQo_QiKS7wd"/>
+</div>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<aside class="w-64 border-r border-slate-200 dark:border-[#283039] bg-white dark:bg-background-dark hidden lg:flex flex-col p-4">
+<div class="flex flex-col gap-6 flex-1">
+<nav class="flex flex-col gap-1">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg active-nav text-primary dark:text-white cursor-pointer">
+<span class="material-symbols-outlined">bookmark</span>
+<p class="text-sm font-semibold">All Bookmarks</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#283039] cursor-pointer transition-colors">
+<span class="material-symbols-outlined">star</span>
+<p class="text-sm font-medium">Favorites</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#283039] cursor-pointer transition-colors">
+<span class="material-symbols-outlined">archive</span>
+<p class="text-sm font-medium">Archive</p>
+</div>
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#283039] cursor-pointer transition-colors">
+<span class="material-symbols-outlined">delete</span>
+<p class="text-sm font-medium">Trash</p>
+</div>
+</nav>
+<div class="flex flex-col gap-3">
+<h3 class="px-3 text-xs font-bold text-slate-400 dark:text-[#9dabb9] uppercase tracking-wider">Folders</h3>
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#283039] group cursor-pointer">
+<div class="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-slate-400">folder</span>
+<p class="text-sm">Work Projects</p>
+</div>
+<span class="text-xs text-slate-400 bg-slate-200 dark:bg-[#1c2127] px-2 py-0.5 rounded-full">12</span>
+</div>
+</div>
+<button class="mx-3 mt-2 flex items-center gap-2 text-primary text-sm font-semibold hover:underline">
+<span class="material-symbols-outlined text-sm">create_new_folder</span>
+                    New Folder
+                </button>
+</div>
+</div>
+<div class="flex flex-col gap-1 border-t border-slate-200 dark:border-[#283039] pt-4 mt-auto">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-[#283039] cursor-pointer">
+<span class="material-symbols-outlined text-xl">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-y-auto bg-slate-50 dark:bg-background-dark">
+<div class="px-8 pt-8 pb-4">
+<div class="flex flex-wrap gap-2 text-sm items-center mb-4">
+<a class="text-slate-500 dark:text-[#9dabb9] hover:text-primary transition-colors" href="#">Dashboard</a>
+<span class="text-slate-400 dark:text-[#9dabb9] material-symbols-outlined text-base">chevron_right</span>
+<span class="text-slate-900 dark:text-white font-medium">All Bookmarks</span>
+</div>
+<div class="flex items-center justify-between">
+<h1 class="text-3xl font-bold text-slate-900 dark:text-white">All Bookmarks</h1>
+<div class="flex items-center gap-2 bg-white dark:bg-[#1c2127] p-1.5 rounded-xl border border-slate-200 dark:border-[#3b4754] shadow-sm">
+<button aria-label="Minimal View" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#283039] text-slate-500 dark:text-[#9dabb9]">
+<span class="material-symbols-outlined">list</span>
+</button>
+<button aria-label="Full List View (Active)" class="p-2 rounded-lg bg-primary text-white shadow-md">
+<span class="material-symbols-outlined">view_list</span>
+</button>
+<button aria-label="Card View" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-[#283039] text-slate-500 dark:text-[#9dabb9]">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+</div>
+</div>
+</div>
+<div class="px-8 mb-6">
+<div class="flex border-b border-slate-200 dark:border-[#3b4754] gap-8">
+<a class="flex items-center gap-2 border-b-2 border-transparent text-slate-500 dark:text-[#9dabb9] pb-4 font-semibold text-sm hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">view_headline</span>
+                    Minimal
+                </a>
+<a class="flex items-center gap-2 border-b-2 border-primary text-primary dark:text-white pb-4 font-semibold text-sm" href="#">
+<span class="material-symbols-outlined text-xl">table_rows</span>
+                    Full List
+                </a>
+<a class="flex items-center gap-2 border-b-2 border-transparent text-slate-500 dark:text-[#9dabb9] pb-4 font-semibold text-sm hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">grid_view</span>
+                    Card View
+                </a>
+</div>
+</div>
+<div class="px-8 pb-10">
+<div class="overflow-hidden rounded-xl border border-slate-200 dark:border-[#3b4754] bg-white dark:bg-[#111418] shadow-sm">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50/80 dark:bg-[#1c2127]/80 backdrop-blur-sm border-b border-slate-200 dark:border-[#3b4754]">
+<th class="px-6 py-5 w-16 text-center">
+<input aria-label="Select all bookmarks" class="h-5 w-5 rounded border-slate-300 dark:border-[#3b4754] bg-transparent text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+</th>
+<th class="px-4 py-5 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-widest">Bookmark &amp; Source</th>
+<th class="px-4 py-5 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-widest w-48">Tags</th>
+<th class="px-4 py-5 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-widest w-40">Date Added</th>
+<th class="px-6 py-5 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-widest text-right w-64">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-[#3b4754]">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-[#1c2127]/30 transition-colors group">
+<td class="px-6 py-8 text-center align-top">
+<input aria-label="Select bookmark: Linear" class="h-5 w-5 rounded border-slate-300 dark:border-[#3b4754] bg-transparent text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-4 py-8">
+<div class="flex gap-5">
+<div class="size-14 rounded-xl bg-slate-100 dark:bg-[#283039] flex-shrink-0 flex items-center justify-center p-3 border border-slate-200 dark:border-[#3b4754]">
+<img alt="Site Favicon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8JPj1XOZRBO4qccGjZgEEwIwZvGnzG3eQBYhTNcm9ONp7jYJEmaM8I8Pdo7nmIx-c3UbPGff0TdYCU_LLbdAGwEV-VwZpD_fEFbF0kpc7Z-zEN3I5_ZqyM7jluOsCDs_D7ifuelrCXBUk0OKxuooN-mPFU-Cwa12XAL8oVXL-fMhPohAiVR9oR8EaPcp5IUPsFNaaNXZl8i3mmIQelHvZyHPuies7N45rxOVRjGP8T_IrsFIrDPkNk2LFdMPqcKhgbgaL_1fkKts_"/>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<a aria-label="Open archived version: Linear - The best way to build software" class="text-slate-900 dark:text-white font-bold text-lg hover:text-primary transition-colors flex items-center gap-1.5" href="#">
+                                                Linear - The best way to build software
+                                                <span aria-hidden="true" class="material-symbols-outlined text-base text-primary/70">cloud_done</span>
+</a>
+</div>
+<p class="text-slate-500 dark:text-[#9dabb9] text-sm leading-relaxed max-w-2xl">Streamline software projects, sprints, tasks, and bug tracking. It’s built for high-performance teams to build products better and faster.</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-bold text-slate-400 dark:text-[#5c6a78] uppercase tracking-tighter">Live URL:</span>
+<a aria-label="Visit live website: linear.app/features/issue-tracking" class="text-primary text-sm font-medium hover:underline flex items-center gap-1" href="https://linear.app/features/issue-tracking">
+                                                linear.app/features/issue-tracking
+                                                <span class="material-symbols-outlined text-xs">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-8 align-top">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded-full bg-primary/5 text-primary border border-primary/20 text-xs font-bold">Productivity</span>
+<span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#283039] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-xs font-bold">SaaS</span>
+</div>
+</td>
+<td class="px-4 py-8 align-top">
+<span class="text-slate-500 dark:text-[#9dabb9] text-sm font-medium">Oct 24, 2023</span>
+</td>
+<td class="px-6 py-8 align-top text-right">
+<div class="flex justify-end gap-2">
+<button aria-label="Edit bookmark" class="action-button">
+<span class="material-symbols-outlined text-xl">edit</span>
+<span class="label-text">Edit</span>
+</button>
+<button aria-label="Archive this item" class="action-button">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+<span class="label-text">Archive</span>
+</button>
+<button aria-label="Share bookmark" class="action-button">
+<span class="material-symbols-outlined text-xl">share</span>
+<span class="label-text">Share</span>
+</button>
+<button aria-label="Delete bookmark" class="action-button delete-button">
+<span class="material-symbols-outlined text-xl">delete</span>
+<span class="label-text">Delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-[#1c2127]/30 transition-colors group">
+<td class="px-6 py-8 text-center align-top">
+<input aria-label="Select bookmark: Tailwind UI" class="h-5 w-5 rounded border-slate-300 dark:border-[#3b4754] bg-transparent text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-4 py-8">
+<div class="flex gap-5">
+<div class="size-14 rounded-xl bg-slate-100 dark:bg-[#283039] flex-shrink-0 flex items-center justify-center p-3 border border-slate-200 dark:border-[#3b4754]">
+<img alt="Site Favicon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjHbFBjhFAOAIKc3p4WWCC-kKF-0m9lJzIfFGSztu0j6KH8viM0xqdTQsiGlhWjhbzpIET2H_AG4hFyh8_gOslv1vBY_o7gZYPncu57ji6wcWY0hHNuqFJr9cDI284hT_5pKVxFIY6gXdS2NiSZYjxq6jiIUNyI6uvMv2IRis1jeJFiYp0TWHE1PC2S6H2csgnqDzKQ2n5B-k8ko41x-dM4tofh9s-Qd0L4d0G9lFbnxMYSLF3NnaDrUvdH-xfcf0s91XUHImzUhO3"/>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<a aria-label="Open archived version: Tailwind UI - Beautiful UI components" class="text-slate-900 dark:text-white font-bold text-lg hover:text-primary transition-colors flex items-center gap-1.5" href="#">
+                                                Tailwind UI - Beautiful UI components
+                                                <span aria-hidden="true" class="material-symbols-outlined text-base text-primary/70">cloud_done</span>
+</a>
+</div>
+<p class="text-slate-500 dark:text-[#9dabb9] text-sm leading-relaxed max-w-2xl">Over 500+ professionally designed, fully responsive, expertly crafted component examples you can drop into your projects.</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-bold text-slate-400 dark:text-[#5c6a78] uppercase tracking-tighter">Live URL:</span>
+<a aria-label="Visit live website: tailwindui.com/components" class="text-primary text-sm font-medium hover:underline flex items-center gap-1" href="https://tailwindui.com/components">
+                                                tailwindui.com/components
+                                                <span class="material-symbols-outlined text-xs">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-8 align-top">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded-full bg-primary/5 text-primary border border-primary/20 text-xs font-bold">Dev</span>
+<span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#283039] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-xs font-bold">Design</span>
+</div>
+</td>
+<td class="px-4 py-8 align-top">
+<span class="text-slate-500 dark:text-[#9dabb9] text-sm font-medium">Oct 20, 2023</span>
+</td>
+<td class="px-6 py-8 align-top text-right">
+<div class="flex justify-end gap-2">
+<button aria-label="Edit bookmark" class="action-button">
+<span class="material-symbols-outlined text-xl">edit</span>
+<span class="label-text">Edit</span>
+</button>
+<button aria-label="Archive this item" class="action-button">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+<span class="label-text">Archive</span>
+</button>
+<button aria-label="Share bookmark" class="action-button">
+<span class="material-symbols-outlined text-xl">share</span>
+<span class="label-text">Share</span>
+</button>
+<button aria-label="Delete bookmark" class="action-button delete-button">
+<span class="material-symbols-outlined text-xl">delete</span>
+<span class="label-text">Delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-[#1c2127]/30 transition-colors group">
+<td class="px-6 py-8 text-center align-top">
+<input aria-label="Select bookmark: React Scaling" class="h-5 w-5 rounded border-slate-300 dark:border-[#3b4754] bg-transparent text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+</td>
+<td class="px-4 py-8">
+<div class="flex gap-5">
+<div class="size-14 rounded-xl bg-slate-100 dark:bg-[#283039] flex-shrink-0 flex items-center justify-center p-3 border border-slate-200 dark:border-[#3b4754]">
+<img alt="Site Favicon" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnpJoDxmZ2NPhcubtLK7-7Fzug6zzo7909QdLFjs3o_fVQ5Zt0hM8Az_TEPI3aNJr5jDzlT2u1ghgJMKrFy4P84iu0-GjFULp0bD3NEAzmZo4uER1al9ZCca06wuJ5Dz4DxDAU4KwUMB-V7uS8Q_EzrqErI1tQ-ymIRAUr1279wpoaP4EuONtQyEn3vJIH7Y8aM443V6LQZUg61OghJBx65lS6VGjYFnZxW6vlozi8NZCo3VT5IyRQs1hJswnxZuxkxT8f0oGf3Pgr"/>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<a aria-label="Open archived version: How to scale React applications in 2024" class="text-slate-900 dark:text-white font-bold text-lg hover:text-primary transition-colors flex items-center gap-1.5" href="#">
+                                                How to scale React applications in 2024
+                                                <span aria-hidden="true" class="material-symbols-outlined text-base text-primary/70">cloud_done</span>
+</a>
+</div>
+<p class="text-slate-500 dark:text-[#9dabb9] text-sm leading-relaxed max-w-2xl">A deep dive into modular architecture, state management strategies, and performance optimization for enterprise-level projects.</p>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-bold text-slate-400 dark:text-[#5c6a78] uppercase tracking-tighter">Live URL:</span>
+<a aria-label="Visit live website: medium.com/engineering/scaling-react-2024" class="text-primary text-sm font-medium hover:underline flex items-center gap-1" href="https://medium.com/engineering/scaling-react-2024">
+                                                medium.com/engineering/scaling-react-2024
+                                                <span class="material-symbols-outlined text-xs">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-8 align-top">
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded-full bg-primary/5 text-primary border border-primary/20 text-xs font-bold">Article</span>
+<span class="px-2.5 py-1 rounded-full bg-slate-100 dark:bg-[#283039] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-xs font-bold">React</span>
+</div>
+</td>
+<td class="px-4 py-8 align-top">
+<span class="text-slate-500 dark:text-[#9dabb9] text-sm font-medium">Oct 18, 2023</span>
+</td>
+<td class="px-6 py-8 align-top text-right">
+<div class="flex justify-end gap-2">
+<button aria-label="Edit bookmark" class="action-button">
+<span class="material-symbols-outlined text-xl">edit</span>
+<span class="label-text">Edit</span>
+</button>
+<button aria-label="Archive this item" class="action-button">
+<span class="material-symbols-outlined text-xl">inventory_2</span>
+<span class="label-text">Archive</span>
+</button>
+<button aria-label="Share bookmark" class="action-button">
+<span class="material-symbols-outlined text-xl">share</span>
+<span class="label-text">Share</span>
+</button>
+<button aria-label="Delete bookmark" class="action-button delete-button">
+<span class="material-symbols-outlined text-xl">delete</span>
+<span class="label-text">Delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between mt-8 px-2">
+<p class="text-sm text-slate-500 dark:text-[#9dabb9]">
+                    Showing <span class="font-bold text-slate-900 dark:text-white">1-10</span> of <span class="font-bold text-slate-900 dark:text-white">128</span> bookmarks
+                </p>
+<nav aria-label="Pagination" class="flex gap-2">
+<button aria-label="Previous page" class="flex items-center justify-center rounded-xl h-11 w-11 border border-slate-200 dark:border-[#3b4754] text-slate-400 dark:text-[#9dabb9] hover:bg-white dark:hover:bg-[#1c2127] transition-all">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button aria-current="page" class="flex items-center justify-center rounded-xl h-11 w-11 bg-primary text-white font-bold text-sm shadow-md">1</button>
+<button class="flex items-center justify-center rounded-xl h-11 w-11 border border-slate-200 dark:border-[#3b4754] text-slate-600 dark:text-[#9dabb9] hover:bg-white dark:hover:bg-[#1c2127] font-bold text-sm transition-all">2</button>
+<button class="flex items-center justify-center rounded-xl h-11 w-11 border border-slate-200 dark:border-[#3b4754] text-slate-600 dark:text-[#9dabb9] hover:bg-white dark:hover:bg-[#1c2127] font-bold text-sm transition-all">3</button>
+<button aria-label="Next page" class="flex items-center justify-center rounded-xl h-11 w-11 border border-slate-200 dark:border-[#3b4754] text-slate-400 dark:text-[#9dabb9] hover:bg-white dark:hover:bg-[#1c2127] transition-all">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</nav>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
