@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest.json",
+  "short_name": "Linkding",
+  "name": "Linkding Client",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "128x128 64x64 48x48 32x32 24x24 16x16",
+      "type": "image/svg+xml"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#fafafa",
+  "background_color": "#0a0a0a"
+}

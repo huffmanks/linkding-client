@@ -1,0 +1,13 @@
+services:
+  linkding-client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: linkding-client
+    container_name: linkding-client
+    ports:
+      - "3000:3000"
+    environment:
+      LINKDING_URL: ${LINKDING_URL}
+      LINKDING_API_TOKEN: ${LINKDING_API_TOKEN}
+    restart: unless-stopped
