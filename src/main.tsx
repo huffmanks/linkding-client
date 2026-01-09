@@ -20,6 +20,7 @@ const router = createRouter({
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
+  defaultNotFoundComponent: () => <div>404 page not found</div>,
 });
 
 declare module "@tanstack/react-router" {

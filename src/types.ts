@@ -1,3 +1,29 @@
+import type { LucideIcon } from "lucide-react";
+
+export interface SidebarNavMain {
+  items: NavItem[];
+}
+
+export type NavItem = SidebarLinkItem | SidebarParentItem;
+
+export interface SidebarLinkItem {
+  name: string;
+  url: string;
+  icon: LucideIcon;
+}
+
+export interface SidebarParentItem {
+  name: string;
+  icon: LucideIcon;
+  isActive: boolean;
+  items: SidebarChildItem[] | null;
+}
+
+export interface SidebarChildItem {
+  name: string;
+  url: string;
+}
+
 export interface Bookmark {
   id: number;
   url: string;

@@ -1,10 +1,10 @@
 services:
-  linkding-client:
+  echo-link:
     build:
       context: .
       dockerfile: Dockerfile
-    image: linkding-client
-    container_name: linkding-client
+    image: echo-link
+    container_name: echo-link
     ports:
       - "3000:3000"
     environment:
