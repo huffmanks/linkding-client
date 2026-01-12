@@ -2,15 +2,8 @@
 
 import { SidebarIcon } from "lucide-react";
 
+import { NavUser } from "@/components/blocks/sidebar/nav-user";
 import { SearchForm } from "@/components/blocks/sidebar/search-form";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -28,19 +21,12 @@ export function SiteHeader() {
           onClick={toggleSidebar}>
           <SidebarIcon />
         </Button>
-        <Separator orientation="vertical" className="mr-2 h-4" />
-        <Breadcrumb className="hidden sm:block">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink className="hover:text-inherit">Dashboard</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Bookmarks</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <SearchForm className="w-full sm:ml-auto sm:w-auto" />
+        <Separator orientation="vertical" className="mr-2 h-(--header-height)" />
+
+        <div className="flex w-full items-center justify-between gap-4">
+          <SearchForm className="w-full sm:w-auto" />
+          <NavUser />
+        </div>
       </div>
     </header>
   );

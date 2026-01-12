@@ -2,13 +2,16 @@
 
 import * as React from "react";
 
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { FolderIcon, HashIcon } from "lucide-react";
 
+import { linkdingFetch } from "@/lib/api";
 import { SIDEBAR_ITEMS } from "@/lib/constants";
+import type { Bundle, Tag } from "@/types";
 
 import { NavMain } from "@/components/blocks/sidebar/nav-main";
 import { NavSecondary } from "@/components/blocks/sidebar/nav-secondary";
-import { NavUser } from "@/components/blocks/sidebar/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -20,6 +23,43 @@ import {
 } from "@/components/ui/sidebar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: folderData } = useQuery({
+    queryKey: ["bundles"],
+    queryFn: () => linkdingFetch<{ results: Bundle[] }>("bundles"),
+  });
+  const { data: tagData } = useQuery({
+    queryKey: ["tags"],
+    queryFn: () => linkdingFetch<{ results: Tag[] }>("tags"),
+  });
+
+  const folderItems =
+    folderData?.results?.map((item) => ({
+      name: item.name,
+      url: `/dashboard/folders/${item.id}`,
+    })) || [];
+
+  const tagItems =
+    tagData?.results?.map((item) => ({
+      name: item.name,
+      url: `/dashboard/tags/${item.id}`,
+    })) || [];
+
+  const navMainItems = [
+    ...SIDEBAR_ITEMS.navMain,
+    {
+      name: "Folders",
+      icon: FolderIcon,
+      isActive: false,
+      items: folderItems,
+    },
+    {
+      name: "Tags",
+      icon: HashIcon,
+      isActive: false,
+      items: tagItems,
+    },
+  ];
+
   return (
     <Sidebar className="top-(--header-height) h-[calc(100svh-var(--header-height))]!" {...props}>
       <SidebarHeader>
@@ -52,11 +92,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={SIDEBAR_ITEMS.navMain} />
-        <NavSecondary items={SIDEBAR_ITEMS.navSecondary} className="mt-auto" />
+        <NavMain items={navMainItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <NavSecondary items={SIDEBAR_ITEMS.navSecondary} className="mt-auto" />
       </SidebarFooter>
     </Sidebar>
   );

@@ -1,9 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
+import z from "zod";
 
 import { login } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
+import CustomFieldError from "@/components/custom-field-error";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -61,37 +63,48 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
             <FieldGroup>
               <form.Field
                 name="username"
+                validators={{
+                  onBlur: z.string().min(1, "Username is required."),
+                }}
                 children={(field) => (
-                  <Field>
+                  <Field data-invalid={!field.state.meta.isValid}>
                     <FieldLabel htmlFor="username">Linkding username</FieldLabel>
                     <Input
                       id="username"
-                      type="username"
-                      placeholder="admin"
-                      required
+                      type="text"
                       value={field.state.value}
+                      aria-invalid={!field.state.meta.isValid}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
+                    {!field.state.meta.isValid && (
+                      <CustomFieldError errors={field.state.meta.errors} />
+                    )}
                   </Field>
                 )}
               />
 
               <form.Field
                 name="token"
+                validators={{
+                  onBlur: z
+                    .hash("sha1", { error: "API token is not valid." })
+                    .min(1, { error: "API token is required." }),
+                }}
                 children={(field) => (
-                  <Field>
+                  <Field data-invalid={!field.state.meta.isValid}>
                     <FieldLabel htmlFor="token">Linkding API token</FieldLabel>
-
                     <Input
                       id="token"
                       type="password"
-                      placeholder="bfe7bcf6be6bbad4abdb0794bd0b6166797199b7"
-                      required
                       value={field.state.value}
+                      aria-invalid={!field.state.meta.isValid}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />
+                    {!field.state.meta.isValid && (
+                      <CustomFieldError errors={field.state.meta.errors} />
+                    )}
                   </Field>
                 )}
               />

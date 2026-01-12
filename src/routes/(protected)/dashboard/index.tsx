@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { linkdingFetch } from "@/lib/fetcher";
+import { linkdingFetch } from "@/lib/api";
 import type { Bookmark } from "@/types";
 
-export const Route = createFileRoute("/(protected)/dashboard")({
+export const Route = createFileRoute("/(protected)/dashboard/")({
   component: RouteComponent,
 });
 

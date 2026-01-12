@@ -25,4 +25,4 @@ dev-docker-down: ## Stop the Docker services
 # The main development target:
 dev-up-all: dev-docker-up
 	@echo "--- Starting app via (pnpm dev) ---"
-	$(shell cat $(ENV_FILE) | xargs) pnpm dev
+	pnpm dev
