@@ -1,4 +1,4 @@
-import { BookmarkIcon, PlusIcon, SettingsIcon, ShieldUserIcon } from "lucide-react";
+import { BookmarkIcon, SettingsIcon, ShieldUserIcon } from "lucide-react";
 
 export const APP_TITLE = "EchoLink";
 export const APP_DESCRIPTION = "Self-hosted client app for Linkding.";
@@ -9,11 +9,6 @@ export const LS_LINKDING_USERNAME = `${LS_PREFIX}_username`;
 
 export const SIDEBAR_ITEMS = {
   navMain: [
-    {
-      name: "Add",
-      url: "/dashboard/add",
-      icon: PlusIcon,
-    },
     {
       name: "Bookmarks",
       url: "/dashboard",

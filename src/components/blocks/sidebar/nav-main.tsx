@@ -18,11 +18,16 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
+import AddMenu from "./add-menu";
+
 export function NavMain({ items }: { items: NavItem[] }) {
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel className="sr-only">Items</SidebarGroupLabel>
       <SidebarMenu>
+        <SidebarMenuItem>
+          <AddMenu />
+        </SidebarMenuItem>
         {items.map((item) => {
           if ("url" in item) {
             return <NavLinkItem key={item.name} item={item} />;

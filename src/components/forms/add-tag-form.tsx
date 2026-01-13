@@ -6,7 +6,13 @@ import { cn } from "@/lib/utils";
 
 import CustomFieldError from "@/components/custom-field-error";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
@@ -25,13 +31,13 @@ export function AddTagForm({ className, ...props }: AddTagFormProps) {
   });
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="mb-2 flex items-center gap-3">Add tag</CardTitle>
-          <CardDescription>Create a new tag.</CardDescription>
-        </CardHeader>
-        <CardContent>
+    <>
+      <DialogHeader className="px-4">
+        <DialogTitle>Add tag</DialogTitle>
+        <DialogDescription>Create a new tag.</DialogDescription>
+      </DialogHeader>
+      <div className="px-4 pb-4">
+        <div className={cn("flex flex-col gap-6", className)} {...props}>
           <form
             onSubmit={async (e) => {
               e.preventDefault();
@@ -66,18 +72,24 @@ export function AddTagForm({ className, ...props }: AddTagFormProps) {
                 )}
               />
 
-              <Field>
+              <DialogFooter>
+                <DialogClose
+                  render={
+                    <Button type="button" variant="outline" className="cursor-pointer">
+                      Cancel
+                    </Button>
+                  }></DialogClose>
                 <Button
                   className="text-foreground cursor-pointer"
                   type="submit"
                   disabled={isPending}>
                   {isPending ? "Saving..." : "Create"}
                 </Button>
-              </Field>
+              </DialogFooter>
             </FieldGroup>
           </form>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
