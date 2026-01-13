@@ -22,11 +22,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 interface ComboboxCreateProps {
   value: string[];
+  entityName?: string;
   initialItems?: string[];
   onChange: (value: string[]) => void;
 }
 
-export function ComboboxCreate({ value, onChange, initialItems = [] }: ComboboxCreateProps) {
+export function ComboboxCreate({
+  value,
+  entityName = "one",
+  initialItems = [],
+  onChange,
+}: ComboboxCreateProps) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState(initialItems);
   const [search, setSearch] = useState("");
@@ -59,7 +65,9 @@ export function ComboboxCreate({ value, onChange, initialItems = [] }: ComboboxC
           <div className="mb-2">
             <CommandInput
               value={search}
-              placeholder="Search or create..."
+              placeholder={
+                !initialItems.length && !value.length ? "Insert here" : "Search or add..."
+              }
               onValueChange={setSearch}
             />
           </div>
@@ -67,7 +75,7 @@ export function ComboboxCreate({ value, onChange, initialItems = [] }: ComboboxC
             <CommandEmpty className="pt-0 pb-1">
               <Button variant="ghost" className="w-full justify-start" onClick={handleCreate}>
                 <Plus className="mr-2 size-4" />
-                Create {search ? `"${search}"` : "a new one"}
+                Add {search ? `"${search}"` : `a new ${entityName}`}
               </Button>
             </CommandEmpty>
             <CommandGroup className="pt-0 pb-1">
@@ -98,7 +106,7 @@ export function ComboboxCreate({ value, onChange, initialItems = [] }: ComboboxC
                 <CommandGroup>
                   <CommandItem onSelect={handleCreate}>
                     <Plus className="mr-2 size-4" />
-                    Create "{search}"
+                    Add "{search}"
                   </CommandItem>
                 </CommandGroup>
               </>
@@ -119,7 +127,7 @@ function DisplaySelected({ value }: { value: string[] }) {
   const hasMore = items.length > limit;
 
   if (items.length === 0) {
-    return <span>Select or create...</span>;
+    return <span>Select or add...</span>;
   }
 
   return (

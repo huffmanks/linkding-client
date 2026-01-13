@@ -1,8 +1,9 @@
+import type { Dispatch, SetStateAction } from "react";
+
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
 
 import { useCreateTag } from "@/lib/api";
-import { cn } from "@/lib/utils";
 
 import CustomFieldError from "@/components/custom-field-error";
 import { Button } from "@/components/ui/button";
@@ -16,9 +17,11 @@ import {
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-type AddTagFormProps = React.ComponentProps<"div">;
+interface AddTagFormProps {
+  setModalType: Dispatch<SetStateAction<"folder" | "tag" | null>>;
+}
 
-export function AddTagForm({ className, ...props }: AddTagFormProps) {
+export function AddTagForm({ setModalType }: AddTagFormProps) {
   const { mutate, isPending } = useCreateTag();
 
   const form = useForm({
@@ -27,6 +30,7 @@ export function AddTagForm({ className, ...props }: AddTagFormProps) {
     },
     onSubmit: async ({ value }) => {
       mutate(value);
+      setModalType(null);
     },
   });
 
@@ -37,7 +41,7 @@ export function AddTagForm({ className, ...props }: AddTagFormProps) {
         <DialogDescription>Create a new tag.</DialogDescription>
       </DialogHeader>
       <div className="px-4 pb-4">
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <div className="flex flex-col gap-6">
           <form
             onSubmit={async (e) => {
               e.preventDefault();

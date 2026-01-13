@@ -51,8 +51,8 @@ export default function AddMenu() {
       </DropdownMenu>
 
       <DialogContent className="gap-4 px-2 pb-2">
-        {modalType === "folder" && <AddFolderForm />}
-        {modalType === "tag" && <AddTagForm />}
+        {modalType === "folder" && <AddFolderForm setModalType={setModalType} />}
+        {modalType === "tag" && <AddTagForm setModalType={setModalType} />}
       </DialogContent>
     </Dialog>
   );
