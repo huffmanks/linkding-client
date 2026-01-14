@@ -5,7 +5,6 @@ import { PlusIcon } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 
-import { AddFolderForm } from "@/components/forms/add-folder-form";
 import { AddTagForm } from "@/components/forms/add-tag-form";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -16,8 +15,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton } from "@/components/ui/sidebar";
 
+export type ModalType = "tag" | null;
+
 export default function AddMenu() {
-  const [modalType, setModalType] = useState<"folder" | "tag" | null>(null);
+  const [modalType, setModalType] = useState<ModalType>(null);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -38,10 +39,12 @@ export default function AddMenu() {
           align="start">
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => navigate({ to: "/dashboard/add" })}>
+            onClick={() => navigate({ to: "/dashboard/bookmarks/add" })}>
             Bookmark
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer" onClick={() => setModalType("folder")}>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => navigate({ to: "/dashboard/folders/add" })}>
             Folder
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer" onClick={() => setModalType("tag")}>
@@ -51,7 +54,6 @@ export default function AddMenu() {
       </DropdownMenu>
 
       <DialogContent className="gap-4 px-2 pb-2">
-        {modalType === "folder" && <AddFolderForm setModalType={setModalType} />}
         {modalType === "tag" && <AddTagForm setModalType={setModalType} />}
       </DialogContent>
     </Dialog>

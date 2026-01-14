@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { AddBookmarkForm } from "@/components/forms/add-bookmark-form";
 
-export const Route = createFileRoute("/(protected)/dashboard/add")({
+export const Route = createFileRoute("/(protected)/dashboard/bookmarks/add")({
   component: RouteComponent,
 });
 

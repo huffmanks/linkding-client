@@ -1,7 +1,8 @@
 import * as React from "react";
 
 import { Link } from "@tanstack/react-router";
-import { type LucideIcon } from "lucide-react";
+
+import type { SidebarLinkItem } from "@/types";
 
 import {
   SidebarGroup,
@@ -15,24 +16,23 @@ export function NavSecondary({
   items,
   ...props
 }: {
-  items: {
-    title: string;
-    url: string;
-    icon: LucideIcon;
-  }[];
+  items: SidebarLinkItem[];
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
+            <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
                 size="sm"
                 render={
-                  <Link to={item.url}>
+                  <Link
+                    to={item.url}
+                    target={item.isExternal ? "_blank" : "_self"}
+                    rel={item.isExternal ? "noopener noreferrer" : undefined}>
                     <item.icon />
-                    <span>{item.title}</span>
+                    <span>{item.name}</span>
                   </Link>
                 }></SidebarMenuButton>
             </SidebarMenuItem>

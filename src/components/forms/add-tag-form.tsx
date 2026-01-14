@@ -5,6 +5,7 @@ import z from "zod";
 
 import { useCreateTag } from "@/lib/api";
 
+import type { ModalType } from "@/components/blocks/sidebar/add-menu";
 import CustomFieldError from "@/components/custom-field-error";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +19,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 
 interface AddTagFormProps {
-  setModalType: Dispatch<SetStateAction<"folder" | "tag" | null>>;
+  setModalType: Dispatch<SetStateAction<ModalType>>;
 }
 
 export function AddTagForm({ setModalType }: AddTagFormProps) {
@@ -52,7 +53,7 @@ export function AddTagForm({ setModalType }: AddTagFormProps) {
               <form.Field
                 name="name"
                 validators={{
-                  onBlur: z.string().min(1, "Name is required."),
+                  onChange: z.string().min(1, "Name is required."),
                 }}
                 children={(field) => (
                   <Field data-invalid={!field.state.meta.isValid}>

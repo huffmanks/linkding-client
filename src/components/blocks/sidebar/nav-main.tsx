@@ -1,10 +1,14 @@
 "use client";
 
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon, FolderIcon, HashIcon } from "lucide-react";
 
-import type { NavItem, SidebarLinkItem, SidebarParentItem } from "@/types";
+import { SIDEBAR_ITEMS } from "@/lib/constants";
+import { getAllQueryOptions } from "@/lib/queries";
+import type { SidebarLinkItem, SidebarParentItem } from "@/types";
 
+import AddMenu from "@/components/blocks/sidebar/add-menu";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
@@ -18,9 +22,38 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
-import AddMenu from "./add-menu";
+export function NavMain() {
+  const { data: folders } = useSuspenseQuery(getAllQueryOptions.folders);
+  const { data: tags } = useSuspenseQuery(getAllQueryOptions.tags);
 
-export function NavMain({ items }: { items: NavItem[] }) {
+  const folderItems =
+    folders?.results?.map((item) => ({
+      name: item.name,
+      url: `/dashboard/folders/${item.id}`,
+    })) || [];
+
+  const tagItems =
+    tags?.results?.map((item) => ({
+      name: item.name,
+      url: `/dashboard/tags/${item.name}`,
+    })) || [];
+
+  const items = [
+    ...SIDEBAR_ITEMS.navMain,
+    {
+      name: "Folders",
+      icon: FolderIcon,
+      isActive: false,
+      items: folderItems,
+    },
+    {
+      name: "Tags",
+      icon: HashIcon,
+      isActive: false,
+      items: tagItems,
+    },
+  ];
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel className="sr-only">Items</SidebarGroupLabel>

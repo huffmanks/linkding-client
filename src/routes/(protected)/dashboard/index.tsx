@@ -1,20 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-import { linkdingFetch } from "@/lib/api";
-import type { Bookmark } from "@/types";
+import { getAllQueryOptions } from "@/lib/queries";
 
 export const Route = createFileRoute("/(protected)/dashboard/")({
   component: RouteComponent,
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(getAllQueryOptions.bookmarks);
+  },
 });
 
 function RouteComponent() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["bookmarks"],
-    queryFn: () => linkdingFetch<{ results: Bookmark[] }>("bookmarks"),
-  });
-
-  if (isLoading) return <div>Loading...</div>;
+  const { data } = useSuspenseQuery(getAllQueryOptions.bookmarks);
 
   const hasBookmarks = data?.results && data?.results?.length;
 

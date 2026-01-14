@@ -1,10 +1,10 @@
 import { useForm } from "@tanstack/react-form";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
-import { linkdingFetch, useCreateBookmark } from "@/lib/api";
+import { useCreateBookmark } from "@/lib/api";
+import { getAllQueryOptions } from "@/lib/queries";
 import { cn } from "@/lib/utils";
-import type { Tag } from "@/types";
 
 import { ComboboxCreate } from "@/components/combobox-create";
 import CustomFieldError from "@/components/custom-field-error";
@@ -25,10 +25,7 @@ type AddBookmarkFormProps = React.ComponentProps<"div">;
 export function AddBookmarkForm({ className, ...props }: AddBookmarkFormProps) {
   const { mutate, isPending } = useCreateBookmark();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["tags"],
-    queryFn: () => linkdingFetch<{ results: Tag[] }>("tags"),
-  });
+  const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
   const initialItems = data?.results?.map((item) => item.name) || [];
 
@@ -109,23 +106,19 @@ export function AddBookmarkForm({ className, ...props }: AddBookmarkFormProps) {
             )}
           />
 
-          {isLoading ? (
-            <p>Loading tags...</p>
-          ) : (
-            <form.Field
-              name="tag_names"
-              children={(field) => (
-                <Field>
-                  <FieldLabel>Tags</FieldLabel>
-                  <ComboboxCreate
-                    value={field.state.value}
-                    initialItems={initialItems}
-                    onChange={(val) => field.handleChange(val)}
-                  />
-                </Field>
-              )}
-            />
-          )}
+          <form.Field
+            name="tag_names"
+            children={(field) => (
+              <Field>
+                <FieldLabel>Tags</FieldLabel>
+                <ComboboxCreate
+                  value={field.state.value}
+                  initialItems={initialItems}
+                  onChange={(val) => field.handleChange(val)}
+                />
+              </Field>
+            )}
+          />
 
           <form.Field
             name="notes"

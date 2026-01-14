@@ -17,13 +17,14 @@ export const SIDEBAR_ITEMS = {
   ],
   navSecondary: [
     {
-      title: "Settings",
+      name: "Settings",
       url: "/dashboard/settings",
       icon: SettingsIcon,
     },
     {
-      title: "Admin",
+      name: "Admin",
       url: `${import.meta.env.VITE_LINKDING_URL}/admin`,
+      isExternal: true,
       icon: ShieldUserIcon,
     },
   ],

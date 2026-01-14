@@ -9,6 +9,7 @@ export type NavItem = SidebarLinkItem | SidebarParentItem;
 export interface SidebarLinkItem {
   name: string;
   url: string;
+  isExternal?: boolean;
   icon: LucideIcon;
 }
 
