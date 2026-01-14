@@ -5,6 +5,15 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export function getCleanDomain(url: string): string {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname.replace(/^www\./, "");
+  } catch (e) {
+    return url;
+  }
+}
+
 interface Value {
   [key: string]: string | string[];
 }

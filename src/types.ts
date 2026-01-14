@@ -38,8 +38,8 @@ export interface Bookmark {
   unread: boolean;
   shared: boolean;
   tag_names: string[] | [];
-  date_added: Date;
-  date_modified: Date;
+  date_added: string;
+  date_modified: string;
   website_title: string | null;
   website_description: string | null;
 }
@@ -47,7 +47,7 @@ export interface Bookmark {
 export interface Asset {
   id: number;
   bookmark: number;
-  date_created: Date;
+  date_created: string;
   file_size: number;
   asset_type: string;
   content_type: string;
@@ -58,7 +58,7 @@ export interface Asset {
 export interface Tag {
   id: number;
   name: string;
-  date_added: Date;
+  date_added: string;
 }
 
 export interface Bundle {
@@ -69,8 +69,8 @@ export interface Bundle {
   all_tags: string;
   excluded_tags: string;
   order: number;
-  date_created: Date;
-  date_modified: Date;
+  date_created: string;
+  date_modified: string;
 }
 
 export interface UserProfile {
