@@ -15,5 +15,5 @@ export const Route = createFileRoute("/(protected)/dashboard/")({
 function RouteComponent() {
   const { data } = useSuspenseQuery(getAllQueryOptions.bookmarks);
 
-  return <BookmarkWrapper heading="Bookmarks" bookmarks={data.results} />;
+  return <BookmarkWrapper heading="All bookmarks" bookmarks={data.results} />;
 }

@@ -1,9 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+
+import { isAuthenticated } from "@/lib/auth";
 
 import { LoginForm } from "@/components/forms/login-form";
 
 export const Route = createFileRoute("/")({
   component: App,
+  beforeLoad: async () => {
+    const authed = await isAuthenticated();
+    if (authed) {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
 });
 
 function App() {

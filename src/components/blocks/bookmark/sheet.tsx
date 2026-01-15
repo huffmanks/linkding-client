@@ -1,7 +1,37 @@
-import type { Bookmark } from "@/types";
+import { useMemo } from "react";
 
+import { useQuery } from "@tanstack/react-query";
+import {
+  ExternalLinkIcon,
+  FileCodeIcon,
+  GlobeIcon,
+  LandmarkIcon,
+  Link2Icon,
+  ShieldIcon,
+} from "lucide-react";
+
+import { useIsMobile } from "@/hooks/use-mobile";
+import { linkdingFetch } from "@/lib/api";
+import type { Asset, Bookmark } from "@/types";
+
+import TagCloud from "@/components/tag-cloud";
 import { Badge } from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BookmarkSheetProps {
   bookmark: Bookmark;
@@ -10,38 +40,171 @@ interface BookmarkSheetProps {
 }
 
 export default function BookmarkSheet({ bookmark, isOpen, handleOpenChange }: BookmarkSheetProps) {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <Drawer open={isOpen} onOpenChange={handleOpenChange}>
+        <DrawerContent className="gap-0">
+          <DrawerHeader>
+            <DrawerTitle className="text-base font-medium">Details</DrawerTitle>
+            <DrawerDescription className="sr-only">Bookmark information</DrawerDescription>
+          </DrawerHeader>
+          <div className="scrollbar overflow-y-auto pb-8">
+            <Content bookmark={bookmark} />
+          </div>
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <Sheet open={isOpen} onOpenChange={handleOpenChange}>
       <SheetContent className="gap-0" side="right">
         <SheetHeader>
           <SheetTitle className="text-base font-medium">Details</SheetTitle>
+          <SheetDescription className="sr-only">Bookmark information</SheetDescription>
         </SheetHeader>
-        <div className="space-y-4 px-4">
-          {bookmark.preview_image_url && (
-            <img
-              className="w-full rounded-lg"
-              src={bookmark.preview_image_url}
-              alt={bookmark.title}
-            />
-          )}
-
-          <Badge variant="secondary">{bookmark.is_archived ? "Archived" : "Active"}</Badge>
-          <h2 className="text-lg font-bold">{bookmark.title}</h2>
-          <p className="text-muted-foreground">{bookmark.description}</p>
-
-          <div>external link input icon adornment to copy and visit</div>
-          <div>wayback link input icon adornment to copy and visit</div>
-          <div>snapshot link input icon adornment to copy and visit</div>
-
-          <div>tags section</div>
-          <div>notes section</div>
-
-          <div className="text-muted-foreground text-xs">
-            <p>Created: {bookmark.date_added}</p>
-            <p>Last modified: {bookmark.date_modified}</p>
-          </div>
-        </div>
+        <Content bookmark={bookmark} />
       </SheetContent>
     </Sheet>
+  );
+}
+
+function Content({ bookmark }: { bookmark: Bookmark }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["assets", bookmark.id],
+    queryFn: () => linkdingFetch<{ results: Asset[] }>(`bookmarks/${bookmark.id}/assets`),
+  });
+
+  const snapshot = useMemo(() => {
+    if (isLoading || !data?.results) return null;
+
+    const latestSnapshot = data.results
+      .filter((item) => item.asset_type === "snapshot")
+      .sort((a, b) => b.date_created.localeCompare(a.date_created))[0];
+
+    if (!latestSnapshot) return null;
+
+    return {
+      url: `${import.meta.env.VITE_LINKDING_URL}/assets/${latestSnapshot.id}`,
+      displayName: latestSnapshot.display_name,
+    };
+  }, [data?.results]);
+
+  return (
+    <div className="mt-3 px-4">
+      {bookmark.preview_image_url && (
+        <img
+          className="mb-3 w-full rounded-lg"
+          src={bookmark.preview_image_url}
+          alt={bookmark.title}
+        />
+      )}
+
+      <section className="mb-3 flex items-center gap-1">
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Badge size="icon" variant="outline">
+                {bookmark.shared ? (
+                  <GlobeIcon className="text-primary" />
+                ) : (
+                  <ShieldIcon className="text-primary" />
+                )}
+              </Badge>
+            }></TooltipTrigger>
+          <TooltipContent>
+            <p>{bookmark.shared ? "Public" : "Private"}</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Badge variant="secondary">{bookmark.is_archived ? "Archived" : "Active"}</Badge>
+      </section>
+
+      <section className="mb-5 space-y-1">
+        <h2 className="text-lg font-bold">{bookmark.title}</h2>
+        <p className="text-muted-foreground">{bookmark.description}</p>
+      </section>
+
+      <section className="mb-5 space-y-2">
+        <h3 className="font-medium">Links</h3>
+        <InputGroup>
+          <InputGroupInput disabled readOnly defaultValue={bookmark.url} className="truncate" />
+          <InputGroupAddon>
+            <Link2Icon className="stroke-foreground size-4" />
+          </InputGroupAddon>
+          <InputGroupAddon align="inline-end">
+            <a href={bookmark.url} target="_blank" rel="noopener noreferrer">
+              <ExternalLinkIcon className="text-primary size-4" />
+            </a>
+          </InputGroupAddon>
+        </InputGroup>
+
+        {bookmark?.web_archive_snapshot_url && (
+          <InputGroup>
+            <InputGroupInput
+              disabled
+              readOnly
+              defaultValue={bookmark.web_archive_snapshot_url}
+              className="truncate"
+            />
+            <InputGroupAddon>
+              <LandmarkIcon className="stroke-foreground size-4" />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end">
+              <a href={bookmark.web_archive_snapshot_url} target="_blank" rel="noopener noreferrer">
+                <ExternalLinkIcon className="text-primary size-4" />
+              </a>
+            </InputGroupAddon>
+          </InputGroup>
+        )}
+
+        {snapshot && (
+          <InputGroup>
+            <InputGroupInput
+              disabled
+              readOnly
+              defaultValue={snapshot.displayName}
+              className="truncate"
+            />
+            <InputGroupAddon>
+              <FileCodeIcon className="stroke-foreground size-4" />
+            </InputGroupAddon>
+            <InputGroupAddon align="inline-end">
+              <a href={snapshot.url} target="_blank" rel="noopener noreferrer">
+                <ExternalLinkIcon className="text-primary size-4" />
+              </a>
+            </InputGroupAddon>
+          </InputGroup>
+        )}
+      </section>
+
+      <section className="mb-5 space-y-2">
+        <h3 className="font-medium">Tags</h3>
+        {bookmark.tag_names.length ? (
+          <TagCloud tags={bookmark.tag_names} />
+        ) : (
+          <p className="text-muted-foreground text-sm">No tags exist for this bookmark.</p>
+        )}
+      </section>
+
+      <section className="mb-5 space-y-2">
+        <h3 className="font-medium">Notes</h3>
+        {bookmark.notes ? (
+          <textarea
+            className="scrollbar bg-accent/30 min-h-36 w-full resize-none rounded-md p-2 pr-3"
+            readOnly
+            defaultValue={bookmark.notes}></textarea>
+        ) : (
+          <p className="text-muted-foreground text-sm">No notes exist for this bookmark.</p>
+        )}
+      </section>
+
+      <section className="text-muted-foreground space-y-1 text-xs">
+        <p>Created: {bookmark.date_added}</p>
+        <p>Last modified: {bookmark.date_modified}</p>
+      </section>
+    </div>
   );
 }

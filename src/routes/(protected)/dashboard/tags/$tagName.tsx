@@ -4,6 +4,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { linkdingFetch } from "@/lib/api";
 import type { Bookmark } from "@/types";
 
+import BookmarkWrapper from "@/components/blocks/bookmark";
+
 const tagQueryOptions = (tagName: string) =>
   queryOptions({
     queryKey: ["bookmarks", tagName],
@@ -24,17 +26,5 @@ function RouteComponent() {
 
   const { data } = useSuspenseQuery(tagQueryOptions(tagName));
 
-  return (
-    <div>
-      <h1 className="mb-4 flex items-center gap-1 text-xl font-medium">
-        <span className="text-muted-foreground text-base">#</span>
-        <span>{tagName}</span>
-      </h1>
-      {data?.results.map((item) => (
-        <div key={item.id}>
-          <h2>{item.title}</h2>
-        </div>
-      ))}
-    </div>
-  );
+  return <BookmarkWrapper heading={`#${tagName}`} bookmarks={data.results} />;
 }

@@ -4,6 +4,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { linkdingFetch } from "@/lib/api";
 import type { Bookmark, Bundle } from "@/types";
 
+import BookmarkWrapper from "@/components/blocks/bookmark";
+
 const folderQueryOptions = (id: string) =>
   queryOptions({
     queryKey: ["bundles", id],
@@ -67,18 +69,5 @@ function FolderComponent() {
   const { data: folder } = useSuspenseQuery(folderQueryOptions(id));
   const { data: bookmarks } = useSuspenseQuery(folderBookmarksOptions(folder));
 
-  return (
-    <div>
-      <h1>Folder: {folder.name}</h1>
-      <p>
-        Query: <code>{folderBookmarksOptions(folder).queryKey[3]}</code>
-      </p>
-
-      <ul>
-        {bookmarks.results.map((bm) => (
-          <li key={bm.id}>{bm.title}</li>
-        ))}
-      </ul>
-    </div>
-  );
+  return <BookmarkWrapper heading={folder.name} bookmarks={bookmarks.results} />;
 }

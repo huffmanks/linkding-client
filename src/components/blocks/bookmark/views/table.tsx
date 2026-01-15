@@ -39,7 +39,7 @@ export default function BookmarkTableView({ bookmarks }: BookmarkTableViewProps)
       <Table className="w-full table-fixed">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-8"></TableHead>
+            <TableHead className="w-8.5"></TableHead>
             <TableHead className="w-80">Title</TableHead>
             <TableHead className="w-56">Link</TableHead>
             <TableHead>Description</TableHead>
@@ -50,20 +50,28 @@ export default function BookmarkTableView({ bookmarks }: BookmarkTableViewProps)
             <TableRow
               key={item.id}
               tabIndex={0}
+              role="button"
               className="hover:bg-muted/50 focus:bg-muted outline-none"
-              onClick={() => handleOpenSheet(item)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
                   handleOpenSheet(item);
                 }
               }}>
-              <TableCell className="cursor-pointer" onClick={() => handleOpenSheet(item)}>
+              <TableCell
+                role="button"
+                className="cursor-pointer"
+                onClick={() => handleOpenSheet(item)}>
                 {item.favicon_url && (
-                  <img className="size-4" src={item.favicon_url} alt={item.title} />
+                  <div className="flex items-center justify-center rounded-full border border-gray-50 bg-gray-200 shadow-lg">
+                    <img className="size-4" src={item.favicon_url} alt={item.title} />
+                  </div>
                 )}
               </TableCell>
-              <TableCell className="cursor-pointer truncate" onClick={() => handleOpenSheet(item)}>
+              <TableCell
+                role="button"
+                className="cursor-pointer truncate"
+                onClick={() => handleOpenSheet(item)}>
                 {item.title}
               </TableCell>
               <TableCell className="truncate">
@@ -76,6 +84,7 @@ export default function BookmarkTableView({ bookmarks }: BookmarkTableViewProps)
                 </a>
               </TableCell>
               <TableCell
+                role="button"
                 className="min-w-0 cursor-pointer truncate"
                 onClick={() => handleOpenSheet(item)}>
                 {item.description}
