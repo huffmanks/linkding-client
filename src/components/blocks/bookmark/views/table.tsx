@@ -63,7 +63,7 @@ export default function BookmarkTableView({ bookmarks }: BookmarkTableViewProps)
                 className="cursor-pointer"
                 onClick={() => handleOpenSheet(item)}>
                 {item.favicon_url && (
-                  <div className="flex items-center justify-center rounded-full border border-gray-50 bg-gray-200 shadow-lg">
+                  <div className="flex items-center justify-center overflow-hidden rounded-full border border-gray-50 bg-gray-200 shadow-lg">
                     <img className="size-4" src={item.favicon_url} alt={item.title} />
                   </div>
                 )}

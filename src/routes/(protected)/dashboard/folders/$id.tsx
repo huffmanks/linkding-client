@@ -5,6 +5,7 @@ import { linkdingFetch } from "@/lib/api";
 import type { Bookmark, Bundle } from "@/types";
 
 import BookmarkWrapper from "@/components/blocks/bookmark";
+import EmptyDescription from "@/components/empty-description";
 
 const folderQueryOptions = (id: string) =>
   queryOptions({
@@ -69,5 +70,12 @@ function FolderComponent() {
   const { data: folder } = useSuspenseQuery(folderQueryOptions(id));
   const { data: bookmarks } = useSuspenseQuery(folderBookmarksOptions(folder));
 
-  return <BookmarkWrapper heading={folder.name} bookmarks={bookmarks.results} />;
+  return (
+    <BookmarkWrapper
+      heading={folder.name}
+      isTagOrFolder
+      description={<EmptyDescription name={folder.name} />}
+      bookmarks={bookmarks.results}
+    />
+  );
 }

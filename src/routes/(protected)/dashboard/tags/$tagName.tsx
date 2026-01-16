@@ -5,6 +5,7 @@ import { linkdingFetch } from "@/lib/api";
 import type { Bookmark } from "@/types";
 
 import BookmarkWrapper from "@/components/blocks/bookmark";
+import EmptyDescription from "@/components/empty-description";
 
 const tagQueryOptions = (tagName: string) =>
   queryOptions({
@@ -26,5 +27,12 @@ function RouteComponent() {
 
   const { data } = useSuspenseQuery(tagQueryOptions(tagName));
 
-  return <BookmarkWrapper heading={`#${tagName}`} bookmarks={data.results} />;
+  return (
+    <BookmarkWrapper
+      heading={`#${tagName}`}
+      isTagOrFolder
+      description={<EmptyDescription name={tagName} isTag />}
+      bookmarks={data.results}
+    />
+  );
 }
