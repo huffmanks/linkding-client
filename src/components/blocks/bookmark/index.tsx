@@ -4,6 +4,7 @@ import { LayoutGridIcon, ListIcon, Table2Icon } from "lucide-react";
 
 import type { Bookmark } from "@/types";
 
+import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
 import BookmarkTableView from "@/components/blocks/bookmark/views/table";
@@ -25,7 +26,22 @@ export default function BookmarkWrapper({
   description,
   bookmarks,
 }: BookmarkWrapperProps) {
-  const [toggleView, setToggleView] = useState<ToggleView>("table");
+  const [toggleView, setToggleView] = useState<ToggleView>("list");
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedBookmark, setSelectedBookmark] = useState<Bookmark | null>(null);
+
+  function handleOpenSheet(bookmark: Bookmark) {
+    setSelectedBookmark(bookmark);
+    setIsOpen(true);
+  }
+
+  function handleOpenChange(open: boolean) {
+    setIsOpen(open);
+
+    if (!open) {
+      setSelectedBookmark(null);
+    }
+  }
 
   function handleValueChange(values: string[]) {
     const nextValue = values[values.length - 1] as ToggleView;
@@ -61,11 +77,25 @@ export default function BookmarkWrapper({
         </ToggleGroup>
       </div>
 
-      {toggleView === "grid" && <BookmarkGridView bookmarks={bookmarks} />}
+      {toggleView === "grid" && (
+        <BookmarkGridView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
+      )}
 
-      {toggleView === "list" && <BookmarkListView bookmarks={bookmarks} />}
+      {toggleView === "list" && (
+        <BookmarkListView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
+      )}
 
-      {toggleView === "table" && <BookmarkTableView bookmarks={bookmarks} />}
+      {toggleView === "table" && (
+        <BookmarkTableView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
+      )}
+
+      {selectedBookmark && (
+        <BookmarkSheet
+          isOpen={isOpen}
+          bookmark={selectedBookmark}
+          handleOpenChange={handleOpenChange}
+        />
+      )}
     </div>
   );
 }

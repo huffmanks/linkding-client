@@ -11,7 +11,7 @@ export default function Sidebar() {
         <SiteHeader />
         <div className="flex flex-1">
           <AppSidebar />
-          <SidebarInset>
+          <SidebarInset className="min-w-0">
             <div className="p-4">
               <Outlet />
             </div>
