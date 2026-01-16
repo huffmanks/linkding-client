@@ -16,3 +16,4 @@
    - [ ] [Create list view](src/components/blocks/bookmark/views/list.tsx)
    - [ ] [Table view](src/components/blocks/bookmark/views/table.tsx)
      - Add pagination.
+3. [ ] Refactor to use .env VITE_LINKDING_API_TOKEN instead of LocalStorage.

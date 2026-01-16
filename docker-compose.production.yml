@@ -8,6 +8,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      LINKDING_URL: ${LINKDING_URL}
-      LINKDING_API_TOKEN: ${LINKDING_API_TOKEN}
+      VITE_LINKDING_URL: ${VITE_LINKDING_URL}
+      VITE_LINKDING_API_TOKEN: ${VITE_LINKDING_API_TOKEN}
     restart: unless-stopped
