@@ -29,11 +29,11 @@ export interface Bookmark {
   id: number;
   url: string;
   title: string;
-  description: string;
+  description: string | null;
   notes: string | "";
   web_archive_snapshot_url: string | null;
   favicon_url: string | null;
-  preview_image_url: null;
+  preview_image_url: string | null;
   is_archived: boolean;
   unread: boolean;
   shared: boolean;

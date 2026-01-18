@@ -57,7 +57,7 @@ export default function BookmarkWrapper({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between gap-4">
+      <div className="mb-6 flex items-center justify-between gap-4 sm:px-2">
         <h1 className="text-xl font-medium">{heading}</h1>
 
         <ToggleGroup

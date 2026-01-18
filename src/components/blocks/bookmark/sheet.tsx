@@ -12,6 +12,7 @@ import {
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { linkdingFetch } from "@/lib/api";
+import { formatToLocalTime } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
 import TagCloud from "@/components/tag-cloud";
@@ -65,7 +66,9 @@ export default function BookmarkSheet({ bookmark, isOpen, handleOpenChange }: Bo
           <SheetTitle className="text-base font-medium">Details</SheetTitle>
           <SheetDescription className="sr-only">Bookmark information</SheetDescription>
         </SheetHeader>
-        <Content bookmark={bookmark} />
+        <div className="scrollbar overflow-y-auto pb-8">
+          <Content bookmark={bookmark} />
+        </div>
       </SheetContent>
     </Sheet>
   );
@@ -77,30 +80,48 @@ function Content({ bookmark }: { bookmark: Bookmark }) {
     queryFn: () => linkdingFetch<{ results: Asset[] }>(`bookmarks/${bookmark.id}/assets`),
   });
 
-  const snapshot = useMemo(() => {
+  const assets = useMemo(() => {
     if (isLoading || !data?.results) return null;
 
-    const latestSnapshot = data.results
+    const snapshots = data.results
       .filter((item) => item.asset_type === "snapshot")
-      .sort((a, b) => b.date_created.localeCompare(a.date_created))[0];
+      .sort((a, b) => b.date_created.localeCompare(a.date_created))
+      .map((item) => {
+        return {
+          url: `${import.meta.env.VITE_LINKDING_URL}/assets/${item.id}`,
+          displayName: `Created: ${formatToLocalTime(item.date_created)}`,
+        };
+      });
 
-    if (!latestSnapshot) return null;
+    let image = bookmark?.preview_image_url;
+
+    if (!image) {
+      const latestImage = data.results
+        .filter((item) => item.content_type?.startsWith("image/"))
+        .sort((a, b) => b.date_created.localeCompare(a.date_created))[0];
+
+      if (latestImage) {
+        image = `${import.meta.env.VITE_LINKDING_URL}/assets/${latestImage.id}`;
+      }
+    }
 
     return {
-      url: `${import.meta.env.VITE_LINKDING_URL}/assets/${latestSnapshot.id}`,
-      displayName: latestSnapshot.display_name,
+      ...(snapshots.length > 0 && { snapshots }),
+      ...(image && { image }),
     };
-  }, [data?.results]);
+  }, [data?.results, isLoading]);
 
   return (
     <div className="mt-3 px-4">
-      {bookmark.preview_image_url && (
-        <img
-          className="mb-3 w-full rounded-lg"
-          src={bookmark.preview_image_url}
-          alt={bookmark.title}
-        />
-      )}
+      <div className="mb-3">
+        {assets?.image && (
+          <img
+            className="max-h-64 w-full rounded-lg object-cover"
+            src={assets.image}
+            alt={bookmark.title}
+          />
+        )}
+      </div>
 
       <section className="mb-3 flex items-center gap-1">
         <Tooltip>
@@ -124,7 +145,11 @@ function Content({ bookmark }: { bookmark: Bookmark }) {
 
       <section className="mb-5 space-y-1">
         <h2 className="text-lg font-bold">{bookmark.title}</h2>
-        <p className="text-muted-foreground">{bookmark.description}</p>
+        {bookmark?.description ? (
+          <p className="text-muted-foreground">{bookmark.description}</p>
+        ) : (
+          <p className="text-muted-foreground text-sm">No description.</p>
+        )}
       </section>
 
       <section className="mb-5 space-y-2">
@@ -159,33 +184,38 @@ function Content({ bookmark }: { bookmark: Bookmark }) {
             </InputGroupAddon>
           </InputGroup>
         )}
-
-        {snapshot && (
-          <InputGroup>
-            <InputGroupInput
-              disabled
-              readOnly
-              defaultValue={snapshot.displayName}
-              className="truncate"
-            />
-            <InputGroupAddon>
-              <FileCodeIcon className="stroke-foreground size-4" />
-            </InputGroupAddon>
-            <InputGroupAddon align="inline-end">
-              <a href={snapshot.url} target="_blank" rel="noopener noreferrer">
-                <ExternalLinkIcon className="text-primary size-4" />
-              </a>
-            </InputGroupAddon>
-          </InputGroup>
-        )}
       </section>
+
+      {assets?.snapshots && (
+        <section className="mb-5 space-y-2">
+          <h3 className="font-medium">HTML snapshots</h3>
+          {assets.snapshots.map((snapshot) => (
+            <InputGroup key={snapshot.url}>
+              <InputGroupInput
+                disabled
+                readOnly
+                defaultValue={snapshot.displayName}
+                className="truncate"
+              />
+              <InputGroupAddon>
+                <FileCodeIcon className="stroke-foreground size-4" />
+              </InputGroupAddon>
+              <InputGroupAddon align="inline-end">
+                <a href={snapshot.url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLinkIcon className="text-primary size-4" />
+                </a>
+              </InputGroupAddon>
+            </InputGroup>
+          ))}
+        </section>
+      )}
 
       <section className="mb-5 space-y-2">
         <h3 className="font-medium">Tags</h3>
         {bookmark.tag_names.length ? (
           <TagCloud tags={bookmark.tag_names} />
         ) : (
-          <p className="text-muted-foreground text-sm">No tags exist for this bookmark.</p>
+          <p className="text-muted-foreground text-sm">No tags exist.</p>
         )}
       </section>
 
@@ -197,7 +227,7 @@ function Content({ bookmark }: { bookmark: Bookmark }) {
             readOnly
             defaultValue={bookmark.notes}></textarea>
         ) : (
-          <p className="text-muted-foreground text-sm">No notes exist for this bookmark.</p>
+          <p className="text-muted-foreground text-sm">No notes exist.</p>
         )}
       </section>
 

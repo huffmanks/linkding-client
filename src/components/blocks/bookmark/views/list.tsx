@@ -1,5 +1,7 @@
+import { Link } from "@tanstack/react-router";
 import { GlobeIcon, ShieldIcon } from "lucide-react";
 
+import { cn, getRelativeTimeString } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
 import BookmarkFavicon from "@/components/bookmark-favicon";
@@ -13,35 +15,77 @@ interface BookmarkListViewProps {
 
 export default function BookmarkListView({ bookmarks, handleOpenSheet }: BookmarkListViewProps) {
   return (
-    <div className="space-y-6">
+    <div className="max-w-3xl space-y-2">
       {bookmarks.map((bookmark) => (
-        <div key={bookmark.id}>
-          <section className="mb-1 flex items-center gap-2">
-            <BookmarkFavicon bookmark={bookmark} />
-            <h2 className="truncate text-sm font-medium">{bookmark.title}</h2>
+        <div
+          key={bookmark.id}
+          className="has-[[data-sheet-trigger]:focus-visible]:ring-primary/20 has-[[data-sheet-trigger]:hover]:ring-primary/20 rounded-md p-2 has-[[data-sheet-trigger]:focus-visible]:ring-1 has-[[data-sheet-trigger]:hover]:ring-1">
+          <section className="mb-1">
+            <a
+              className="decoration-primary hover:decoration-primary/70 focus-visible:decoration-primary/70 hover:text-primary/70 focus-visible:text-primary/70 flex items-center gap-2 underline underline-offset-4 transition-colors outline-none"
+              href={bookmark.url}
+              target="_blank"
+              rel="noopener noreferrer">
+              <BookmarkFavicon bookmark={bookmark} />
+              <h2 className="truncate text-sm font-medium">{bookmark.title}</h2>
+            </a>
           </section>
-          <section className="mb-2">
-            <p className="text-muted-foreground line-clamp-2 text-xs">{bookmark.description}</p>
-          </section>
-          <section className="mb-2 flex items-center gap-1">
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Badge size="icon" variant="outline">
-                    {bookmark.shared ? (
-                      <GlobeIcon className="text-primary" />
-                    ) : (
-                      <ShieldIcon className="text-primary" />
-                    )}
-                  </Badge>
-                }></TooltipTrigger>
-              <TooltipContent>
-                <p>{bookmark.shared ? "Public" : "Private"}</p>
-              </TooltipContent>
-            </Tooltip>
+          <div
+            tabIndex={0}
+            role="button"
+            data-sheet-trigger
+            className="cursor-pointer outline-none"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleOpenSheet(bookmark);
+              }
+            }}
+            onClick={() => handleOpenSheet(bookmark)}>
+            <section className="mb-2 space-y-1">
+              {bookmark?.description && (
+                <p className="text-muted-foreground line-clamp-2 text-xs">{bookmark.description}</p>
+              )}
+              <p className={cn("text-xs", !bookmark?.description && "mt-2")}>
+                {getRelativeTimeString(new Date(bookmark.date_added))}
+              </p>
+            </section>
+            <section className="mb-2 flex items-center gap-1">
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Badge size="icon" variant="outline">
+                      {bookmark.shared ? (
+                        <GlobeIcon className="text-primary" />
+                      ) : (
+                        <ShieldIcon className="text-primary" />
+                      )}
+                    </Badge>
+                  }></TooltipTrigger>
+                <TooltipContent>
+                  <p>{bookmark.shared ? "Public" : "Private"}</p>
+                </TooltipContent>
+              </Tooltip>
 
-            <Badge variant="secondary">{bookmark.is_archived ? "Archived" : "Active"}</Badge>
-          </section>
+              <Badge variant="secondary">{bookmark.is_archived ? "Archived" : "Active"}</Badge>
+
+              {bookmark?.tag_names &&
+                bookmark.tag_names.map((tag) => (
+                  <Link
+                    className="group outline-none"
+                    to="/dashboard/tags/$tagName"
+                    params={{ tagName: tag }}
+                    onClick={(e) => e.stopPropagation()}>
+                    <Badge
+                      key={tag}
+                      className="group-hover:bg-muted group-focus-visible:bg-muted group-hover:text-primary/80 group-focus-visible:text-primary/80 transition-colors outline-none"
+                      onClick={(e) => e.stopPropagation()}>
+                      #{tag}
+                    </Badge>
+                  </Link>
+                ))}
+            </section>
+          </div>
         </div>
       ))}
     </div>

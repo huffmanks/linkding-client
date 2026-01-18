@@ -54,3 +54,46 @@ export function processValue<T extends Value, R extends ReturnType>({
 
   return result as ProcessedValue<T, R>;
 }
+
+export function getRelativeTimeString(date: Date | number, lang = navigator.language): string {
+  const timeMs = typeof date === "number" ? date : date.getTime();
+  const diff = timeMs - Date.now();
+  const absDiff = Math.abs(diff);
+
+  const units: { unit: Intl.RelativeTimeFormatUnit; ms: number }[] = [
+    { unit: "year", ms: 31536000000 },
+    { unit: "month", ms: 2592000000 },
+    { unit: "day", ms: 86400000 },
+    { unit: "hour", ms: 3600000 },
+    { unit: "minute", ms: 60000 },
+    { unit: "second", ms: 1000 },
+  ];
+
+  for (const { unit, ms } of units) {
+    if (absDiff >= ms || unit === "second") {
+      const value = Math.round(diff / ms);
+      const rtf = new Intl.RelativeTimeFormat(lang, { numeric: "auto" });
+      return rtf.format(value, unit);
+    }
+  }
+
+  return "";
+}
+
+export function formatToLocalTime(isoString: string): string {
+  const date = new Date(isoString);
+
+  if (isNaN(date.getTime())) {
+    return "Invalid Date";
+  }
+
+  return new Intl.DateTimeFormat(navigator.language, {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+  }).format(date);
+}
