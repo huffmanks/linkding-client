@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { Link } from "@tanstack/react-router";
 
-import { SIDEBAR_ITEMS } from "@/lib/constants";
+import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
 
 import { NavMain } from "@/components/blocks/sidebar/nav-main";
 import { NavSecondary } from "@/components/blocks/sidebar/nav-secondary";
@@ -18,7 +18,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+import type { ActiveModal } from ".";
+
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
+};
+
+export function AppSidebar({ setActiveModal, ...props }: AppSidebarProps) {
   return (
     <Sidebar className="top-(--header-height) h-[calc(100svh-var(--header-height))]!" {...props}>
       <SidebarHeader>
@@ -51,10 +57,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain />
+        <NavMain setActiveModal={setActiveModal} />
       </SidebarContent>
       <SidebarFooter>
-        <NavSecondary items={SIDEBAR_ITEMS.navSecondary} className="mt-auto" />
+        <NavSecondary items={SIDEBAR_NAV_SECONDARY} className="mt-auto" />
       </SidebarFooter>
     </Sidebar>
   );

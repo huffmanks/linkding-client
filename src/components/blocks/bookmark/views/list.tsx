@@ -72,12 +72,12 @@ export default function BookmarkListView({ bookmarks, handleOpenSheet }: Bookmar
               {bookmark?.tag_names &&
                 bookmark.tag_names.map((tag) => (
                   <Link
+                    key={tag}
                     className="group outline-none"
                     to="/dashboard/tags/$tagName"
                     params={{ tagName: tag }}
                     onClick={(e) => e.stopPropagation()}>
                     <Badge
-                      key={tag}
                       className="group-hover:bg-muted group-focus-visible:bg-muted group-hover:text-primary/80 group-focus-visible:text-primary/80 transition-colors outline-none"
                       onClick={(e) => e.stopPropagation()}>
                       #{tag}

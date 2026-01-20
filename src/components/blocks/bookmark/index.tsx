@@ -1,8 +1,10 @@
 import { useState } from "react";
 
 import { LayoutGridIcon, ListIcon, Table2Icon } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
 
-import type { Bookmark } from "@/types";
+import { useSettingsStore } from "@/lib/store";
+import type { Bookmark, View } from "@/types";
 
 import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
@@ -18,17 +20,21 @@ interface BookmarkWrapperProps {
   bookmarks: Bookmark[];
 }
 
-type ToggleView = "grid" | "list" | "table";
-
 export default function BookmarkWrapper({
   heading,
   isTagOrFolder,
   description,
   bookmarks,
 }: BookmarkWrapperProps) {
-  const [toggleView, setToggleView] = useState<ToggleView>("list");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedBookmark, setSelectedBookmark] = useState<Bookmark | null>(null);
+
+  const { view, setView } = useSettingsStore(
+    useShallow((state) => ({
+      view: state.view,
+      setView: state.setView,
+    }))
+  );
 
   function handleOpenSheet(bookmark: Bookmark) {
     setSelectedBookmark(bookmark);
@@ -44,10 +50,10 @@ export default function BookmarkWrapper({
   }
 
   function handleValueChange(values: string[]) {
-    const nextValue = values[values.length - 1] as ToggleView;
+    const nextValue = values[values.length - 1] as View;
 
     if (nextValue) {
-      setToggleView(nextValue);
+      setView(nextValue);
     }
   }
 
@@ -63,7 +69,7 @@ export default function BookmarkWrapper({
         <ToggleGroup
           variant="outline"
           multiple={false}
-          value={[toggleView]}
+          value={[view]}
           onValueChange={handleValueChange}>
           <ToggleGroupItem value="grid" aria-label="Grid view">
             <LayoutGridIcon />
@@ -77,15 +83,15 @@ export default function BookmarkWrapper({
         </ToggleGroup>
       </div>
 
-      {toggleView === "grid" && (
+      {view === "grid" && (
         <BookmarkGridView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
       )}
 
-      {toggleView === "list" && (
+      {view === "list" && (
         <BookmarkListView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
       )}
 
-      {toggleView === "table" && (
+      {view === "table" && (
         <BookmarkTableView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
       )}
 

@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { ChevronRightIcon, FolderIcon, HashIcon } from "lucide-react";
 
-import { SIDEBAR_ITEMS } from "@/lib/constants";
+import { SIDEBAR_NAV_MAIN } from "@/lib/constants";
 import { getAllQueryOptions } from "@/lib/queries";
-import type { SidebarLinkItem, SidebarParentItem } from "@/types";
+import type { SidebarNavItem, SidebarSubNavItem } from "@/types";
 
-import AddMenu from "@/components/blocks/sidebar/add-menu";
+import type { ActiveModal } from "@/components/blocks/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
@@ -20,64 +22,126 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
-export function NavMain() {
+interface NavMainProps {
+  setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
+}
+
+export function NavMain({ setActiveModal }: NavMainProps) {
   const { data: folders } = useSuspenseQuery(getAllQueryOptions.folders);
   const { data: tags } = useSuspenseQuery(getAllQueryOptions.tags);
 
+  const { isMobile, setOpenMobile } = useSidebar();
+  const { pathname } = useLocation();
+
+  const checkActive = (url?: string) => !!url && pathname === url;
+
   const folderItems =
-    folders?.results?.map((item) => ({
-      name: item.name,
-      url: `/dashboard/folders/${item.id}`,
-    })) || [];
+    folders?.results?.map((item) => {
+      const url = `/dashboard/folders/${item.id}`;
+
+      return {
+        name: item.name,
+        url,
+        isActive: checkActive(url),
+      };
+    }) || [];
 
   const tagItems =
-    tags?.results?.map((item) => ({
-      name: item.name,
-      url: `/dashboard/tags/${item.name}`,
-    })) || [];
+    tags?.results?.map((item) => {
+      const url = `/dashboard/tags/${item.name}`;
+      return {
+        name: item.name,
+        url,
+        isActive: checkActive(url),
+      };
+    }) || [];
 
   const items = [
-    ...SIDEBAR_ITEMS.navMain,
+    ...SIDEBAR_NAV_MAIN.map((item) => {
+      const subItems =
+        item.items?.map((sub) => ({
+          ...sub,
+          isActive: checkActive(sub.url),
+        })) || [];
+
+      return {
+        ...item,
+        items: subItems,
+      };
+    }),
     {
       name: "Folders",
       icon: FolderIcon,
-      isActive: false,
+      isActive: folderItems.some((folder) => folder.isActive),
+      isCollapsible: true,
       items: folderItems,
     },
     {
       name: "Tags",
       icon: HashIcon,
-      isActive: false,
+      isActive: tagItems.some((tag) => tag.isActive),
+      isCollapsible: true,
       items: tagItems,
     },
-  ];
+  ] as SidebarNavItem[];
+
+  function handleCloseSidebar() {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel className="sr-only">Items</SidebarGroupLabel>
       <SidebarMenu>
-        <SidebarMenuItem>
-          <AddMenu />
-        </SidebarMenuItem>
-        {items.map((item) => {
-          if ("url" in item) {
-            return <NavLinkItem key={item.name} item={item} />;
-          }
-          return <NavParentItem key={item.name} item={item} />;
-        })}
+        {items.map((item) =>
+          item?.url ? (
+            <NavLinkItem key={item.name} item={item} handleCloseSidebar={handleCloseSidebar} />
+          ) : item?.isCollapsible ? (
+            <NavCollapsibleItem
+              key={item.name}
+              item={item}
+              handleCloseSidebar={handleCloseSidebar}
+              setActiveModal={setActiveModal}
+            />
+          ) : item?.items ? (
+            <SidebarMenuItem key={item.name}>
+              <SidebarMenuButton className="opacity-100!" isActive={false} disabled>
+                <item.icon />
+                <span>{item.name}</span>
+              </SidebarMenuButton>
+              <SidebarMenuSub>
+                <SubNavItems
+                  items={item.items}
+                  handleCloseSidebar={handleCloseSidebar}
+                  setActiveModal={setActiveModal}
+                />
+              </SidebarMenuSub>
+            </SidebarMenuItem>
+          ) : null
+        )}
       </SidebarMenu>
     </SidebarGroup>
   );
 }
 
-function NavLinkItem({ item }: { item: SidebarLinkItem }) {
+function NavLinkItem({
+  item,
+  handleCloseSidebar,
+}: {
+  item: SidebarNavItem;
+  handleCloseSidebar: () => void;
+}) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
+        isActive={item.isActive}
         render={
-          <Link to={item.url}>
+          <Link to={item.url} onClick={handleCloseSidebar}>
             <item.icon />
             <span>{item.name}</span>
           </Link>
@@ -86,12 +150,59 @@ function NavLinkItem({ item }: { item: SidebarLinkItem }) {
   );
 }
 
-function NavParentItem({ item }: { item: SidebarParentItem }) {
-  const hasItems = item.items !== null && item.items?.length > 0;
+function SubNavItems({
+  items = [],
+  handleCloseSidebar,
+  setActiveModal,
+}: {
+  items?: SidebarSubNavItem[];
+  handleCloseSidebar: () => void;
+  setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
+}) {
+  function handleClick() {
+    handleCloseSidebar();
+    setActiveModal("tag-form");
+  }
+  return (
+    <>
+      {items.map((subItem) => (
+        <SidebarMenuSubItem key={subItem.name}>
+          {subItem.isModal ? (
+            <SidebarMenuSubButton className="cursor-pointer" onClick={handleClick}>
+              {subItem.name}
+            </SidebarMenuSubButton>
+          ) : (
+            <SidebarMenuSubButton
+              isActive={subItem.isActive}
+              render={
+                <Link to={subItem.url} onClick={handleCloseSidebar}>
+                  <span>{subItem.name}</span>
+                </Link>
+              }></SidebarMenuSubButton>
+          )}
+        </SidebarMenuSubItem>
+      ))}
+    </>
+  );
+}
+
+function NavCollapsibleItem({
+  item,
+  handleCloseSidebar,
+  setActiveModal,
+}: {
+  item: SidebarNavItem;
+  handleCloseSidebar: () => void;
+  setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
+}) {
+  const [isOpen, setIsOpen] = useState(item.isActive);
+
+  const hasItems = !!item.items?.length;
 
   return (
     <Collapsible
-      defaultOpen={item.isActive}
+      open={isOpen}
+      onOpenChange={setIsOpen}
       render={
         <SidebarMenuItem>
           <CollapsibleTrigger
@@ -120,16 +231,11 @@ function NavParentItem({ item }: { item: SidebarParentItem }) {
             <>
               <CollapsibleContent className="py-2">
                 <SidebarMenuSub className="scrollbar max-h-48 overflow-y-auto">
-                  {item.items!.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.name}>
-                      <SidebarMenuSubButton
-                        render={
-                          <Link to={subItem.url}>
-                            <span>{subItem.name}</span>
-                          </Link>
-                        }></SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))}
+                  <SubNavItems
+                    items={item.items}
+                    handleCloseSidebar={handleCloseSidebar}
+                    setActiveModal={setActiveModal}
+                  />
                 </SidebarMenuSub>
               </CollapsibleContent>
             </>

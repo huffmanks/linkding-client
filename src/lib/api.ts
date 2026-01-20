@@ -1,14 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-const BASE_URL = "/api";
-const API_TOKEN = import.meta.env.VITE_LINKDING_API_TOKEN;
+import { useSettingsStore } from "@/lib/store";
 
 export async function linkdingFetch<T>(
   endpoint: string,
   { params, ...options }: RequestInit & { params?: Record<string, string> } = {}
 ): Promise<T> {
+  const baseUrl = "/api";
+  const { token } = useSettingsStore.getState();
+
   const path = endpoint.endsWith("/") ? endpoint : `${endpoint}/`;
-  let url = `${BASE_URL}/${path}`;
+  let url = `${baseUrl}/${path}`;
 
   if (params) {
     const searchParams = new URLSearchParams(params);
@@ -18,7 +20,7 @@ export async function linkdingFetch<T>(
   const response = await fetch(url, {
     ...options,
     headers: {
-      Authorization: `Token ${API_TOKEN}`,
+      Authorization: `Token ${token}`,
       "Content-Type": "application/json",
       ...options?.headers,
     },

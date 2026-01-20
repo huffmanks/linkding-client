@@ -1,32 +1,32 @@
-import { LS_LINKDING_TOKEN, LS_LINKDING_USERNAME } from "@/lib/constants";
+import { useSettingsStore } from "@/lib/store";
 
-export async function login({ token, username }: { token: string; username: string }) {
+export async function login({ username }: { username: string }) {
+  const token = import.meta.env.VITE_LINKDING_API_TOKEN;
+
+  if (!token) return false;
+
   const isValid = await validate({ token });
 
   if (isValid) {
-    localStorage.setItem(LS_LINKDING_TOKEN, token);
-    localStorage.setItem(LS_LINKDING_USERNAME, username);
+    const { setUsername, setToken } = useSettingsStore.getState();
+
+    setUsername(username);
+    setToken(token);
     return true;
   } else {
-    console.error("Failed to validate Linkding session.");
+    console.error("Failed to validate Linkding API token.");
     return false;
   }
 }
 
 export function logout() {
-  localStorage.removeItem(LS_LINKDING_TOKEN);
-  localStorage.removeItem(LS_LINKDING_USERNAME);
-}
-
-export function getUsername() {
-  const username = localStorage.getItem(LS_LINKDING_USERNAME);
-
-  return username ? username : "Default";
+  const { setUsername, setToken } = useSettingsStore.getState();
+  setUsername(null);
+  setToken(null);
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const token = localStorage.getItem(LS_LINKDING_TOKEN);
-  const username = localStorage.getItem(LS_LINKDING_USERNAME);
+  const { username, token } = useSettingsStore.getState();
 
   if (!token || !username) {
     return false;

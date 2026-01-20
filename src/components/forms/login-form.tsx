@@ -19,7 +19,6 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
   const form = useForm({
     defaultValues: {
       username: "",
-      token: "",
     },
     onSubmit: async ({ value }) => {
       const ok = await login({ ...value });
@@ -72,31 +71,6 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                     <Input
                       id="username"
                       type="text"
-                      value={field.state.value}
-                      aria-invalid={!field.state.meta.isValid}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                    {!field.state.meta.isValid && (
-                      <CustomFieldError errors={field.state.meta.errors} />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <form.Field
-                name="token"
-                validators={{
-                  onBlur: z
-                    .hash("sha1", { error: "API token is not valid." })
-                    .min(1, { error: "API token is required." }),
-                }}
-                children={(field) => (
-                  <Field data-invalid={!field.state.meta.isValid}>
-                    <FieldLabel htmlFor="token">Linkding API token</FieldLabel>
-                    <Input
-                      id="token"
-                      type="password"
                       value={field.state.value}
                       aria-invalid={!field.state.meta.isValid}
                       onBlur={field.handleBlur}

@@ -8,7 +8,7 @@ import reportWebVitals from "@/reportWebVitals.ts";
 import { routeTree } from "@/routeTree.gen";
 import "@/styles.css";
 
-import { ThemeProvider } from "@/components/theme-provider.tsx";
+import ThemeWatcher from "@/components/theme-watcher";
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
 const router = createRouter({
@@ -35,9 +35,8 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <RouterProvider router={router} />
-        </ThemeProvider>
+        <ThemeWatcher />
+        <RouterProvider router={router} />
       </TanStackQueryProvider.Provider>
     </StrictMode>
   );

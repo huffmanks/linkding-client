@@ -1,31 +1,54 @@
-import { BookmarkIcon, SettingsIcon, ShieldUserIcon } from "lucide-react";
+import { BookmarkIcon, PlusIcon, SettingsIcon, ShieldUserIcon } from "lucide-react";
+
+import type { SidebarNavItem } from "@/types";
 
 export const APP_TITLE = "EchoLink";
 export const APP_DESCRIPTION = "Self-hosted client app for Linkding.";
 
-export const LS_PREFIX = "echo_link";
-export const LS_LINKDING_TOKEN = `${LS_PREFIX}_linkding_token`;
-export const LS_LINKDING_USERNAME = `${LS_PREFIX}_username`;
+export const SIDEBAR_NAV_MAIN = [
+  {
+    name: "Add",
+    isActive: false,
+    icon: PlusIcon,
+    items: [
+      {
+        name: "Bookmark",
+        url: "/dashboard/bookmarks/add",
+        isActive: false,
+      },
+      {
+        name: "Folder",
+        url: "/dashboard/folders/add",
+        isActive: false,
+      },
+      {
+        name: "Tag",
+        isActive: false,
+        isModal: true,
+      },
+    ],
+  },
+  {
+    name: "Bookmarks",
+    url: "/dashboard",
+    isActive: false,
+    icon: BookmarkIcon,
+  },
+] as SidebarNavItem[];
 
-export const SIDEBAR_ITEMS = {
-  navMain: [
-    {
-      name: "Bookmarks",
-      url: "/dashboard",
-      icon: BookmarkIcon,
-    },
-  ],
-  navSecondary: [
-    {
-      name: "Settings",
-      url: "/dashboard/settings",
-      icon: SettingsIcon,
-    },
-    {
-      name: "Admin",
-      url: `${import.meta.env.VITE_LINKDING_URL}/admin`,
-      isExternal: true,
-      icon: ShieldUserIcon,
-    },
-  ],
-};
+export const SIDEBAR_NAV_SECONDARY = [
+  {
+    name: "Settings",
+    url: "/dashboard/settings",
+    isActive: false,
+    isExternal: false,
+    icon: SettingsIcon,
+  },
+  {
+    name: "Admin",
+    url: `${import.meta.env.VITE_LINKDING_URL}/admin`,
+    isActive: false,
+    isExternal: true,
+    icon: ShieldUserIcon,
+  },
+] as SidebarNavItem[];

@@ -5,7 +5,7 @@ import z from "zod";
 
 import { useCreateTag } from "@/lib/api";
 
-import type { ModalType } from "@/components/blocks/sidebar/add-menu";
+import type { ActiveModal } from "@/components/blocks/sidebar";
 import CustomFieldError from "@/components/custom-field-error";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,10 +19,10 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 
 interface AddTagFormProps {
-  setModalType: Dispatch<SetStateAction<ModalType>>;
+  setOpenTagModal: Dispatch<SetStateAction<ActiveModal>>;
 }
 
-export function AddTagForm({ setModalType }: AddTagFormProps) {
+export function AddTagForm({ setOpenTagModal }: AddTagFormProps) {
   const { mutate, isPending } = useCreateTag();
 
   const form = useForm({
@@ -31,7 +31,7 @@ export function AddTagForm({ setModalType }: AddTagFormProps) {
     },
     onSubmit: async ({ value }) => {
       mutate(value);
-      setModalType(null);
+      setOpenTagModal(null);
     },
   });
 

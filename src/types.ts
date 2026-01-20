@@ -1,29 +1,24 @@
 import type { LucideIcon } from "lucide-react";
 
-export interface SidebarNavMain {
-  items: NavItem[];
-}
-
-export type NavItem = SidebarLinkItem | SidebarParentItem;
-
-export interface SidebarLinkItem {
+export interface SidebarNavItem {
   name: string;
-  url: string;
-  isExternal?: boolean;
-  icon: LucideIcon;
-}
-
-export interface SidebarParentItem {
-  name: string;
+  url?: string;
   icon: LucideIcon;
   isActive: boolean;
-  items: SidebarChildItem[] | null;
+  isExternal?: boolean;
+  isCollapsible?: boolean;
+  items?: SidebarSubNavItem[];
 }
 
-export interface SidebarChildItem {
+export interface SidebarSubNavItem {
   name: string;
-  url: string;
+  url?: string;
+  isActive: boolean;
+  isModal?: boolean;
 }
+
+export type View = "table" | "list" | "grid";
+export type Theme = "light" | "dark" | "system";
 
 export interface Bookmark {
   id: number;

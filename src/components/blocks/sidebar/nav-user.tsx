@@ -3,7 +3,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 
-import { getUsername, logout } from "@/lib/auth";
+import { logout } from "@/lib/auth";
+import { useSettingsStore } from "@/lib/store";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -20,8 +21,8 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui
 export function NavUser() {
   const navigate = useNavigate();
 
-  const username = getUsername();
-  const initial = username.charAt(0).toUpperCase();
+  const username = useSettingsStore((state) => state.username);
+  const initial = username ? username.charAt(0).toUpperCase() : "E";
 
   function handleLogout() {
     logout();
