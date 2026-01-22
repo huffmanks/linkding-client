@@ -59,6 +59,52 @@ export function useCreateBookmark() {
   });
 }
 
+export function useDeleteBookmark() {
+  const queryClient = useQueryClient();
+  const { token } = useSettingsStore.getState();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/bookmarks/${id}/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+    },
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries({ queryKey: ["bookmarks"] });
+
+      const previousBookmarks = queryClient.getQueryData(["bookmarks"]);
+
+      queryClient.setQueriesData({ queryKey: ["bookmarks"] }, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          count: old.count - 1,
+          results: old.results.filter((b: any) => b.id !== deletedId),
+        };
+      });
+
+      return { previousBookmarks };
+    },
+
+    onError: (err, _, context) => {
+      queryClient.setQueryData(["bookmarks"], context?.previousBookmarks);
+      console.error("Failed to delete bookmark:", err);
+    },
+
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+    },
+  });
+}
+
 interface CreateFolderInput {
   name: string;
   search: string;

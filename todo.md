@@ -9,5 +9,3 @@
    - [ ] [Notes textarea](src/components/blocks/bookmark/sheet.tsx#L193)
      - Refactor to render markdown.
      - Also add ability to edit.
-2. [Views](src/components/blocks/bookmark/views)
-   - [ ] Add pagination to list and table view.

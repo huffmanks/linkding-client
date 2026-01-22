@@ -11,12 +11,24 @@ import {
 } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { linkdingFetch } from "@/lib/api";
+import { linkdingFetch, useDeleteBookmark } from "@/lib/api";
 import { formatToLocalTime } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
 import TagCloud from "@/components/tag-cloud";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
@@ -52,7 +64,7 @@ export default function BookmarkSheet({ bookmark, isOpen, handleOpenChange }: Bo
             <DrawerDescription className="sr-only">Bookmark information</DrawerDescription>
           </DrawerHeader>
           <div className="scrollbar overflow-y-auto pb-8">
-            <Content bookmark={bookmark} />
+            <Content bookmark={bookmark} handleOpenChange={handleOpenChange} />
           </div>
         </DrawerContent>
       </Drawer>
@@ -67,18 +79,26 @@ export default function BookmarkSheet({ bookmark, isOpen, handleOpenChange }: Bo
           <SheetDescription className="sr-only">Bookmark information</SheetDescription>
         </SheetHeader>
         <div className="scrollbar overflow-y-auto pb-8">
-          <Content bookmark={bookmark} />
+          <Content bookmark={bookmark} handleOpenChange={handleOpenChange} />
         </div>
       </SheetContent>
     </Sheet>
   );
 }
 
-function Content({ bookmark }: { bookmark: Bookmark }) {
+function Content({
+  bookmark,
+  handleOpenChange,
+}: {
+  bookmark: Bookmark;
+  handleOpenChange: (open: boolean) => void;
+}) {
   const { data, isLoading } = useQuery({
     queryKey: ["assets", bookmark.id],
     queryFn: () => linkdingFetch<{ results: Asset[] }>(`bookmarks/${bookmark.id}/assets`),
   });
+
+  const { mutate } = useDeleteBookmark();
 
   const assets = useMemo(() => {
     if (isLoading || !data?.results) return null;
@@ -231,9 +251,39 @@ function Content({ bookmark }: { bookmark: Bookmark }) {
         )}
       </section>
 
-      <section className="text-muted-foreground space-y-1 text-xs">
+      <section className="text-muted-foreground mb-5 space-y-1 text-xs">
         <p>Created: {bookmark.date_added}</p>
         <p>Last modified: {bookmark.date_modified}</p>
+      </section>
+      <section>
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={
+              <Button className="cursor-pointer" variant="destructive">
+                Delete
+              </Button>
+            }></AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this bookmark.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                className="cursor-pointer"
+                onClick={() => {
+                  handleOpenChange(false);
+                  mutate(bookmark.id);
+                }}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </section>
     </div>
   );
