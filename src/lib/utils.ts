@@ -97,3 +97,30 @@ export function formatToLocalTime(isoString: string): string {
     hour12: true,
   }).format(date);
 }
+
+export function getPageNumbers(current: number, total: number) {
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages: (number | string)[] = [];
+  pages.push(1);
+
+  if (current > 3) {
+    pages.push("ellipsis-start");
+  }
+
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  if (current < total - 2) {
+    pages.push("ellipsis-end");
+  }
+
+  pages.push(total);
+  return pages;
+}

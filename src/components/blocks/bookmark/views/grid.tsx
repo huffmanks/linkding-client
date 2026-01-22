@@ -30,7 +30,9 @@ export default function BookmarkGridView({ bookmarks, handleOpenSheet }: Bookmar
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {bookmarks.map((bookmark) => (
-        <Card className="group/card has-[[data-sheet-trigger]:focus-visible]:ring-primary/20 has-[[data-sheet-trigger]:hover]:ring-primary/20 cursor-pointer gap-4 pt-0 pb-4 transition-all has-[[data-sheet-trigger]:focus-visible]:opacity-50 has-[[data-sheet-trigger]:focus-visible]:ring-1 has-[[data-sheet-trigger]:hover]:opacity-50 has-[[data-sheet-trigger]:hover]:ring-1">
+        <Card
+          key={bookmark.id}
+          className="group/card has-[[data-sheet-trigger]:focus-visible]:ring-primary/20 has-[[data-sheet-trigger]:hover]:ring-primary/20 cursor-pointer gap-4 pt-0 pb-4 transition-all has-[[data-sheet-trigger]:focus-visible]:opacity-50 has-[[data-sheet-trigger]:focus-visible]:ring-1 has-[[data-sheet-trigger]:hover]:opacity-50 has-[[data-sheet-trigger]:hover]:ring-1">
           <CardImage bookmark={bookmark} />
           <CardHeader className="px-3">
             <CardTitle className="min-w-0">

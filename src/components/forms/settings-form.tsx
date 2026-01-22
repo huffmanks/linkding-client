@@ -30,40 +30,32 @@ import {
 type SettingsFormProps = React.ComponentProps<"div">;
 
 export function SettingsForm({ className, ...props }: SettingsFormProps) {
-  const {
-    username,
-    view,
-    theme,
-    resultsPerPage,
-    setUsername,
-    setView,
-    setTheme,
-    setResultsPerPage,
-  } = useSettingsStore(
-    useShallow((state) => ({
-      username: state.username,
-      view: state.view,
-      theme: state.theme,
-      resultsPerPage: state.resultsPerPage,
-      setUsername: state.setUsername,
-      setView: state.setView,
-      setTheme: state.setTheme,
-      setResultsPerPage: state.setResultsPerPage,
-    }))
-  );
+  const { username, view, theme, limit, setUsername, setView, setTheme, setLimit } =
+    useSettingsStore(
+      useShallow((state) => ({
+        username: state.username,
+        view: state.view,
+        theme: state.theme,
+        limit: state.limit,
+        setUsername: state.setUsername,
+        setView: state.setView,
+        setTheme: state.setTheme,
+        setLimit: state.setLimit,
+      }))
+    );
 
   const form = useForm({
     defaultValues: {
       username: username ?? "",
       view,
       theme,
-      resultsPerPage,
+      limit,
     },
     onSubmit: async ({ value }) => {
       setUsername(value.username);
       setView(value.view);
       setTheme(value.theme);
-      setResultsPerPage(Number(value.resultsPerPage));
+      setLimit(Number(value.limit));
     },
   });
 
@@ -191,15 +183,15 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
             />
 
             <form.Field
-              name="resultsPerPage"
+              name="limit"
               validators={{
                 onChange: z.number().min(10, "Must have a minimum of 10."),
               }}
               children={(field) => (
                 <Field data-invalid={!field.state.meta.isValid}>
-                  <FieldLabel htmlFor="resultsPerPage">Results per page</FieldLabel>
+                  <FieldLabel htmlFor="limit">Results per page</FieldLabel>
                   <Input
-                    id="resultsPerPage"
+                    id="limit"
                     name={field.name}
                     type="number"
                     value={field.state.value}

@@ -3,34 +3,49 @@ import { useState } from "react";
 import { LayoutGridIcon, ListIcon, Table2Icon } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
+import { usePagination } from "@/hooks/use-pagination";
 import { useSettingsStore } from "@/lib/store";
-import type { Bookmark, View } from "@/types";
+import type { Bookmark, PaginatedResponse, View } from "@/types";
 
 import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
 import BookmarkTableView from "@/components/blocks/bookmark/views/table";
 import EmptyBookmarks from "@/components/empty-bookmarks";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface BookmarkWrapperProps {
   heading: string;
   isTagOrFolder?: boolean;
   description?: React.ReactNode;
-  bookmarks: Bookmark[];
+  bookmarkData: PaginatedResponse<Bookmark>;
+  offset?: number;
+  onOffsetChange: (offset: number) => void;
 }
 
 export default function BookmarkWrapper({
   heading,
   isTagOrFolder,
   description,
-  bookmarks,
+  bookmarkData,
+  offset = 0,
+  onOffsetChange,
 }: BookmarkWrapperProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedBookmark, setSelectedBookmark] = useState<Bookmark | null>(null);
 
-  const { view, setView } = useSettingsStore(
+  const { limit, view, setView } = useSettingsStore(
     useShallow((state) => ({
+      limit: state.limit,
       view: state.view,
       setView: state.setView,
     }))
@@ -57,7 +72,24 @@ export default function BookmarkWrapper({
     }
   }
 
-  if (!bookmarks.length) {
+  const {
+    currentPage,
+    pageNumbers,
+    handleNext,
+    handlePrevious,
+    handlePageClick,
+    hasNext,
+    hasPrevious,
+  } = usePagination({
+    offset,
+    limit,
+    totalCount: bookmarkData.count,
+    hasNext: !!bookmarkData.next,
+    hasPrevious: !!bookmarkData.previous,
+    onOffsetChange,
+  });
+
+  if (!bookmarkData?.results.length) {
     return <EmptyBookmarks isTagOrFolder={isTagOrFolder} description={description} />;
   }
 
@@ -84,15 +116,15 @@ export default function BookmarkWrapper({
       </div>
 
       {view === "grid" && (
-        <BookmarkGridView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
+        <BookmarkGridView bookmarks={bookmarkData.results} handleOpenSheet={handleOpenSheet} />
       )}
 
       {view === "list" && (
-        <BookmarkListView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
+        <BookmarkListView bookmarks={bookmarkData.results} handleOpenSheet={handleOpenSheet} />
       )}
 
       {view === "table" && (
-        <BookmarkTableView bookmarks={bookmarks} handleOpenSheet={handleOpenSheet} />
+        <BookmarkTableView bookmarks={bookmarkData.results} handleOpenSheet={handleOpenSheet} />
       )}
 
       {selectedBookmark && (
@@ -101,6 +133,44 @@ export default function BookmarkWrapper({
           bookmark={selectedBookmark}
           handleOpenChange={handleOpenChange}
         />
+      )}
+
+      {bookmarkData.count > limit && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={handlePrevious}
+                className={!hasPrevious ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+
+            {pageNumbers.map((page, i) => (
+              <PaginationItem key={typeof page === "string" ? `el-${i}` : page}>
+                {page === "ellipsis-start" || page === "ellipsis-end" ? (
+                  <PaginationEllipsis />
+                ) : (
+                  <PaginationLink
+                    href="#"
+                    isActive={currentPage === page}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handlePageClick(page as number);
+                    }}>
+                    {page}
+                  </PaginationLink>
+                )}
+              </PaginationItem>
+            ))}
+
+            <PaginationItem>
+              <PaginationNext
+                onClick={handleNext}
+                className={!hasNext ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       )}
     </div>
   );

@@ -15,7 +15,7 @@ type SettingsStoreState = {
   view: View;
   theme: Theme;
   token: Token | null;
-  resultsPerPage: number;
+  limit: number;
 };
 
 type SettingsStoreActions = {
@@ -23,7 +23,7 @@ type SettingsStoreActions = {
   setView: (view: View) => void;
   setTheme: (theme: Theme) => void;
   setToken: (token: Token | null) => void;
-  setResultsPerPage: (resultsPerPage: number) => void;
+  setLimit: (limit: number) => void;
   reset: () => void;
 };
 
@@ -32,7 +32,7 @@ const initialSettingsStoreState: SettingsStoreState = {
   view: "grid",
   theme: "system",
   token: null,
-  resultsPerPage: 10,
+  limit: 10,
 };
 
 export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions>()(
@@ -43,7 +43,7 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
       setView: (view) => set({ view }),
       setTheme: (theme) => set({ theme }),
       setToken: (token) => set({ token }),
-      setResultsPerPage: (resultsPerPage) => set({ resultsPerPage }),
+      setLimit: (limit) => set({ limit }),
       reset: () => set(initialSettingsStoreState),
     }),
     {

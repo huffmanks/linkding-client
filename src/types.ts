@@ -20,6 +20,17 @@ export interface SidebarSubNavItem {
 export type View = "table" | "list" | "grid";
 export type Theme = "light" | "dark" | "system";
 
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+export type BookmarkSearch = {
+  offset?: number;
+};
+
 export interface Bookmark {
   id: number;
   url: string;
