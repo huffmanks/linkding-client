@@ -2,6 +2,8 @@ import { BookmarkIcon, PlusIcon, SettingsIcon, ShieldUserIcon } from "lucide-rea
 
 import type { SidebarNavItem } from "@/types";
 
+import LinkdingIcon from "@/components/linkding-icon";
+
 export const APP_TITLE = "EchoLink";
 export const APP_DESCRIPTION = "Self-hosted client app for Linkding.";
 
@@ -10,6 +12,7 @@ export const SIDEBAR_NAV_MAIN = [
     name: "Add",
     isActive: false,
     icon: PlusIcon,
+    isCollapsible: true,
     items: [
       {
         name: "Bookmark",
@@ -50,5 +53,12 @@ export const SIDEBAR_NAV_SECONDARY = [
     isActive: false,
     isExternal: true,
     icon: ShieldUserIcon,
+  },
+  {
+    name: "Web UI",
+    url: `${import.meta.env.VITE_LINKDING_URL}/bookmarks`,
+    isActive: false,
+    isExternal: true,
+    icon: LinkdingIcon,
   },
 ] as SidebarNavItem[];

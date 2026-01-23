@@ -11,6 +11,8 @@ import CustomFieldError from "@/components/custom-field-error";
 import { Button } from "@/components/ui/button";
 import {
   Field,
+  FieldContent,
+  FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldLegend,
@@ -26,35 +28,50 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 type SettingsFormProps = React.ComponentProps<"div">;
 
 export function SettingsForm({ className, ...props }: SettingsFormProps) {
-  const { username, view, theme, limit, setUsername, setView, setTheme, setLimit } =
-    useSettingsStore(
-      useShallow((state) => ({
-        username: state.username,
-        view: state.view,
-        theme: state.theme,
-        limit: state.limit,
-        setUsername: state.setUsername,
-        setView: state.setView,
-        setTheme: state.setTheme,
-        setLimit: state.setLimit,
-      }))
-    );
+  const {
+    username,
+    view,
+    theme,
+    sidebarAddOpen,
+    limit,
+    setUsername,
+    setView,
+    setTheme,
+    setSidebarAddOpen,
+    setLimit,
+  } = useSettingsStore(
+    useShallow((state) => ({
+      username: state.username,
+      view: state.view,
+      theme: state.theme,
+      sidebarAddOpen: state.sidebarAddOpen,
+      limit: state.limit,
+      setUsername: state.setUsername,
+      setView: state.setView,
+      setTheme: state.setTheme,
+      setSidebarAddOpen: state.setSidebarAddOpen,
+      setLimit: state.setLimit,
+    }))
+  );
 
   const form = useForm({
     defaultValues: {
       username: username ?? "",
       view,
       theme,
+      sidebarAddOpen,
       limit,
     },
     onSubmit: async ({ value }) => {
       setUsername(value.username);
       setView(value.view);
       setTheme(value.theme);
+      setSidebarAddOpen(value.sidebarAddOpen);
       setLimit(Number(value.limit));
     },
   });
@@ -178,6 +195,26 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
                       </SelectItem>
                     </SelectContent>
                   </Select>
+                </Field>
+              )}
+            />
+
+            <form.Field
+              name="sidebarAddOpen"
+              children={(field) => (
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldLabel htmlFor="sidebarAddOpen">Sidebar “Add” default state</FieldLabel>
+                    <FieldDescription>
+                      Choose whether the “Add” item in the sidebar is open or collapsed by default.
+                    </FieldDescription>
+                  </FieldContent>
+                  <Switch
+                    id="sidebarAddOpen"
+                    checked={field.state.value}
+                    onBlur={field.handleBlur}
+                    onCheckedChange={(checked) => field.handleChange(checked)}
+                  />
                 </Field>
               )}
             />

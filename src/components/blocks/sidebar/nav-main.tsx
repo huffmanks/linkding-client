@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
@@ -8,6 +8,7 @@ import { ChevronRightIcon, FolderIcon, HashIcon } from "lucide-react";
 
 import { SIDEBAR_NAV_MAIN } from "@/lib/constants";
 import { getAllQueryOptions } from "@/lib/queries";
+import { useSettingsStore } from "@/lib/store";
 import type { SidebarNavItem, SidebarSubNavItem } from "@/types";
 
 import type { ActiveModal } from "@/components/blocks/sidebar";
@@ -108,20 +109,6 @@ export function NavMain({ setActiveModal }: NavMainProps) {
               handleCloseSidebar={handleCloseSidebar}
               setActiveModal={setActiveModal}
             />
-          ) : item?.items ? (
-            <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton className="opacity-100!" isActive={false} disabled>
-                <item.icon />
-                <span>{item.name}</span>
-              </SidebarMenuButton>
-              <SidebarMenuSub>
-                <SubNavItems
-                  items={item.items}
-                  handleCloseSidebar={handleCloseSidebar}
-                  setActiveModal={setActiveModal}
-                />
-              </SidebarMenuSub>
-            </SidebarMenuItem>
           ) : null
         )}
       </SidebarMenu>
@@ -195,7 +182,15 @@ function NavCollapsibleItem({
   handleCloseSidebar: () => void;
   setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
 }) {
-  const [isOpen, setIsOpen] = useState(item.isActive);
+  const { sidebarAddOpen } = useSettingsStore();
+  const isAdd = item.name === "Add";
+  const [isOpen, setIsOpen] = useState(isAdd ? sidebarAddOpen : item.isActive);
+
+  useEffect(() => {
+    if (isAdd) {
+      setIsOpen(sidebarAddOpen);
+    }
+  }, [sidebarAddOpen, isAdd]);
 
   const hasItems = !!item.items?.length;
 

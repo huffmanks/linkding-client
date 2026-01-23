@@ -44,6 +44,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BookmarkSheetProps {
@@ -166,7 +167,7 @@ function Content({
       <section className="mb-5 space-y-1">
         <h2 className="text-lg font-bold">{bookmark.title}</h2>
         {bookmark?.description ? (
-          <p className="text-muted-foreground">{bookmark.description}</p>
+          <p className="text-muted-foreground text-sm">{bookmark.description}</p>
         ) : (
           <p className="text-muted-foreground text-sm">No description.</p>
         )}
@@ -232,22 +233,22 @@ function Content({
 
       <section className="mb-5 space-y-2">
         <h3 className="font-medium">Tags</h3>
-        {bookmark.tag_names.length ? (
-          <TagCloud tags={bookmark.tag_names} />
-        ) : (
-          <p className="text-muted-foreground text-sm">No tags exist.</p>
-        )}
+        <TagCloud tags={bookmark.tag_names} />
       </section>
 
       <section className="mb-5 space-y-2">
         <h3 className="font-medium">Notes</h3>
         {bookmark.notes ? (
-          <textarea
-            className="scrollbar bg-accent/30 min-h-36 w-full resize-none rounded-md p-2 pr-3"
+          <Textarea
+            className="scrollbar max-h-72 min-h-36 resize-none pr-4"
             readOnly
-            defaultValue={bookmark.notes}></textarea>
+            defaultValue={bookmark.notes}></Textarea>
         ) : (
-          <p className="text-muted-foreground text-sm">No notes exist.</p>
+          <Textarea
+            className="min-h-fit resize-none disabled:cursor-auto"
+            disabled
+            readOnly
+            defaultValue="No notes"></Textarea>
         )}
       </section>
 

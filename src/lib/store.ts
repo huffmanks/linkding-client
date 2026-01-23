@@ -14,6 +14,7 @@ type SettingsStoreState = {
   username: string | null;
   view: View;
   theme: Theme;
+  sidebarAddOpen: boolean;
   token: Token | null;
   limit: number;
 };
@@ -22,6 +23,7 @@ type SettingsStoreActions = {
   setUsername: (username: string | null) => void;
   setView: (view: View) => void;
   setTheme: (theme: Theme) => void;
+  setSidebarAddOpen: (sidebarAddOpen: boolean) => void;
   setToken: (token: Token | null) => void;
   setLimit: (limit: number) => void;
   reset: () => void;
@@ -31,6 +33,7 @@ const initialSettingsStoreState: SettingsStoreState = {
   username: null,
   view: "grid",
   theme: "system",
+  sidebarAddOpen: true,
   token: null,
   limit: 10,
 };
@@ -42,6 +45,7 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
       setUsername: (username) => set({ username }),
       setView: (view) => set({ view }),
       setTheme: (theme) => set({ theme }),
+      setSidebarAddOpen: (sidebarAddOpen) => set({ sidebarAddOpen }),
       setToken: (token) => set({ token }),
       setLimit: (limit) => set({ limit }),
       reset: () => set(initialSettingsStoreState),
