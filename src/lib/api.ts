@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { useSettingsStore } from "@/lib/store";
+import type { BookmarkInsert, FolderInsert, TagInsert } from "@/types";
 
 export async function linkdingFetch<T>(
   endpoint: string,
@@ -33,28 +35,46 @@ export async function linkdingFetch<T>(
   return await response.json();
 }
 
-interface CreateBookmarkInput {
-  url: string;
-  title: string;
-  description: string;
-  notes: string;
-  is_archived: boolean;
-  unread: boolean;
-  shared: boolean;
-  tag_names: string[];
-}
-
 export function useCreateBookmark() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newBookmark: CreateBookmarkInput) =>
-      linkdingFetch("bookmarks", {
+    mutationFn: async (newBookmark: BookmarkInsert) =>
+      await linkdingFetch("bookmarks", {
         method: "POST",
         body: JSON.stringify(newBookmark),
       }),
+    onError: async (err) => {
+      console.error("Failed to create bookmark:", err);
+      toast.error("Failed to create bookmark.");
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+      toast.success("Bookmark has been created.");
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+    },
+  });
+}
+
+export function useEditBookmark() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (modifiedBookmark: BookmarkInsert) =>
+      await linkdingFetch("bookmarks", {
+        method: "PUT",
+        body: JSON.stringify(modifiedBookmark),
+      }),
+    onError: async (err) => {
+      console.error("Failed to update bookmark:", err);
+      toast.error("Failed to update bookmark.");
+    },
+    onSuccess: () => {
+      toast.success("Bookmark has been updated.");
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
     },
   });
 }
@@ -79,8 +99,7 @@ export function useDeleteBookmark() {
     },
     onMutate: async (deletedId) => {
       await queryClient.cancelQueries({ queryKey: ["bookmarks"] });
-
-      const previousBookmarks = queryClient.getQueryData(["bookmarks"]);
+      const previousBookmarks = await queryClient.getQueryData(["bookmarks"]);
 
       queryClient.setQueriesData({ queryKey: ["bookmarks"] }, (old: any) => {
         if (!old) return old;
@@ -93,56 +112,134 @@ export function useDeleteBookmark() {
 
       return { previousBookmarks };
     },
-
-    onError: (err, _, context) => {
-      queryClient.setQueryData(["bookmarks"], context?.previousBookmarks);
+    onError: async (err, _, context) => {
+      await queryClient.setQueryData(["bookmarks"], context?.previousBookmarks);
       console.error("Failed to delete bookmark:", err);
+      toast.error("Failed to delete bookmark.");
     },
-
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
+    onSuccess: () => {
+      toast.success("Bookmark has been deleted.");
+    },
+    onSettled: async (_, _err, id) => {
+      await queryClient.invalidateQueries({ queryKey: ["bookmarks", id] });
     },
   });
-}
-
-interface CreateFolderInput {
-  name: string;
-  search: string;
-  any_tags: string;
-  all_tags: string;
-  excluded_tags: string;
 }
 
 export function useCreateFolder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newFolder: CreateFolderInput) =>
-      linkdingFetch("bundles", {
+    mutationFn: async (newFolder: FolderInsert) =>
+      await linkdingFetch("bundles", {
         method: "POST",
         body: JSON.stringify(newFolder),
       }),
+    onError: async (err) => {
+      console.error("Failed to create folder:", err);
+      toast.error("Failed to create folder.");
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bundles"] });
+      toast.success("Folder has been created.");
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["bundles"] });
     },
   });
 }
 
-interface CreateTagInput {
-  name: string;
+export function useEditFolder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, modifiedFolder }: { id: number; modifiedFolder: FolderInsert }) =>
+      await linkdingFetch(`bundles/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(modifiedFolder),
+      }),
+    onError: async (err) => {
+      console.error("Failed to update folder:", err);
+      toast.error("Failed to update folder.");
+    },
+    onSuccess: () => {
+      toast.success("Folder has been updated.");
+    },
+    onSettled: async (_, _err, id) => {
+      await queryClient.invalidateQueries({ queryKey: ["bundles", id] });
+    },
+  });
+}
+
+export function useDeleteFolder() {
+  const queryClient = useQueryClient();
+  const { token } = useSettingsStore.getState();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/bundles/${id}/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+      }
+    },
+    onMutate: async (deletedId) => {
+      await queryClient.cancelQueries({ queryKey: ["bundles"] });
+      const previousFolders = await queryClient.getQueryData(["bundles"]);
+
+      queryClient.setQueriesData({ queryKey: ["bundles"] }, (old: any) => {
+        if (!old) return old;
+
+        if (old.results) {
+          return {
+            ...old,
+            count: Math.max(0, old.count - 1),
+            results: old.results.filter((f: any) => f.id !== deletedId),
+          };
+        }
+
+        return old.id === deletedId ? undefined : old;
+      });
+
+      return { previousFolders };
+    },
+    onError: async (err, _, context) => {
+      await queryClient.setQueryData(["bundles"], context?.previousFolders);
+      console.error("Failed to delete folder:", err);
+      toast.error("Failed to delete folder.");
+    },
+    onSuccess: () => {
+      toast.success("Folder has been deleted.");
+    },
+    onSettled: async (_, _err, id) => {
+      await queryClient.invalidateQueries({ queryKey: ["bundles", id] });
+    },
+  });
 }
 
 export function useCreateTag() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (newTag: CreateTagInput) =>
-      linkdingFetch("tags", {
+    mutationFn: async (newTag: TagInsert) =>
+      await linkdingFetch("tags", {
         method: "POST",
         body: JSON.stringify(newTag),
       }),
+    onError: async (err) => {
+      console.error("Failed to create tag:", err);
+      toast.error("Failed to create tag.");
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["tags"] });
+      toast.success("Tag has been created.");
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["tags"] });
     },
   });
 }

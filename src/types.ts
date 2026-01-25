@@ -31,26 +31,29 @@ export type BookmarkSearch = {
   offset?: number;
 };
 
-export interface Bookmark {
+export type Bookmark = BookmarkInsert & {
   id: number;
-  url: string;
-  title: string;
-  description: string | null;
-  notes: string | "";
   web_archive_snapshot_url: string | null;
   favicon_url: string | null;
   preview_image_url: string | null;
-  is_archived: boolean;
-  unread: boolean;
-  shared: boolean;
-  tag_names: string[] | [];
   date_added: string;
   date_modified: string;
   website_title: string | null;
   website_description: string | null;
-}
+};
 
-export interface Asset {
+export type BookmarkInsert = {
+  url: string;
+  title: string;
+  description: string;
+  notes: string;
+  is_archived: boolean;
+  unread: boolean;
+  shared: boolean;
+  tag_names: string[];
+};
+
+export type Asset = {
   id: number;
   bookmark: number;
   date_created: string;
@@ -59,43 +62,28 @@ export interface Asset {
   content_type: string;
   display_name: string;
   status: string;
-}
+};
 
-export interface Tag {
+export type Tag = TagInsert & {
   id: number;
-  name: string;
   date_added: string;
-}
+};
 
-export interface Bundle {
+export type TagInsert = {
+  name: string;
+};
+
+export type Folder = FolderInsert & {
   id: number;
+  order: number;
+  date_created: string;
+  date_modified: string;
+};
+
+export type FolderInsert = {
   name: string;
   search: string;
   any_tags: string;
   all_tags: string;
   excluded_tags: string;
-  order: number;
-  date_created: string;
-  date_modified: string;
-}
-
-export interface UserProfile {
-  theme: "auto" | "light" | "dark";
-  bookmark_date_display: "relative" | "absolute" | "hidden";
-  bookmark_link_target: "_blank" | "_self";
-  web_archive_integration: "disabled" | "enabled";
-  tag_search: "lax" | "strict";
-  enable_sharing: boolean;
-  enable_public_sharing: boolean;
-  enable_favicons: boolean;
-  display_url: boolean;
-  permanent_notes: boolean;
-  search_preferences: SearchPreferences;
-  version: string;
-}
-
-export interface SearchPreferences {
-  sort: "title_asc" | "title_desc";
-  shared: "off" | "on";
-  unread: "off" | "on";
-}
+};

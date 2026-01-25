@@ -2,15 +2,15 @@ import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { EllipsisVerticalIcon, GlobeIcon, ImageIcon, ShieldIcon } from "lucide-react";
+import { GlobeIcon, ImageIcon, ShieldIcon } from "lucide-react";
 
 import { linkdingFetch } from "@/lib/api";
 import { cn, getRelativeTimeString } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
+import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
 import BookmarkFavicon from "@/components/bookmark-favicon";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -24,15 +24,18 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 interface BookmarkGridViewProps {
   bookmarks: Bookmark[];
   handleOpenSheet: (bookmark: Bookmark) => void;
+  handleOpenChange: (open: boolean) => void;
 }
 
-export default function BookmarkGridView({ bookmarks, handleOpenSheet }: BookmarkGridViewProps) {
+export default function BookmarkGridView({
+  bookmarks,
+  handleOpenSheet,
+  handleOpenChange,
+}: BookmarkGridViewProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {bookmarks.map((bookmark) => (
-        <Card
-          key={bookmark.id}
-          className="group/card has-[[data-sheet-trigger]:focus-visible]:ring-primary/20 has-[[data-sheet-trigger]:hover]:ring-primary/20 cursor-pointer gap-4 pt-0 pb-4 transition-all has-[[data-sheet-trigger]:focus-visible]:opacity-50 has-[[data-sheet-trigger]:focus-visible]:ring-1 has-[[data-sheet-trigger]:hover]:opacity-50 has-[[data-sheet-trigger]:hover]:ring-1">
+        <Card key={bookmark.id} className="gap-4 pt-0 pb-4">
           <CardImage bookmark={bookmark} />
           <CardHeader className="px-3">
             <CardTitle className="min-w-0">
@@ -56,27 +59,15 @@ export default function BookmarkGridView({ bookmarks, handleOpenSheet }: Bookmar
               </p>
             </CardDescription>
             <CardAction>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="-mt-1.5 cursor-pointer"
-                onClick={() => handleOpenSheet(bookmark)}>
-                <EllipsisVerticalIcon className="size-4" />
-              </Button>
+              <ActionDropdown
+                triggerButtonClassName="-mt-1.5"
+                bookmark={bookmark}
+                handleOpenSheet={handleOpenSheet}
+                handleOpenChange={handleOpenChange}
+              />
             </CardAction>
           </CardHeader>
-          <CardContent
-            tabIndex={0}
-            role="button"
-            data-sheet-trigger
-            className="mt-auto cursor-pointer px-3 outline-none"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                handleOpenSheet(bookmark);
-              }
-            }}
-            onClick={() => handleOpenSheet(bookmark)}>
+          <CardContent className="mt-auto px-3">
             <section className="flex items-center gap-1">
               <Tooltip>
                 <TooltipTrigger
@@ -100,10 +91,9 @@ export default function BookmarkGridView({ bookmarks, handleOpenSheet }: Bookmar
                 bookmark.tag_names.map((tag) => (
                   <Badge
                     key={tag}
-                    className="group-hover:bg-muted group-focus-visible:bg-muted group-hover:text-primary/80 group-focus-visible:text-primary/80 transition-colors outline-none"
                     render={
                       <Link
-                        className="group outline-none"
+                        className="hover:bg-muted! hover:text-primary/80 focus-visible:bg-muted! focus-visible:text-primary/80 transition-colors outline-none"
                         to="/dashboard/tags/$tagName"
                         params={{ tagName: tag }}
                         onClick={(e) => e.stopPropagation()}>
@@ -147,7 +137,7 @@ function CardImage({ bookmark }: { bookmark: Bookmark }) {
 
   return (
     <a
-      className="block overflow-hidden rounded-t-lg transition-opacity outline-none group-has-[[data-sheet-trigger]:focus-visible]/card:opacity-100 group-has-[[data-sheet-trigger]:hover]/card:opacity-100 hover:opacity-50 focus-visible:opacity-50"
+      className="block overflow-hidden rounded-t-lg transition-opacity outline-none hover:opacity-50 focus-visible:opacity-50"
       tabIndex={-1}
       href={bookmark.url}
       target="_blank"

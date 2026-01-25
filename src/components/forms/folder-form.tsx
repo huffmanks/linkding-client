@@ -2,9 +2,10 @@ import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import z from "zod";
 
-import { useCreateFolder } from "@/lib/api";
+import { useCreateFolder, useEditFolder } from "@/lib/api";
 import { getAllQueryOptions } from "@/lib/queries";
-import { cn, processValue } from "@/lib/utils";
+import { cn, processValue, stringToStringArray } from "@/lib/utils";
+import type { Folder } from "@/types";
 
 import { ComboboxCreate } from "@/components/combobox-create";
 import CustomFieldError from "@/components/custom-field-error";
@@ -18,26 +19,45 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-type AddFolderFormProps = React.ComponentProps<"div">;
+type FolderFormProps = React.ComponentProps<"div"> & {
+  folder?: Folder;
+};
 
-export function AddFolderForm({ className, ...props }: AddFolderFormProps) {
+export function FolderForm({ folder, className, ...props }: FolderFormProps) {
   const { mutate, isPending } = useCreateFolder();
+  const { mutateAsync } = useEditFolder();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
+  const defaultValues = {
+    name: folder?.name ?? "",
+    search: stringToStringArray(folder?.search),
+    any_tags: stringToStringArray(folder?.any_tags),
+    all_tags: stringToStringArray(folder?.all_tags),
+    excluded_tags: stringToStringArray(folder?.excluded_tags),
+  };
+
   const tagItems = data?.results?.map((item) => item.name) || [];
 
+  const initialAnyTagsItems = [...new Set([...tagItems, ...defaultValues.any_tags])].sort((a, b) =>
+    a.localeCompare(b)
+  );
+  const initialAllTagsItems = [...new Set([...tagItems, ...defaultValues.all_tags])].sort((a, b) =>
+    a.localeCompare(b)
+  );
+  const initialExcludedTagsItems = [...new Set([...tagItems, ...defaultValues.excluded_tags])].sort(
+    (a, b) => a.localeCompare(b)
+  );
+
   const form = useForm({
-    defaultValues: {
-      name: "",
-      search: [""],
-      any_tags: [""],
-      all_tags: [""],
-      excluded_tags: [""],
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
       const processed = processValue({ value, returnType: "string" });
-      mutate(processed);
+      if (folder?.id) {
+        mutateAsync({ id: folder.id, modifiedFolder: processed });
+      } else {
+        mutate(processed);
+      }
     },
   });
 
@@ -82,6 +102,7 @@ export function AddFolderForm({ className, ...props }: AddFolderFormProps) {
                 <ComboboxCreate
                   value={field.state.value}
                   entityName="keyword"
+                  initialItems={defaultValues.search}
                   onChange={(val) => field.handleChange(val)}
                 />
                 <FieldDescription>
@@ -102,7 +123,7 @@ export function AddFolderForm({ className, ...props }: AddFolderFormProps) {
                 <ComboboxCreate
                   value={field.state.value}
                   entityName="tag"
-                  initialItems={tagItems}
+                  initialItems={initialAnyTagsItems}
                   onChange={(val) => field.handleChange(val)}
                 />
                 <FieldDescription>
@@ -120,7 +141,7 @@ export function AddFolderForm({ className, ...props }: AddFolderFormProps) {
                 <ComboboxCreate
                   value={field.state.value}
                   entityName="tag"
-                  initialItems={tagItems}
+                  initialItems={initialAllTagsItems}
                   onChange={(val) => field.handleChange(val)}
                 />
                 <FieldDescription>
@@ -138,7 +159,7 @@ export function AddFolderForm({ className, ...props }: AddFolderFormProps) {
                 <ComboboxCreate
                   value={field.state.value}
                   entityName="tag"
-                  initialItems={tagItems}
+                  initialItems={initialExcludedTagsItems}
                   onChange={(val) => field.handleChange(val)}
                 />
                 <FieldDescription>
@@ -149,8 +170,11 @@ export function AddFolderForm({ className, ...props }: AddFolderFormProps) {
             )}
           />
 
-          <Button className="text-foreground cursor-pointer" type="submit" disabled={isPending}>
-            {isPending ? "Saving..." : "Create"}
+          <Button
+            className="text-primary-foreground cursor-pointer"
+            type="submit"
+            disabled={isPending}>
+            {folder?.id ? "Update" : "Create"}
           </Button>
         </FieldGroup>
       </form>

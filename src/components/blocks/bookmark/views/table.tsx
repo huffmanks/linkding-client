@@ -1,6 +1,7 @@
 import { getCleanDomain } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
+import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
 import BookmarkFavicon from "@/components/bookmark-favicon";
 import {
   Table,
@@ -14,9 +15,14 @@ import {
 interface BookmarkTableViewProps {
   bookmarks: Bookmark[];
   handleOpenSheet: (bookmark: Bookmark) => void;
+  handleOpenChange: (open: boolean) => void;
 }
 
-export default function BookmarkTableView({ bookmarks, handleOpenSheet }: BookmarkTableViewProps) {
+export default function BookmarkTableView({
+  bookmarks,
+  handleOpenSheet,
+  handleOpenChange,
+}: BookmarkTableViewProps) {
   return (
     <div className="sm:px-2">
       <Table className="w-full table-fixed">
@@ -26,6 +32,7 @@ export default function BookmarkTableView({ bookmarks, handleOpenSheet }: Bookma
             <TableHead className="w-80">Title</TableHead>
             <TableHead className="w-56">Link</TableHead>
             <TableHead className="w-80">Description</TableHead>
+            <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -71,6 +78,13 @@ export default function BookmarkTableView({ bookmarks, handleOpenSheet }: Bookma
                 ) : (
                   <span className="text-muted-foreground">No description</span>
                 )}
+              </TableCell>
+              <TableCell>
+                <ActionDropdown
+                  bookmark={bookmark}
+                  handleOpenSheet={handleOpenSheet}
+                  handleOpenChange={handleOpenChange}
+                />
               </TableCell>
             </TableRow>
           ))}

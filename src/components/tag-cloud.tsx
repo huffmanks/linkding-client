@@ -1,8 +1,13 @@
 import { Link } from "@tanstack/react-router";
 
-import { Badge } from "./ui/badge";
+import { Badge } from "@/components/ui/badge";
 
-export default function TagCloud({ tags }: { tags: string[] }) {
+interface TagCloudProps {
+  tags: string[];
+  handleOpenChange: (open: boolean) => void;
+}
+
+export default function TagCloud({ tags, handleOpenChange }: TagCloudProps) {
   return (
     <div className="border-input bg-accent/14 rounded-lg border border-dashed p-3 transition-colors outline-none select-none">
       <div className="flex flex-wrap items-center gap-1">
@@ -11,7 +16,10 @@ export default function TagCloud({ tags }: { tags: string[] }) {
             <Badge
               key={tag}
               render={
-                <Link to="/dashboard/tags/$tagName" params={{ tagName: tag }}>
+                <Link
+                  to="/dashboard/tags/$tagName"
+                  params={{ tagName: tag }}
+                  onClick={() => handleOpenChange(false)}>
                   {tag}
                 </Link>
               }

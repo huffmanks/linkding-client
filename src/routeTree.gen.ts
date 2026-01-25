@@ -15,8 +15,9 @@ import { Route as protectedDashboardIndexRouteImport } from './routes/(protected
 import { Route as protectedDashboardSettingsIndexRouteImport } from './routes/(protected)/dashboard/settings/index'
 import { Route as protectedDashboardTagsTagNameRouteImport } from './routes/(protected)/dashboard/tags/$tagName'
 import { Route as protectedDashboardFoldersAddRouteImport } from './routes/(protected)/dashboard/folders/add'
-import { Route as protectedDashboardFoldersIdRouteImport } from './routes/(protected)/dashboard/folders/$id'
 import { Route as protectedDashboardBookmarksAddRouteImport } from './routes/(protected)/dashboard/bookmarks/add'
+import { Route as protectedDashboardFoldersIdIndexRouteImport } from './routes/(protected)/dashboard/folders/$id/index'
+import { Route as protectedDashboardFoldersIdEditRouteImport } from './routes/(protected)/dashboard/folders/$id/edit'
 
 const protectedRouteRoute = protectedRouteRouteImport.update({
   id: '/(protected)',
@@ -50,16 +51,22 @@ const protectedDashboardFoldersAddRoute =
     path: '/dashboard/folders/add',
     getParentRoute: () => protectedRouteRoute,
   } as any)
-const protectedDashboardFoldersIdRoute =
-  protectedDashboardFoldersIdRouteImport.update({
-    id: '/dashboard/folders/$id',
-    path: '/dashboard/folders/$id',
-    getParentRoute: () => protectedRouteRoute,
-  } as any)
 const protectedDashboardBookmarksAddRoute =
   protectedDashboardBookmarksAddRouteImport.update({
     id: '/dashboard/bookmarks/add',
     path: '/dashboard/bookmarks/add',
+    getParentRoute: () => protectedRouteRoute,
+  } as any)
+const protectedDashboardFoldersIdIndexRoute =
+  protectedDashboardFoldersIdIndexRouteImport.update({
+    id: '/dashboard/folders/$id/',
+    path: '/dashboard/folders/$id/',
+    getParentRoute: () => protectedRouteRoute,
+  } as any)
+const protectedDashboardFoldersIdEditRoute =
+  protectedDashboardFoldersIdEditRouteImport.update({
+    id: '/dashboard/folders/$id/edit',
+    path: '/dashboard/folders/$id/edit',
     getParentRoute: () => protectedRouteRoute,
   } as any)
 
@@ -67,19 +74,21 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof protectedDashboardIndexRoute
   '/dashboard/bookmarks/add': typeof protectedDashboardBookmarksAddRoute
-  '/dashboard/folders/$id': typeof protectedDashboardFoldersIdRoute
   '/dashboard/folders/add': typeof protectedDashboardFoldersAddRoute
   '/dashboard/tags/$tagName': typeof protectedDashboardTagsTagNameRoute
   '/dashboard/settings': typeof protectedDashboardSettingsIndexRoute
+  '/dashboard/folders/$id/edit': typeof protectedDashboardFoldersIdEditRoute
+  '/dashboard/folders/$id': typeof protectedDashboardFoldersIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof protectedDashboardIndexRoute
   '/dashboard/bookmarks/add': typeof protectedDashboardBookmarksAddRoute
-  '/dashboard/folders/$id': typeof protectedDashboardFoldersIdRoute
   '/dashboard/folders/add': typeof protectedDashboardFoldersAddRoute
   '/dashboard/tags/$tagName': typeof protectedDashboardTagsTagNameRoute
   '/dashboard/settings': typeof protectedDashboardSettingsIndexRoute
+  '/dashboard/folders/$id/edit': typeof protectedDashboardFoldersIdEditRoute
+  '/dashboard/folders/$id': typeof protectedDashboardFoldersIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,10 +96,11 @@ export interface FileRoutesById {
   '/(protected)': typeof protectedRouteRouteWithChildren
   '/(protected)/dashboard/': typeof protectedDashboardIndexRoute
   '/(protected)/dashboard/bookmarks/add': typeof protectedDashboardBookmarksAddRoute
-  '/(protected)/dashboard/folders/$id': typeof protectedDashboardFoldersIdRoute
   '/(protected)/dashboard/folders/add': typeof protectedDashboardFoldersAddRoute
   '/(protected)/dashboard/tags/$tagName': typeof protectedDashboardTagsTagNameRoute
   '/(protected)/dashboard/settings/': typeof protectedDashboardSettingsIndexRoute
+  '/(protected)/dashboard/folders/$id/edit': typeof protectedDashboardFoldersIdEditRoute
+  '/(protected)/dashboard/folders/$id/': typeof protectedDashboardFoldersIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -98,29 +108,32 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/dashboard/bookmarks/add'
-    | '/dashboard/folders/$id'
     | '/dashboard/folders/add'
     | '/dashboard/tags/$tagName'
     | '/dashboard/settings'
+    | '/dashboard/folders/$id/edit'
+    | '/dashboard/folders/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dashboard'
     | '/dashboard/bookmarks/add'
-    | '/dashboard/folders/$id'
     | '/dashboard/folders/add'
     | '/dashboard/tags/$tagName'
     | '/dashboard/settings'
+    | '/dashboard/folders/$id/edit'
+    | '/dashboard/folders/$id'
   id:
     | '__root__'
     | '/'
     | '/(protected)'
     | '/(protected)/dashboard/'
     | '/(protected)/dashboard/bookmarks/add'
-    | '/(protected)/dashboard/folders/$id'
     | '/(protected)/dashboard/folders/add'
     | '/(protected)/dashboard/tags/$tagName'
     | '/(protected)/dashboard/settings/'
+    | '/(protected)/dashboard/folders/$id/edit'
+    | '/(protected)/dashboard/folders/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -172,18 +185,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof protectedDashboardFoldersAddRouteImport
       parentRoute: typeof protectedRouteRoute
     }
-    '/(protected)/dashboard/folders/$id': {
-      id: '/(protected)/dashboard/folders/$id'
-      path: '/dashboard/folders/$id'
-      fullPath: '/dashboard/folders/$id'
-      preLoaderRoute: typeof protectedDashboardFoldersIdRouteImport
-      parentRoute: typeof protectedRouteRoute
-    }
     '/(protected)/dashboard/bookmarks/add': {
       id: '/(protected)/dashboard/bookmarks/add'
       path: '/dashboard/bookmarks/add'
       fullPath: '/dashboard/bookmarks/add'
       preLoaderRoute: typeof protectedDashboardBookmarksAddRouteImport
+      parentRoute: typeof protectedRouteRoute
+    }
+    '/(protected)/dashboard/folders/$id/': {
+      id: '/(protected)/dashboard/folders/$id/'
+      path: '/dashboard/folders/$id'
+      fullPath: '/dashboard/folders/$id'
+      preLoaderRoute: typeof protectedDashboardFoldersIdIndexRouteImport
+      parentRoute: typeof protectedRouteRoute
+    }
+    '/(protected)/dashboard/folders/$id/edit': {
+      id: '/(protected)/dashboard/folders/$id/edit'
+      path: '/dashboard/folders/$id/edit'
+      fullPath: '/dashboard/folders/$id/edit'
+      preLoaderRoute: typeof protectedDashboardFoldersIdEditRouteImport
       parentRoute: typeof protectedRouteRoute
     }
   }
@@ -192,19 +212,21 @@ declare module '@tanstack/react-router' {
 interface protectedRouteRouteChildren {
   protectedDashboardIndexRoute: typeof protectedDashboardIndexRoute
   protectedDashboardBookmarksAddRoute: typeof protectedDashboardBookmarksAddRoute
-  protectedDashboardFoldersIdRoute: typeof protectedDashboardFoldersIdRoute
   protectedDashboardFoldersAddRoute: typeof protectedDashboardFoldersAddRoute
   protectedDashboardTagsTagNameRoute: typeof protectedDashboardTagsTagNameRoute
   protectedDashboardSettingsIndexRoute: typeof protectedDashboardSettingsIndexRoute
+  protectedDashboardFoldersIdEditRoute: typeof protectedDashboardFoldersIdEditRoute
+  protectedDashboardFoldersIdIndexRoute: typeof protectedDashboardFoldersIdIndexRoute
 }
 
 const protectedRouteRouteChildren: protectedRouteRouteChildren = {
   protectedDashboardIndexRoute: protectedDashboardIndexRoute,
   protectedDashboardBookmarksAddRoute: protectedDashboardBookmarksAddRoute,
-  protectedDashboardFoldersIdRoute: protectedDashboardFoldersIdRoute,
   protectedDashboardFoldersAddRoute: protectedDashboardFoldersAddRoute,
   protectedDashboardTagsTagNameRoute: protectedDashboardTagsTagNameRoute,
   protectedDashboardSettingsIndexRoute: protectedDashboardSettingsIndexRoute,
+  protectedDashboardFoldersIdEditRoute: protectedDashboardFoldersIdEditRoute,
+  protectedDashboardFoldersIdIndexRoute: protectedDashboardFoldersIdIndexRoute,
 }
 
 const protectedRouteRouteWithChildren = protectedRouteRoute._addFileChildren(

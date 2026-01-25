@@ -1,18 +1,42 @@
-import { Search } from "lucide-react";
+import { useRef } from "react";
 
+import { SearchIcon } from "lucide-react";
+
+import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
+
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import { Kbd } from "@/components/ui/kbd";
 import { Label } from "@/components/ui/label";
-import { SidebarInput } from "@/components/ui/sidebar";
 
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function toggleFocus() {
+    inputRef.current?.focus();
+  }
+
+  useKeyboardShortcut("k", toggleFocus, { mod: true });
+
   return (
     <form {...props}>
-      <div className="relative">
-        <Label htmlFor="search" className="sr-only">
-          Search
-        </Label>
-        <SidebarInput id="search" placeholder="Type to search..." className="h-8 pl-7" />
-        <Search className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 opacity-50 select-none" />
-      </div>
+      <Label htmlFor="search" className="sr-only">
+        Search
+      </Label>
+
+      <InputGroup className="max-w-sm">
+        <InputGroupInput
+          ref={inputRef}
+          id="search"
+          placeholder="Search..."
+          className="bg-background h-8 w-full shadow-none"
+        />
+        <InputGroupAddon>
+          <SearchIcon className="text-muted-foreground" />
+        </InputGroupAddon>
+        <InputGroupAddon align="inline-end">
+          <Kbd>⌘K</Kbd>
+        </InputGroupAddon>
+      </InputGroup>
     </form>
   );
 }

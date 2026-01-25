@@ -30,6 +30,7 @@ interface BookmarkWrapperProps {
   bookmarkData: PaginatedResponse<Bookmark>;
   offset?: number;
   onOffsetChange: (offset: number) => void;
+  children?: React.ReactNode;
 }
 
 export default function BookmarkWrapper({
@@ -39,6 +40,7 @@ export default function BookmarkWrapper({
   bookmarkData,
   offset = 0,
   onOffsetChange,
+  children,
 }: BookmarkWrapperProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedBookmark, setSelectedBookmark] = useState<Bookmark | null>(null);
@@ -96,7 +98,10 @@ export default function BookmarkWrapper({
   return (
     <div>
       <div className="mb-6 flex items-center justify-between gap-4 sm:px-2">
-        <h1 className="text-xl font-medium">{heading}</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-medium">{heading}</h1>
+          {children}
+        </div>
 
         <ToggleGroup
           variant="outline"
@@ -116,15 +121,27 @@ export default function BookmarkWrapper({
       </div>
 
       {view === "grid" && (
-        <BookmarkGridView bookmarks={bookmarkData.results} handleOpenSheet={handleOpenSheet} />
+        <BookmarkGridView
+          bookmarks={bookmarkData.results}
+          handleOpenSheet={handleOpenSheet}
+          handleOpenChange={handleOpenChange}
+        />
       )}
 
       {view === "list" && (
-        <BookmarkListView bookmarks={bookmarkData.results} handleOpenSheet={handleOpenSheet} />
+        <BookmarkListView
+          bookmarks={bookmarkData.results}
+          handleOpenSheet={handleOpenSheet}
+          handleOpenChange={handleOpenChange}
+        />
       )}
 
       {view === "table" && (
-        <BookmarkTableView bookmarks={bookmarkData.results} handleOpenSheet={handleOpenSheet} />
+        <BookmarkTableView
+          bookmarks={bookmarkData.results}
+          handleOpenSheet={handleOpenSheet}
+          handleOpenChange={handleOpenChange}
+        />
       )}
 
       {selectedBookmark && (

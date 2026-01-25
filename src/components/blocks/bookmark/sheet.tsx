@@ -99,7 +99,12 @@ function Content({
     queryFn: () => linkdingFetch<{ results: Asset[] }>(`bookmarks/${bookmark.id}/assets`),
   });
 
-  const { mutate } = useDeleteBookmark();
+  const { mutateAsync } = useDeleteBookmark();
+
+  async function handleDelete() {
+    mutateAsync(bookmark.id);
+    handleOpenChange(false);
+  }
 
   const assets = useMemo(() => {
     if (isLoading || !data?.results) return null;
@@ -233,7 +238,7 @@ function Content({
 
       <section className="mb-5 space-y-2">
         <h3 className="font-medium">Tags</h3>
-        <TagCloud tags={bookmark.tag_names} />
+        <TagCloud tags={bookmark.tag_names} handleOpenChange={handleOpenChange} />
       </section>
 
       <section className="mb-5 space-y-2">
@@ -276,10 +281,7 @@ function Content({
               <AlertDialogAction
                 variant="destructive"
                 className="cursor-pointer"
-                onClick={() => {
-                  handleOpenChange(false);
-                  mutate(bookmark.id);
-                }}>
+                onClick={handleDelete}>
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

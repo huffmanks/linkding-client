@@ -124,3 +124,8 @@ export function getPageNumbers(current: number, total: number) {
   pages.push(total);
   return pages;
 }
+
+export function stringToStringArray(string?: string) {
+  if (!string) return [""];
+  return string.split(" ");
+}

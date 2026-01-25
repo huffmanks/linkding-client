@@ -204,7 +204,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
               children={(field) => (
                 <Field orientation="horizontal">
                   <FieldContent>
-                    <FieldLabel htmlFor="sidebarAddOpen">Sidebar “Add” default state</FieldLabel>
+                    <FieldLabel htmlFor="sidebarAddOpen">Sidebar “Add” default open</FieldLabel>
                     <FieldDescription>
                       Choose whether the “Add” item in the sidebar is open or collapsed by default.
                     </FieldDescription>

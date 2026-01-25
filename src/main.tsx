@@ -9,6 +9,7 @@ import { routeTree } from "@/routeTree.gen";
 import "@/styles.css";
 
 import ThemeWatcher from "@/components/theme-watcher";
+import { Toaster } from "@/components/ui/sonner";
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
 const router = createRouter({
@@ -37,6 +38,7 @@ if (rootElement && !rootElement.innerHTML) {
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
         <ThemeWatcher />
         <RouterProvider router={router} />
+        <Toaster richColors />
       </TanStackQueryProvider.Provider>
     </StrictMode>
   );
