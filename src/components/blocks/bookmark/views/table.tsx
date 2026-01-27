@@ -2,7 +2,7 @@ import { getCleanDomain } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
-import BookmarkFavicon from "@/components/bookmark-favicon";
+import BookmarkFavicon from "@/components/blocks/bookmark/bookmark-favicon";
 import {
   Table,
   TableBody,
@@ -24,7 +24,7 @@ export default function BookmarkTableView({
   handleOpenChange,
 }: BookmarkTableViewProps) {
   return (
-    <div className="sm:px-2">
+    <div className="pb-6 sm:px-2">
       <Table className="w-full table-fixed">
         <TableHeader>
           <TableRow>

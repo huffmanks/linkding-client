@@ -28,7 +28,9 @@ export interface PaginatedResponse<T> {
 }
 
 export type BookmarkSearch = {
+  q?: string;
   offset?: number;
+  bundle?: string;
 };
 
 export type Bookmark = BookmarkInsert & {

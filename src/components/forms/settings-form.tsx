@@ -7,7 +7,7 @@ import { useSettingsStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { Theme, View } from "@/types";
 
-import CustomFieldError from "@/components/custom-field-error";
+import CustomFieldError from "@/components/forms/custom-field-error";
 import { Button } from "@/components/ui/button";
 import {
   Field,

@@ -3,10 +3,10 @@ import type { Dispatch, SetStateAction } from "react";
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
 
-import { useCreateTag } from "@/lib/api";
+import { useCreateTag } from "@/lib/mutations";
 
 import type { ActiveModal } from "@/components/blocks/sidebar";
-import CustomFieldError from "@/components/custom-field-error";
+import CustomFieldError from "@/components/forms/custom-field-error";
 import { Button } from "@/components/ui/button";
 import {
   DialogClose,
@@ -22,7 +22,7 @@ interface AddTagFormProps {
   setOpenTagModal: Dispatch<SetStateAction<ActiveModal>>;
 }
 
-export function AddTagForm({ setOpenTagModal }: AddTagFormProps) {
+export function CreateTagForm({ setOpenTagModal }: AddTagFormProps) {
   const { mutate, isPending } = useCreateTag();
 
   const form = useForm({

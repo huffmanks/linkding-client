@@ -2,13 +2,13 @@ import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import z from "zod";
 
-import { useCreateFolder, useEditFolder } from "@/lib/api";
+import { useCreateFolder, useEditFolder } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
 import { cn, processValue, stringToStringArray } from "@/lib/utils";
 import type { Folder } from "@/types";
 
-import { ComboboxCreate } from "@/components/combobox-create";
-import CustomFieldError from "@/components/custom-field-error";
+import { ComboboxCreate } from "@/components/forms/combobox-create";
+import CustomFieldError from "@/components/forms/custom-field-error";
 import { Button } from "@/components/ui/button";
 import {
   Field,

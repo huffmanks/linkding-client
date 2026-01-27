@@ -2,12 +2,13 @@ import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { z } from "zod";
 
-import { useCreateBookmark } from "@/lib/api";
+import { useCreateBookmark, useEditBookmark } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import type { Bookmark } from "@/types";
 
-import { ComboboxCreate } from "@/components/combobox-create";
-import CustomFieldError from "@/components/custom-field-error";
+import { ComboboxCreate } from "@/components/forms/combobox-create";
+import CustomFieldError from "@/components/forms/custom-field-error";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -20,28 +21,41 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
-type AddBookmarkFormProps = React.ComponentProps<"div">;
+type BookmarkFormProps = React.ComponentProps<"div"> & {
+  bookmark?: Bookmark;
+};
 
-export function AddBookmarkForm({ className, ...props }: AddBookmarkFormProps) {
+export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProps) {
   const { mutate, isPending } = useCreateBookmark();
+  const { mutateAsync } = useEditBookmark();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
-  const initialItems = data?.results?.map((item) => item.name) || [];
+  const defaultValues = {
+    url: bookmark?.url ?? "",
+    title: bookmark?.title ?? "",
+    description: bookmark?.description ?? "",
+    notes: bookmark?.notes ?? "",
+    is_archived: bookmark?.is_archived ?? false,
+    unread: bookmark?.unread ?? false,
+    shared: bookmark?.shared ?? false,
+    tag_names: bookmark?.tag_names ?? [""],
+  };
+
+  const tagItems = data?.results?.map((item) => item.name) || [];
+
+  const initialItems = [...new Set([...tagItems, ...defaultValues.tag_names])].sort((a, b) =>
+    a.localeCompare(b)
+  );
 
   const form = useForm({
-    defaultValues: {
-      url: "",
-      title: "",
-      description: "",
-      notes: "",
-      is_archived: false,
-      unread: false,
-      shared: false,
-      tag_names: [""],
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
-      mutate({ ...value, tag_names: value.tag_names.filter(Boolean) });
+      if (bookmark?.id) {
+        mutateAsync({ id: bookmark.id, modifiedBookmark: value });
+      } else {
+        mutate({ ...value, tag_names: value.tag_names.filter(Boolean) });
+      }
     },
   });
 
@@ -98,6 +112,7 @@ export function AddBookmarkForm({ className, ...props }: AddBookmarkFormProps) {
                 <FieldLabel htmlFor="description">Description</FieldLabel>
                 <Textarea
                   id="description"
+                  className="scrollbar max-h-72 resize-none pr-4"
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -127,7 +142,7 @@ export function AddBookmarkForm({ className, ...props }: AddBookmarkFormProps) {
                 <FieldLabel htmlFor="notes">Notes</FieldLabel>
                 <Textarea
                   id="notes"
-                  className="min-h-48"
+                  className="scrollbar max-h-72 min-h-36 resize-none pr-4"
                   placeholder="Additional notes, supports Markdown"
                   value={field.state.value}
                   onBlur={field.handleBlur}
@@ -198,7 +213,7 @@ export function AddBookmarkForm({ className, ...props }: AddBookmarkFormProps) {
           />
 
           <Button className="text-foreground cursor-pointer" type="submit" disabled={isPending}>
-            {isPending ? "Saving..." : "Create"}
+            {bookmark?.id ? "Update" : "Create"}
           </Button>
         </FieldGroup>
       </form>

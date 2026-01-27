@@ -1,28 +1,26 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
-import { folderBookmarksOptions, getAllQueryOptions } from "@/lib/queries";
+import { getAllQueryOptions } from "@/lib/queries";
+import { useSettingsStore } from "@/lib/store";
+import EmptyFolder from "@/routes/(protected)/dashboard/folders/-components/empty-folder";
+import FolderActionDropdown from "@/routes/(protected)/dashboard/folders/-components/folder-action-dropdown";
 import type { BookmarkSearch } from "@/types";
 
 import BookmarkWrapper from "@/components/blocks/bookmark";
-import EmptyDescription from "@/components/empty-description";
-import FolderActionDropdown from "@/components/folder-action-dropdown";
 
 export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
   validateSearch: (search: Record<string, unknown>): BookmarkSearch => {
     return {
-      offset: Number(search.offset) || 0,
+      offset: typeof search.offset === "number" && search.offset !== 0 ? search.offset : undefined,
     };
   },
-  loaderDeps: ({ search: { offset } }) => ({ offset }),
+  loaderDeps: ({ search: { offset } }) => ({ offset: offset ?? 0 }),
   loader: async ({ context: { queryClient }, params: { id }, deps: { offset } }) => {
+    const { limit } = useSettingsStore.getState();
     const folder = await queryClient.ensureQueryData(getAllQueryOptions.folderById(id));
 
-    const bookmarksByFolderQuery = folderBookmarksOptions(folder);
-
-    await queryClient.ensureQueryData(
-      getAllQueryOptions.bookmarksByFolderId(folder, bookmarksByFolderQuery, (offset = 0))
-    );
+    await queryClient.ensureQueryData(getAllQueryOptions.bookmarksByFolderId(id, offset, limit));
 
     return folder;
   },
@@ -32,11 +30,11 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
 function FolderComponent() {
   const folder = Route.useLoaderData();
   const { offset } = Route.useSearch();
+  const { limit } = useSettingsStore();
   const navigate = useNavigate({ from: Route.fullPath });
 
-  const bookmarksByFolderQuery = folderBookmarksOptions(folder);
   const { data: bookmarks } = useSuspenseQuery(
-    getAllQueryOptions.bookmarksByFolderId(folder, bookmarksByFolderQuery, offset ?? 0)
+    getAllQueryOptions.bookmarksByFolderId(String(folder.id), offset, limit)
   );
 
   function onOffsetChange(newOffset: number) {
@@ -48,11 +46,10 @@ function FolderComponent() {
   return (
     <BookmarkWrapper
       heading={folder.name}
-      isTagOrFolder
-      description={<EmptyDescription name={folder.name} />}
       bookmarkData={bookmarks}
       offset={offset}
-      onOffsetChange={onOffsetChange}>
+      onOffsetChange={onOffsetChange}
+      emptyComponent={<EmptyFolder id={folder.id} name={folder.name} />}>
       <FolderActionDropdown folder={folder} />
     </BookmarkWrapper>
   );

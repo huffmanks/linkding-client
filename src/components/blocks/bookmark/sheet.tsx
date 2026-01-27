@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import {
   ExternalLinkIcon,
   FileCodeIcon,
@@ -11,11 +12,12 @@ import {
 } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { linkdingFetch, useDeleteBookmark } from "@/lib/api";
+import { linkdingFetch } from "@/lib/api";
+import { useDeleteBookmark } from "@/lib/mutations";
 import { formatToLocalTime } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
-import TagCloud from "@/components/tag-cloud";
+import TagCloud from "@/components/blocks/bookmark/tag-cloud";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -261,32 +263,44 @@ function Content({
         <p>Created: {bookmark.date_added}</p>
         <p>Last modified: {bookmark.date_modified}</p>
       </section>
-      <section>
-        <AlertDialog>
-          <AlertDialogTrigger
+      <section className="flex justify-end">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="secondary"
+            nativeButton={false}
             render={
-              <Button className="cursor-pointer" variant="destructive">
-                Delete
-              </Button>
-            }></AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete this bookmark.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                variant="destructive"
-                className="cursor-pointer"
-                onClick={handleDelete}>
-                Delete
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+              <Link to="/dashboard/bookmarks/$id/edit" params={{ id: String(bookmark.id) }}>
+                Edit
+              </Link>
+            }
+          />
+
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button className="cursor-pointer" variant="destructive">
+                  Delete
+                </Button>
+              }></AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete this bookmark.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  className="cursor-pointer"
+                  onClick={handleDelete}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </section>
     </div>
   );

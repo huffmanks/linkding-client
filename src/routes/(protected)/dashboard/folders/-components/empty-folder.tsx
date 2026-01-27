@@ -11,15 +11,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 
-interface EmptyBookmarksProps {
-  isTagOrFolder?: boolean;
-  description?: React.ReactNode;
-}
-
-export default function EmptyBookmarks({
-  isTagOrFolder = false,
-  description = <DefaultDescription />,
-}: EmptyBookmarksProps) {
+export default function EmptyFolder({ id, name }: { id: number; name: string }) {
   return (
     <Empty>
       <EmptyHeader>
@@ -27,27 +19,27 @@ export default function EmptyBookmarks({
           <BookmarkIcon />
         </EmptyMedia>
         <EmptyTitle>No bookmarks yet</EmptyTitle>
-        <EmptyDescription>{description}</EmptyDescription>
+        <EmptyDescription>
+          You haven’t added any bookmarks to this folder <code>{name}</code>. Edit this folder to
+          include bookmarks or create a new bookmark.
+        </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
-          {isTagOrFolder && (
-            <Button
-              nativeButton={false}
-              variant="outline"
-              render={<Link to="/dashboard">Go to bookmarks</Link>}></Button>
-          )}
+          <Button
+            nativeButton={false}
+            variant="outline"
+            render={
+              <Link to="/dashboard/folders/$id/edit" params={{ id: String(id) }}>
+                Edit folder
+              </Link>
+            }></Button>
+
           <Button
             nativeButton={false}
             render={<Link to="/dashboard/bookmarks/add">Create bookmark</Link>}></Button>
         </div>
       </EmptyContent>
     </Empty>
-  );
-}
-
-function DefaultDescription() {
-  return (
-    <span>You haven’t created any bookmarks yet. Get started by creating your first bokmark.</span>
   );
 }

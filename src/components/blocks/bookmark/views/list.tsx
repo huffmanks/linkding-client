@@ -5,7 +5,7 @@ import { cn, getRelativeTimeString } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
-import BookmarkFavicon from "@/components/bookmark-favicon";
+import BookmarkFavicon from "@/components/blocks/bookmark/bookmark-favicon";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -21,7 +21,7 @@ export default function BookmarkListView({
   handleOpenChange,
 }: BookmarkListViewProps) {
   return (
-    <div className="max-w-3xl space-y-2">
+    <div className="max-w-3xl space-y-2 pb-10">
       {bookmarks.map((bookmark) => (
         <div
           key={bookmark.id}

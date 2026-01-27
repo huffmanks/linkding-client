@@ -1,6 +1,7 @@
+import { Link } from "@tanstack/react-router";
 import { EllipsisVerticalIcon } from "lucide-react";
 
-import { useDeleteBookmark } from "@/lib/api";
+import { useDeleteBookmark } from "@/lib/mutations";
 import { cn } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
@@ -62,6 +63,16 @@ export default function ActionDropdown({
             <DropdownMenuItem className="cursor-pointer" onClick={() => handleOpenSheet(bookmark)}>
               View
             </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              nativeButton={false}
+              render={
+                <Link to="/dashboard/bookmarks/$id/edit" params={{ id: String(bookmark.id) }}>
+                  Edit
+                </Link>
+              }
+            />
+
             <DropdownMenuItem className="w-full cursor-pointer" variant="destructive">
               <AlertDialogTrigger
                 className="w-full"

@@ -11,7 +11,6 @@ import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
 import BookmarkTableView from "@/components/blocks/bookmark/views/table";
-import EmptyBookmarks from "@/components/empty-bookmarks";
 import {
   Pagination,
   PaginationContent,
@@ -25,18 +24,16 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface BookmarkWrapperProps {
   heading: string;
-  isTagOrFolder?: boolean;
-  description?: React.ReactNode;
   bookmarkData: PaginatedResponse<Bookmark>;
   offset?: number;
   onOffsetChange: (offset: number) => void;
+  emptyComponent: React.ReactNode;
   children?: React.ReactNode;
 }
 
 export default function BookmarkWrapper({
   heading,
-  isTagOrFolder,
-  description,
+  emptyComponent,
   bookmarkData,
   offset = 0,
   onOffsetChange,
@@ -92,7 +89,7 @@ export default function BookmarkWrapper({
   });
 
   if (!bookmarkData?.results.length) {
-    return <EmptyBookmarks isTagOrFolder={isTagOrFolder} description={description} />;
+    return emptyComponent;
   }
 
   return (
@@ -153,7 +150,7 @@ export default function BookmarkWrapper({
       )}
 
       {bookmarkData.count > limit && (
-        <Pagination>
+        <Pagination className="mb-10">
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious

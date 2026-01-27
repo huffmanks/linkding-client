@@ -1,7 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { EllipsisVerticalIcon } from "lucide-react";
 
-import { useDeleteFolder } from "@/lib/api";
+import { useDeleteFolder } from "@/lib/mutations";
 import type { Folder } from "@/types";
 
 import {

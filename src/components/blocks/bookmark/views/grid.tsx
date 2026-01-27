@@ -9,7 +9,7 @@ import { cn, getRelativeTimeString } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
-import BookmarkFavicon from "@/components/bookmark-favicon";
+import BookmarkFavicon from "@/components/blocks/bookmark/bookmark-favicon";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -33,7 +33,7 @@ export default function BookmarkGridView({
   handleOpenChange,
 }: BookmarkGridViewProps) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid gap-4 pb-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {bookmarks.map((bookmark) => (
         <Card key={bookmark.id} className="gap-4 pt-0 pb-4">
           <CardImage bookmark={bookmark} />

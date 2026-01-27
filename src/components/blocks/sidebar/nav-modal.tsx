@@ -1,7 +1,7 @@
 import { type Dispatch, type SetStateAction } from "react";
 
 import type { ActiveModal } from "@/components/blocks/sidebar";
-import { AddTagForm } from "@/components/forms/add-tag-form";
+import { CreateTagForm } from "@/components/forms/create-tag-form";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface NavModalProps {
@@ -15,7 +15,7 @@ export default function NavModal({ activeModal, setActiveModal }: NavModalProps)
       {activeModal === "tag-form" && (
         <Dialog open onOpenChange={() => setActiveModal(null)}>
           <DialogContent>
-            <AddTagForm setOpenTagModal={() => setActiveModal(null)} />
+            <CreateTagForm setOpenTagModal={() => setActiveModal(null)} />
           </DialogContent>
         </Dialog>
       )}
