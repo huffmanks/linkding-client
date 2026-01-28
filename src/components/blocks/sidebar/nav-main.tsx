@@ -9,6 +9,7 @@ import { ChevronRightIcon, FolderIcon, HashIcon } from "lucide-react";
 import { SIDEBAR_NAV_MAIN } from "@/lib/constants";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import type { SidebarNavItem, SidebarSubNavItem } from "@/types";
 
 import type { ActiveModal } from "@/components/blocks/sidebar";
@@ -106,6 +107,7 @@ export function NavMain({ setActiveModal }: NavMainProps) {
             <NavCollapsibleItem
               key={item.name}
               item={item}
+              isButton={item.name === "Add"}
               handleCloseSidebar={handleCloseSidebar}
               setActiveModal={setActiveModal}
             />
@@ -175,10 +177,12 @@ function SubNavItems({
 
 function NavCollapsibleItem({
   item,
+  isButton = false,
   handleCloseSidebar,
   setActiveModal,
 }: {
   item: SidebarNavItem;
+  isButton: boolean;
   handleCloseSidebar: () => void;
   setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
 }) {
@@ -202,10 +206,13 @@ function NavCollapsibleItem({
         <SidebarMenuItem>
           <CollapsibleTrigger
             disabled={!hasItems}
-            nativeButton={false}
             render={
               <SidebarMenuAction
-                className="group relative top-0 right-0 flex aspect-auto h-8 w-full items-center justify-between gap-2 p-2 text-sm [&_svg]:size-4 [&_svg]:shrink-0"
+                className={cn(
+                  "group relative top-0 right-0 flex aspect-auto h-8 w-full items-center justify-between gap-2 p-2 text-sm [&_svg]:size-4 [&_svg]:shrink-0",
+                  isButton &&
+                    "bg-sidebar-foreground hover:bg-sidebar-accent text-sidebar hover:text-sidebar-accent-foreground has-[+div_a:hover]:sidebar-foreground"
+                )}
                 render={
                   <div>
                     <span className="flex items-center gap-2 text-sm">
