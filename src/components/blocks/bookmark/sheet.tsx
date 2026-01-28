@@ -10,6 +10,7 @@ import {
   Link2Icon,
   ShieldIcon,
 } from "lucide-react";
+import Markdown from "markdown-to-jsx";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { linkdingFetch } from "@/lib/api";
@@ -246,10 +247,9 @@ function Content({
       <section className="mb-5 space-y-2">
         <h3 className="font-medium">Notes</h3>
         {bookmark.notes ? (
-          <Textarea
-            className="scrollbar max-h-72 min-h-36 resize-none pr-4"
-            readOnly
-            defaultValue={bookmark.notes}></Textarea>
+          <div className="prose prose-neutral prose-sm prose-pre:overflow-x-auto prose-pre:max-w-full dark:prose-invert bg-input/30 max-w-none rounded-md p-4">
+            <Markdown>{bookmark.notes}</Markdown>
+          </div>
         ) : (
           <Textarea
             className="min-h-fit resize-none disabled:cursor-auto"

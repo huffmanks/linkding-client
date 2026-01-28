@@ -206,6 +206,7 @@ function NavCollapsibleItem({
         <SidebarMenuItem>
           <CollapsibleTrigger
             disabled={!hasItems}
+            nativeButton={false}
             render={
               <SidebarMenuAction
                 className={cn(
