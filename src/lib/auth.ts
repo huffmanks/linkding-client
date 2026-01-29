@@ -1,16 +1,23 @@
-import { useSettingsStore } from "@/lib/store";
+import { type Token, type Url, useSettingsStore } from "@/lib/store";
 
-export async function login({ username }: { username: string }) {
-  const token = import.meta.env.VITE_LINKDING_API_TOKEN;
+export async function login({
+  username,
+  linkdingUrl,
+  token,
+}: {
+  username: string;
+  linkdingUrl: Url;
+  token: Token;
+}) {
+  const { setUsername, setLinkdingUrl, setToken } = useSettingsStore.getState();
 
-  if (!token) return false;
+  if (!username || !token || !linkdingUrl) return false;
 
   const isValid = await validate({ token });
 
   if (isValid) {
-    const { setUsername, setToken } = useSettingsStore.getState();
-
     setUsername(username);
+    setLinkdingUrl(linkdingUrl);
     setToken(token);
     return true;
   } else {
@@ -20,15 +27,16 @@ export async function login({ username }: { username: string }) {
 }
 
 export function logout() {
-  const { setUsername, setToken } = useSettingsStore.getState();
+  const { setUsername, setLinkdingUrl, setToken } = useSettingsStore.getState();
   setUsername(null);
+  setLinkdingUrl(null);
   setToken(null);
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const { username, token } = useSettingsStore.getState();
+  const { username, linkdingUrl, token } = useSettingsStore.getState();
 
-  if (!token || !username) {
+  if (!username || !linkdingUrl || !token) {
     return false;
   }
 

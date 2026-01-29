@@ -30,7 +30,7 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
 function FolderComponent() {
   const folder = Route.useLoaderData();
   const { offset } = Route.useSearch();
-  const { limit } = useSettingsStore();
+  const limit = useSettingsStore((state) => state.limit);
   const navigate = useNavigate({ from: Route.fullPath });
 
   const { data: bookmarks } = useSuspenseQuery(

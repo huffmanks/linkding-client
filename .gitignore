@@ -13,3 +13,4 @@ count.txt
 !.env*.example
 data
 .pnpmfile.cjs
+dev-dist

@@ -15,7 +15,8 @@ import Markdown from "markdown-to-jsx";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { linkdingFetch } from "@/lib/api";
 import { useDeleteBookmark } from "@/lib/mutations";
-import { formatToLocalTime } from "@/lib/utils";
+import { useSettingsStore } from "@/lib/store";
+import { formatToLocalTime, joinUrlPath } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
 import TagCloud from "@/components/blocks/bookmark/tag-cloud";
@@ -102,6 +103,7 @@ function Content({
     queryFn: () => linkdingFetch<{ results: Asset[] }>(`bookmarks/${bookmark.id}/assets`),
   });
 
+  const linkdingUrl = useSettingsStore((state) => state.linkdingUrl);
   const { mutateAsync } = useDeleteBookmark();
 
   async function handleDelete() {
@@ -117,12 +119,12 @@ function Content({
       .sort((a, b) => b.date_created.localeCompare(a.date_created))
       .map((item) => {
         return {
-          url: `${import.meta.env.VITE_LINKDING_URL}/assets/${item.id}`,
+          url: `${linkdingUrl}/assets/${item.id}`,
           displayName: `Created: ${formatToLocalTime(item.date_created)}`,
         };
       });
 
-    let image = bookmark?.preview_image_url;
+    let image = joinUrlPath(linkdingUrl, bookmark?.preview_image_url);
 
     if (!image) {
       const latestImage = data.results
@@ -130,7 +132,7 @@ function Content({
         .sort((a, b) => b.date_created.localeCompare(a.date_created))[0];
 
       if (latestImage) {
-        image = `${import.meta.env.VITE_LINKDING_URL}/assets/${latestImage.id}`;
+        image = `${linkdingUrl}/assets/${latestImage.id}`;
       }
     }
 
@@ -138,7 +140,7 @@ function Content({
       ...(snapshots.length > 0 && { snapshots }),
       ...(image && { image }),
     };
-  }, [data?.results, isLoading]);
+  }, [data?.results, isLoading, linkdingUrl]);
 
   return (
     <div className="mt-3 px-4">

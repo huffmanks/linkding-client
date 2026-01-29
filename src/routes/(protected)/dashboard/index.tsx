@@ -34,7 +34,7 @@ export const Route = createFileRoute("/(protected)/dashboard/")({
 
 function RouteComponent() {
   const { q, offset } = Route.useSearch();
-  const { limit } = useSettingsStore();
+  const limit = useSettingsStore((state) => state.limit);
   const navigate = useNavigate({ from: Route.fullPath });
 
   const { data } = useSuspenseQuery(getAllQueryOptions.bookmarks(q, offset, limit));

@@ -184,7 +184,7 @@ function NavCollapsibleItem({
   handleCloseSidebar: () => void;
   setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
 }) {
-  const { sidebarAddOpen } = useSettingsStore();
+  const sidebarAddOpen = useSettingsStore((state) => state.sidebarAddOpen);
   const isAdd = item.name === "Add";
   const [isOpen, setIsOpen] = useState(isAdd ? sidebarAddOpen : item.isActive);
 

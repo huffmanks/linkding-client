@@ -1,5 +1,5 @@
-# --- STAGE 0: Installer ---
-FROM node:22.18.0-alpine AS installer
+# --- STAGE 0: Builder ---
+FROM node:22.18.0-alpine AS builder
 
 WORKDIR /app
 
@@ -8,32 +8,32 @@ COPY package*.json pnpm-lock.yaml ./
 RUN corepack enable \
     && pnpm install --frozen-lockfile
 
-# --- STAGE 1: Builder ---
-FROM installer AS builder
-
-WORKDIR /app
-
-COPY --from=installer /app/node_modules ./node_modules
 COPY . .
 
 RUN pnpm run build \
-    && rm -rf node_modules \
     && pnpm store prune
 
-# --- STAGE 2: Production ---
-FROM node:22.18.0-alpine AS production
+# --- STAGE 1: Runner ---
+FROM nginx:alpine AS runner
 
-WORKDIR /app
+RUN rm -rf /usr/share/nginx/html/* && mkdir -p /etc/nginx/templates
 
-COPY package*.json pnpm-lock.yaml ./
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-RUN chown -R node:node /app
+RUN echo 'server { \
+    listen 80; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html; \
+        try_files $uri $uri/ /index.html; \
+    } \
+    location /api/ { \
+        proxy_pass ${LINKDING_INTERNAL}/api/; \
+        proxy_set_header Host $host; \
+        proxy_set_header X-Real-IP $remote_addr; \
+    } \
+}' > /etc/nginx/templates/default.conf.template
 
-COPY --from=builder --chown=node:node /app/.output .output
+EXPOSE 80
 
-USER node
-
-ENV PORT=3000
-EXPOSE 3000
-
-CMD ["node", ".output/server/index.mjs"]
+CMD ["nginx", "-g", "daemon off;"]

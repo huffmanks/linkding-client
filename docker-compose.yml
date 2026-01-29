@@ -9,3 +9,14 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+  echo-link:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # image: huffmanks/echo-link@latest
+    container_name: echo-link
+    ports:
+      - "3000:80"
+    environment:
+      - LINKDING_INTERNAL=http://linkding:9090 # this must match linkding container name and port above
+    restart: unless-stopped

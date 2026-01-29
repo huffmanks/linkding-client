@@ -4,8 +4,6 @@ import * as React from "react";
 
 import { Link } from "@tanstack/react-router";
 
-import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
-
 import { NavMain } from "@/components/blocks/sidebar/nav-main";
 import { NavSecondary } from "@/components/blocks/sidebar/nav-secondary";
 import {
@@ -60,7 +58,7 @@ export function AppSidebar({ setActiveModal, ...props }: AppSidebarProps) {
         <NavMain setActiveModal={setActiveModal} />
       </SidebarContent>
       <SidebarFooter>
-        <NavSecondary items={SIDEBAR_NAV_SECONDARY} className="mt-auto" />
+        <NavSecondary className="mt-auto" />
       </SidebarFooter>
     </Sidebar>
   );

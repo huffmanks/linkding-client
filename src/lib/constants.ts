@@ -49,14 +49,14 @@ export const SIDEBAR_NAV_SECONDARY = [
   },
   {
     name: "Admin",
-    url: `${import.meta.env.VITE_LINKDING_URL}/admin`,
+    url: "/admin",
     isActive: false,
     isExternal: true,
     icon: ShieldUserIcon,
   },
   {
     name: "Web UI",
-    url: `${import.meta.env.VITE_LINKDING_URL}/bookmarks`,
+    url: "/bookmarks",
     isActive: false,
     isExternal: true,
     icon: LinkdingIcon,

@@ -34,7 +34,7 @@ export const Route = createFileRoute("/(protected)/dashboard/tags/$tagName")({
 function RouteComponent() {
   const { tagName } = Route.useParams();
   const { offset } = Route.useSearch();
-  const { limit } = useSettingsStore();
+  const limit = useSettingsStore((state) => state.limit);
   const navigate = useNavigate({ from: Route.fullPath });
 
   const { data } = useSuspenseQuery(getAllQueryOptions.bookmarksByTagName(tagName, offset, limit));
