@@ -33,6 +33,10 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
       return;
     }
 
+    if (e.target.value.split(" ").some((item) => item.startsWith("#"))) {
+      console.log("word starts with hash");
+    }
+
     setSearchInput(e.target.value);
   }
 

@@ -25,7 +25,7 @@ export default function BookmarkListView({
       {bookmarks.map((bookmark) => (
         <div
           key={bookmark.id}
-          className="has-[[data-sheet-trigger]:focus-visible]:ring-primary/20 has-[[data-sheet-trigger]:hover]:ring-primary/20 rounded-md p-2 has-[[data-sheet-trigger]:focus-visible]:ring-1 has-[[data-sheet-trigger]:hover]:ring-1 has-[[data-tag-links]:focus-visible]:ring-0 has-[[data-tag-links]:hover]:ring-0">
+          className="has-[[data-sheet-trigger]:focus-visible]:bg-card has-[[data-sheet-trigger]:hover]:bg-card has-[[data-sheet-trigger]:focus-visible]:ring-primary/20 has-[[data-sheet-trigger]:hover]:ring-primary/20 rounded-md p-2 has-[[data-sheet-trigger]:focus-visible]:ring-1 has-[[data-sheet-trigger]:hover]:ring-1 has-[[data-tag-links]:focus-visible]:bg-transparent has-[[data-tag-links]:focus-visible]:ring-0 has-[[data-tag-links]:hover]:bg-transparent has-[[data-tag-links]:hover]:ring-0">
           <section className="mb-1 flex items-center justify-between gap-2">
             <a
               className="decoration-primary hover:decoration-primary/70 focus-visible:decoration-primary/70 hover:text-primary/70 focus-visible:text-primary/70 flex items-center gap-2 underline underline-offset-4 transition-colors outline-none"

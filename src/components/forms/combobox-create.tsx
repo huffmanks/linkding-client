@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
+import { CheckIcon, ChevronsUpDown, PlusIcon } from "lucide-react";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -37,14 +37,14 @@ export function ComboboxCreate({
   const [items, setItems] = useState(initialItems);
   const [search, setSearch] = useState("");
 
-  const handleCreate = () => {
+  function handleCreate() {
     if (search && !items.includes(search)) {
       setItems([...items, search]);
       onChange([...value, search]);
       setOpen(false);
       setSearch("");
     }
-  };
+  }
 
   return (
     <Popover onOpenChange={setOpen} open={open}>
@@ -74,7 +74,7 @@ export function ComboboxCreate({
           <CommandList>
             <CommandEmpty className="pt-0 pb-1">
               <Button variant="ghost" className="w-full justify-start" onClick={handleCreate}>
-                <Plus className="mr-2 size-4" />
+                <PlusIcon className="mr-2 size-4" />
                 Add {search ? `"${search}"` : `a new ${entityName}`}
               </Button>
             </CommandEmpty>
@@ -90,7 +90,7 @@ export function ComboboxCreate({
                     onChange(newValue);
                     setOpen(false);
                   }}>
-                  <Check
+                  <CheckIcon
                     className={cn(
                       "mr-2 size-4",
                       value.includes(item) ? "opacity-100" : "opacity-0"
@@ -105,7 +105,7 @@ export function ComboboxCreate({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem onSelect={handleCreate}>
-                    <Plus className="mr-2 size-4" />
+                    <PlusIcon className="mr-2 size-4" />
                     Add "{search}"
                   </CommandItem>
                 </CommandGroup>
