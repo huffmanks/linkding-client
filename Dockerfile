@@ -14,10 +14,9 @@ RUN pnpm run build \
     && pnpm store prune
 
 # --- STAGE 1: Runner ---
-FROM caddy:alpine AS runner
+FROM nginxinc/nginx-unprivileged:alpine AS runner
 
-COPY --from=builder /app/dist /srv
-COPY --from=builder /app/Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 
 EXPOSE 8080
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]

@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import z from "zod";
 
 import { login } from "@/lib/auth";
-import { TokenSchema } from "@/lib/store";
+import { TokenSchema, UrlSchema } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 import CustomFieldError from "@/components/forms/custom-field-error";
@@ -20,6 +20,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
   const form = useForm({
     defaultValues: {
       username: "",
+      linkdingUrl: "",
       token: "",
     },
     onSubmit: async ({ value }) => {
@@ -52,7 +53,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
             </svg>
             <h1>EchoLink</h1>
           </CardTitle>
-          <CardDescription>Enter the connection settings.</CardDescription>
+          <CardDescription>Enter your Linkding connection settings.</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -75,6 +76,30 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                       type="text"
                       value={field.state.value}
                       aria-invalid={!field.state.meta.isValid}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    {!field.state.meta.isValid && (
+                      <CustomFieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <form.Field
+                name="linkdingUrl"
+                validators={{
+                  onBlur: UrlSchema,
+                }}
+                children={(field) => (
+                  <Field data-invalid={!field.state.meta.isValid}>
+                    <FieldLabel htmlFor="linkdingUrl">Linkding URL</FieldLabel>
+                    <Input
+                      id="linkdingUrl"
+                      type="text"
+                      value={field.state.value}
+                      aria-invalid={!field.state.meta.isValid}
+                      placeholder="http://localhost:9090"
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
                     />

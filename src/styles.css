@@ -130,6 +130,10 @@
 }
 
 /* ===== Scrollbar CSS ===== */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* Firefox */
 .scrollbar {
   scrollbar-width: auto;

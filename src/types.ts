@@ -89,9 +89,3 @@ export type FolderInsert = {
   all_tags: string;
   excluded_tags: string;
 };
-
-export interface Window {
-  __ENV__?: {
-    VITE_PUBLIC_LINKDING_URL: string;
-  };
-}

@@ -8,10 +8,16 @@ export const TokenSchema = z
   .hash("sha1", { error: "API token is not valid." })
   .min(1, { error: "API token is required." });
 
+export const UrlSchema = z
+  .url({ error: "Url is not valid." })
+  .min(1, { error: "Url is required." });
+
 export type Token = z.infer<typeof TokenSchema>;
+export type Url = z.infer<typeof UrlSchema>;
 
 type SettingsStoreState = {
   username: string | null;
+  linkdingUrl: Url | null;
   token: Token | null;
   view: View;
   theme: Theme;
@@ -21,6 +27,7 @@ type SettingsStoreState = {
 
 type SettingsStoreActions = {
   setUsername: (username: string | null) => void;
+  setLinkdingUrl: (linkdingUrl: Url | null) => void;
   setToken: (token: Token | null) => void;
   setView: (view: View) => void;
   setTheme: (theme: Theme) => void;
@@ -31,6 +38,7 @@ type SettingsStoreActions = {
 
 const initialSettingsStoreState: SettingsStoreState = {
   username: null,
+  linkdingUrl: null,
   token: null,
   view: "grid",
   theme: "system",
@@ -43,6 +51,7 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
     (set) => ({
       ...initialSettingsStoreState,
       setUsername: (username) => set({ username }),
+      setLinkdingUrl: (linkdingUrl) => set({ linkdingUrl }),
       setToken: (token) => set({ token }),
       setView: (view) => set({ view }),
       setTheme: (theme) => set({ theme }),

@@ -4,11 +4,10 @@ export async function linkdingFetch<T>(
   endpoint: string,
   { params, ...options }: RequestInit & { params?: Record<string, string> } = {}
 ): Promise<T> {
-  const baseUrl = "/api";
   const { token } = useSettingsStore.getState();
 
   const path = endpoint.endsWith("/") ? endpoint : `${endpoint}/`;
-  let url = `${baseUrl}/${path}`;
+  let url = `/api/${path}`;
 
   if (params) {
     const searchParams = new URLSearchParams(params);

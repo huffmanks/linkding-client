@@ -4,7 +4,9 @@ ENV_FILE = .env
 # --- Global Commands ---
 all: dev-up-all ## Run the full development startup
 dev: dev-up-all ## Alias to start dev
+dev-down: dev-docker-down ## Alias to start dev
 prod: prod-docker-up ## Run the full production startup
+prod-down: prod-docker-down ## Run the full production startup
 
 DOCKER_COMPOSE = docker compose --env-file $(ENV_FILE)
 
@@ -27,7 +29,7 @@ dev-up-all: dev-docker-up
 # --- Production Targets ---
 .PHONY: prod-docker-up prod-docker-down
 prod-docker-up: ## Start the Docker services
-	@$(DOCKER_COMPOSE) up -d
+	@$(DOCKER_COMPOSE) up --build --force-recreate -d
 
 prod-docker-down: ## Stop the Docker services
 	@$(DOCKER_COMPOSE) down

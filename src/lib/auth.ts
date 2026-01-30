@@ -1,14 +1,23 @@
-import { type Token, useSettingsStore } from "@/lib/store";
+import { type Token, type Url, useSettingsStore } from "@/lib/store";
 
-export async function login({ username, token }: { username: string; token: Token }) {
-  const { setUsername, setToken } = useSettingsStore.getState();
+export async function login({
+  username,
+  linkdingUrl,
+  token,
+}: {
+  username: string;
+  linkdingUrl: Url;
+  token: Token;
+}) {
+  const { setUsername, setLinkdingUrl, setToken } = useSettingsStore.getState();
 
-  if (!username || !token) return false;
+  if (!username || !linkdingUrl || !token) return false;
 
   const isValid = await validate({ token });
 
   if (isValid) {
     setUsername(username);
+    setLinkdingUrl(linkdingUrl);
     setToken(token);
     return true;
   } else {
@@ -18,15 +27,16 @@ export async function login({ username, token }: { username: string; token: Toke
 }
 
 export function logout() {
-  const { setUsername, setToken } = useSettingsStore.getState();
+  const { setUsername, setLinkdingUrl, setToken } = useSettingsStore.getState();
   setUsername(null);
+  setLinkdingUrl(null);
   setToken(null);
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const { username, token } = useSettingsStore.getState();
+  const { username, linkdingUrl, token } = useSettingsStore.getState();
 
-  if (!username || !token) {
+  if (!username || !linkdingUrl || !token) {
     return false;
   }
 
@@ -35,7 +45,7 @@ export async function isAuthenticated(): Promise<boolean> {
 
 async function validate({ token }: { token: string }) {
   try {
-    const res = await fetch(`/api/user/profile/`, {
+    const res = await fetch("/api/user/profile/", {
       signal: AbortSignal.timeout(5000),
       headers: {
         Authorization: `Token ${token}`,
