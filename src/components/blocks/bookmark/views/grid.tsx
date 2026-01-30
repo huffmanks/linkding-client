@@ -5,8 +5,8 @@ import { Link } from "@tanstack/react-router";
 import { GlobeIcon, ImageIcon, ShieldIcon } from "lucide-react";
 
 import { linkdingFetch } from "@/lib/api";
-import { useSettingsStore } from "@/lib/store";
-import { cn, getRelativeTimeString, joinUrlPath } from "@/lib/utils";
+import { LINKDING_URL } from "@/lib/constants";
+import { cn, getRelativeTimeString } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
@@ -116,12 +116,10 @@ function CardImage({ bookmark }: { bookmark: Bookmark }) {
     queryFn: () => linkdingFetch<{ results: Asset[] }>(`bookmarks/${bookmark.id}/assets`),
   });
 
-  const linkdingUrl = useSettingsStore((state) => state.linkdingUrl);
-
   const assets = useMemo(() => {
     if (isLoading || !data?.results) return null;
 
-    let image = joinUrlPath(linkdingUrl, bookmark?.preview_image_url);
+    let image = bookmark?.preview_image_url;
 
     if (!image) {
       const latestImage = data.results
@@ -129,7 +127,7 @@ function CardImage({ bookmark }: { bookmark: Bookmark }) {
         .sort((a, b) => b.date_created.localeCompare(a.date_created))[0];
 
       if (latestImage) {
-        image = `${linkdingUrl}/assets/${latestImage.id}`;
+        image = `${LINKDING_URL}/assets/${latestImage.id}`;
       }
     }
 

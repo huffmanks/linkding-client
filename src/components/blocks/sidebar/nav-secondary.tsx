@@ -3,7 +3,6 @@ import * as React from "react";
 import { Link } from "@tanstack/react-router";
 
 import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
-import { useSettingsStore } from "@/lib/store";
 
 import {
   SidebarGroup,
@@ -20,17 +19,6 @@ export function NavSecondary({
   ...props
 }: {} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const { isMobile, setOpenMobile } = useSidebar();
-  const linkdingUrl = useSettingsStore((state) => state.linkdingUrl);
-
-  const items = React.useMemo(() => {
-    return SIDEBAR_NAV_SECONDARY.map((item) => {
-      const newItem = { ...item };
-      if (!!linkdingUrl && (newItem.name === "Admin" || newItem.name === "Web UI")) {
-        newItem.url = `${linkdingUrl}${newItem.url}`;
-      }
-      return newItem;
-    });
-  }, [linkdingUrl]);
 
   function handleCloseSidebar(isExternal: boolean) {
     if (isExternal || !isMobile) return;
@@ -42,7 +30,7 @@ export function NavSecondary({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.slice(0, 1).map((item) => (
+          {SIDEBAR_NAV_SECONDARY.slice(0, 1).map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
                 size="sm"
@@ -66,7 +54,7 @@ export function NavSecondary({
           Linkding
         </SidebarGroupLabel>
         <SidebarMenu>
-          {items.slice(1).map((item) => (
+          {SIDEBAR_NAV_SECONDARY.slice(1).map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
                 size="sm"

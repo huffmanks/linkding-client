@@ -49,8 +49,7 @@ obj/
 # 3. Security & Sensitive Files
 # ----------------------------------------------------
 # Environment Variables
-example*.env*
-.env*example*
+.env*
 .npmrc
 .yarnrc
 .pnpmrc

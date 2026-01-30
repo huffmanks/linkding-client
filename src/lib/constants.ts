@@ -1,11 +1,15 @@
 import { BookmarkIcon, PlusIcon, SettingsIcon, ShieldUserIcon } from "lucide-react";
 
-import type { SidebarNavItem } from "@/types";
+import type { SidebarNavItem, Window } from "@/types";
 
 import LinkdingIcon from "@/components/linkding-icon";
 
 export const APP_TITLE = "EchoLink";
 export const APP_DESCRIPTION = "Self-hosted client app for Linkding.";
+
+export const LINKDING_URL = import.meta.env.DEV
+  ? import.meta.env.VITE_PUBLIC_LINKDING_URL
+  : (window as Window).__ENV__?.VITE_PUBLIC_LINKDING_URL;
 
 export const SIDEBAR_NAV_MAIN = [
   {
@@ -49,14 +53,14 @@ export const SIDEBAR_NAV_SECONDARY = [
   },
   {
     name: "Admin",
-    url: "/admin",
+    url: `${LINKDING_URL}/admin`,
     isActive: false,
     isExternal: true,
     icon: ShieldUserIcon,
   },
   {
     name: "Web UI",
-    url: "/bookmarks",
+    url: `${LINKDING_URL}/bookmarks`,
     isActive: false,
     isExternal: true,
     icon: LinkdingIcon,

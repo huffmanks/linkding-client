@@ -129,20 +129,3 @@ export function stringToStringArray(string?: string) {
   if (!string) return [""];
   return string.split(" ");
 }
-
-export function joinUrlPath(url: string | null, path: string | null) {
-  if (!url || !path) return "";
-
-  let cleanPath = path;
-
-  if (cleanPath.startsWith("http://localhost") || cleanPath.startsWith("http://127.0.0.1")) {
-    cleanPath = cleanPath.replace(/^http?:\/\/[^\/]+/, "");
-  }
-
-  if (cleanPath.startsWith("http")) return cleanPath;
-
-  const cleanBase = url.replace(/\/$/, "");
-  const normalizedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
-
-  return `${cleanBase}${normalizedPath}`;
-}

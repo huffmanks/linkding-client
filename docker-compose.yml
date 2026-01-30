@@ -6,8 +6,11 @@ services:
       - "9090:9090"
     volumes:
       - ./data:/etc/linkding/data
-    env_file:
-      - .env
+    environment:
+      LD_SUPERUSER_NAME: ${LD_SUPERUSER_NAME}
+      LD_SUPERUSER_PASSWORD: ${LD_SUPERUSER_PASSWORD}
+      LD_USE_X_FORWARDED_HOST: "true"
+      LD_CSRF_TRUSTED_ORIGINS: http://${APP_DOMAIN}:${APP_PORT:-3000}
     restart: unless-stopped
   echo-link:
     build:
@@ -16,7 +19,9 @@ services:
     # image: huffmanks/echo-link@latest
     container_name: echo-link
     ports:
-      - "3000:80"
+      - "${APP_PORT:-3000}:8080"
     environment:
-      - LINKDING_INTERNAL=http://linkding:9090 # this must match linkding container name and port above
+      VITE_PUBLIC_LINKDING_URL: ${VITE_PUBLIC_LINKDING_URL}
+    depends_on:
+      - linkding
     restart: unless-stopped

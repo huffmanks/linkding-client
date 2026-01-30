@@ -7,17 +7,12 @@ import type { Theme, View } from "@/types";
 export const TokenSchema = z
   .hash("sha1", { error: "API token is not valid." })
   .min(1, { error: "API token is required." });
-export const UrlSchema = z
-  .url({ error: "Url is not valid." })
-  .min(1, { error: "Url is required." });
 
 export type Token = z.infer<typeof TokenSchema>;
-export type Url = z.infer<typeof UrlSchema>;
 
 type SettingsStoreState = {
   username: string | null;
   token: Token | null;
-  linkdingUrl: Url | null;
   view: View;
   theme: Theme;
   sidebarAddOpen: boolean;
@@ -27,7 +22,6 @@ type SettingsStoreState = {
 type SettingsStoreActions = {
   setUsername: (username: string | null) => void;
   setToken: (token: Token | null) => void;
-  setLinkdingUrl: (linkdingUrl: Url | null) => void;
   setView: (view: View) => void;
   setTheme: (theme: Theme) => void;
   setSidebarAddOpen: (sidebarAddOpen: boolean) => void;
@@ -38,7 +32,6 @@ type SettingsStoreActions = {
 const initialSettingsStoreState: SettingsStoreState = {
   username: null,
   token: null,
-  linkdingUrl: null,
   view: "grid",
   theme: "system",
   sidebarAddOpen: true,
@@ -51,7 +44,6 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
       ...initialSettingsStoreState,
       setUsername: (username) => set({ username }),
       setToken: (token) => set({ token }),
-      setLinkdingUrl: (linkdingUrl) => set({ linkdingUrl }),
       setView: (view) => set({ view }),
       setTheme: (theme) => set({ theme }),
       setSidebarAddOpen: (sidebarAddOpen) => set({ sidebarAddOpen }),

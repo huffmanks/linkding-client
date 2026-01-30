@@ -3,7 +3,7 @@ import { LaptopIcon, LayoutGridIcon, ListIcon, MoonIcon, SunIcon, Table2Icon } f
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
-import { UrlSchema, useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import type { Theme, View } from "@/types";
 
@@ -35,13 +35,11 @@ type SettingsFormProps = React.ComponentProps<"div">;
 export function SettingsForm({ className, ...props }: SettingsFormProps) {
   const {
     username,
-    linkdingUrl,
     view,
     theme,
     sidebarAddOpen,
     limit,
     setUsername,
-    setLinkdingUrl,
     setView,
     setTheme,
     setSidebarAddOpen,
@@ -49,13 +47,11 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
   } = useSettingsStore(
     useShallow((state) => ({
       username: state.username,
-      linkdingUrl: state.linkdingUrl,
       view: state.view,
       theme: state.theme,
       sidebarAddOpen: state.sidebarAddOpen,
       limit: state.limit,
       setUsername: state.setUsername,
-      setLinkdingUrl: state.setLinkdingUrl,
       setView: state.setView,
       setTheme: state.setTheme,
       setSidebarAddOpen: state.setSidebarAddOpen,
@@ -66,7 +62,6 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
   const form = useForm({
     defaultValues: {
       username: username ?? "",
-      linkdingUrl: linkdingUrl ?? "",
       view,
       theme,
       sidebarAddOpen,
@@ -74,7 +69,6 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
     },
     onSubmit: async ({ value }) => {
       setUsername(value.username);
-      setLinkdingUrl(value.linkdingUrl);
       setView(value.view);
       setTheme(value.theme);
       setSidebarAddOpen(value.sidebarAddOpen);
@@ -100,32 +94,9 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
               }}
               children={(field) => (
                 <Field data-invalid={!field.state.meta.isValid}>
-                  <FieldLabel htmlFor="username">Linkding username</FieldLabel>
+                  <FieldLabel htmlFor="username">Username</FieldLabel>
                   <Input
                     id="username"
-                    type="text"
-                    value={field.state.value}
-                    aria-invalid={!field.state.meta.isValid}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  {!field.state.meta.isValid && (
-                    <CustomFieldError errors={field.state.meta.errors} />
-                  )}
-                </Field>
-              )}
-            />
-
-            <form.Field
-              name="linkdingUrl"
-              validators={{
-                onBlur: UrlSchema,
-              }}
-              children={(field) => (
-                <Field data-invalid={!field.state.meta.isValid}>
-                  <FieldLabel htmlFor="linkdingUrl">Linkding URL</FieldLabel>
-                  <Input
-                    id="linkdingUrl"
                     type="text"
                     value={field.state.value}
                     aria-invalid={!field.state.meta.isValid}
