@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => {
       viteReact(),
       tailwindcss(),
       VitePWA({
+        disable: mode === "development",
         registerType: "autoUpdate",
         workbox: {
           globPatterns: ["**/*.{css,html,js,json,webmanifest,ico,png,svg,otf,ttf,woff,woff2}"],
@@ -72,9 +73,6 @@ export default defineConfig(({ mode }) => {
               },
             },
           ],
-        },
-        devOptions: {
-          enabled: mode === "development",
         },
       }),
     ],
