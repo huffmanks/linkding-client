@@ -10,7 +10,7 @@ services:
       LD_SUPERUSER_NAME: ${LD_SUPERUSER_NAME}
       LD_SUPERUSER_PASSWORD: ${LD_SUPERUSER_PASSWORD}
       LD_USE_X_FORWARDED_HOST: "true"
-      LD_CSRF_TRUSTED_ORIGINS: http://${APP_DOMAIN}:${APP_PORT:-3000}
+      LD_CSRF_TRUSTED_ORIGINS: "http://${APP_DOMAIN},https://${APP_DOMAIN}"
     restart: unless-stopped
   echo-link:
     build:
@@ -20,6 +20,9 @@ services:
     container_name: echo-link
     ports:
       - "${APP_PORT:-3000}:8080"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+      LINKDING_CONTAINER_URL: ${LINKDING_CONTAINER_URL}
     depends_on:
       - linkding
     restart: unless-stopped

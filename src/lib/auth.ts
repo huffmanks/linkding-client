@@ -40,7 +40,15 @@ export async function isAuthenticated(): Promise<boolean> {
     return false;
   }
 
-  return await validate({ token });
+  if (!navigator.onLine) {
+    return true;
+  }
+
+  try {
+    return await validate({ token });
+  } catch (error) {
+    return true;
+  }
 }
 
 async function validate({ token }: { token: string }) {

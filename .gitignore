@@ -11,6 +11,7 @@ count.txt
 
 *.env*
 !.env*.example
+*.pem
 data
 .pnpmfile.cjs
 dev-dist

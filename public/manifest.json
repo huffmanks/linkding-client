@@ -2,6 +2,11 @@
   "$schema": "https://json.schemastore.org/web-manifest.json",
   "short_name": "EchoLink",
   "name": "EchoLink",
+  "description": "Self-hosted client app for Linkding.",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#15ba81",
+  "background_color": "#0a0a0a",
   "icons": [
     {
       "src": "favicon.svg",
@@ -29,9 +34,5 @@
       "sizes": "512x512",
       "purpose": "maskable"
     }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#15ba81",
-  "background_color": "#0a0a0a"
+  ]
 }
