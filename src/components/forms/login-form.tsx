@@ -1,35 +1,47 @@
+import { useState } from "react";
+
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { toast } from "sonner";
 import z from "zod";
 
 import { login } from "@/lib/auth";
 import { TokenSchema, UrlSchema } from "@/lib/store";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 
 import CustomFieldError from "@/components/forms/custom-field-error";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 
 type LoginFormProps = React.ComponentProps<"div">;
 
 export function LoginForm({ className, ...props }: LoginFormProps) {
   const navigate = useNavigate();
 
+  const [showToken, setShowToken] = useState(false);
+
   const form = useForm({
     defaultValues: {
-      username: "",
-      linkdingUrl: "",
+      username: "admin",
+      linkdingUrl: "http://localhost:9090",
       token: "",
     },
     onSubmit: async ({ value }) => {
-      const ok = await login({ ...value });
+      try {
+        const { isValid, errorMessage } = await login({ ...value });
 
-      if (ok) {
+        if (!isValid && errorMessage) {
+          throw new Error(errorMessage);
+        }
         navigate({ to: "/dashboard" });
-      } else {
-        console.error("Failed to login.");
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        console.error(errorMessage);
+        toast.error(errorMessage);
       }
     },
   });
@@ -57,6 +69,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
         </CardHeader>
         <CardContent>
           <form
+            autoComplete="off"
             onSubmit={async (e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -74,6 +87,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                     <Input
                       id="username"
                       type="text"
+                      autoComplete="off"
                       value={field.state.value}
                       aria-invalid={!field.state.meta.isValid}
                       onBlur={field.handleBlur}
@@ -118,14 +132,28 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                 children={(field) => (
                   <Field data-invalid={!field.state.meta.isValid}>
                     <FieldLabel htmlFor="token">Linkding API token</FieldLabel>
-                    <Input
-                      id="token"
-                      type="password"
-                      value={field.state.value}
-                      aria-invalid={!field.state.meta.isValid}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
+
+                    <InputGroup>
+                      <InputGroupInput
+                        id="token"
+                        type={showToken ? "text" : "password"}
+                        autoComplete="new-password"
+                        value={field.state.value}
+                        aria-invalid={!field.state.meta.isValid}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                      />
+                      <InputGroupAddon
+                        align="inline-end"
+                        onClick={() => setShowToken((prev) => !prev)}>
+                        {showToken ? (
+                          <EyeIcon className="stroke-foreground size-4" />
+                        ) : (
+                          <EyeOffIcon className="stroke-foreground size-4" />
+                        )}
+                      </InputGroupAddon>
+                    </InputGroup>
+
                     {!field.state.meta.isValid && (
                       <CustomFieldError errors={field.state.meta.errors} />
                     )}

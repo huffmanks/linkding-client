@@ -7,8 +7,9 @@ import { LoginForm } from "@/components/forms/login-form";
 export const Route = createFileRoute("/")({
   component: App,
   beforeLoad: async () => {
-    const authed = await isAuthenticated();
-    if (authed) {
+    const { isValid } = await isAuthenticated();
+
+    if (isValid) {
       throw redirect({ to: "/dashboard" });
     }
   },

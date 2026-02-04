@@ -146,3 +146,32 @@ export function joinUrlPath(url: string | null, path: string | null) {
 
   return `${cleanBase}${normalizedPath}`;
 }
+
+export function getErrorMessage(error: unknown) {
+  if (!(error instanceof Error)) {
+    return String(error);
+  }
+
+  switch (error.name) {
+    case "TimeoutError":
+      return "The request took too long. Please check your connection.";
+
+    case "AbortError":
+      return "The request was cancelled.";
+
+    case "TypeError":
+      if (error.message.includes("fetch")) {
+        return "Network error: check your internet or CORS settings.";
+      }
+      return "A system type error occurred.";
+
+    case "SyntaxError":
+      return "Failed to parse the server response (Invalid JSON).";
+
+    case "NotAllowedError":
+      return "Permissions were denied for this operation.";
+
+    default:
+      return error.message || "An unexpected error occurred.";
+  }
+}

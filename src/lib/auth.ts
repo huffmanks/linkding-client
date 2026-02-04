@@ -1,4 +1,5 @@
 import { type Token, type Url, useSettingsStore } from "@/lib/store";
+import { getErrorMessage } from "@/lib/utils";
 
 export async function login({
   username,
@@ -11,18 +12,26 @@ export async function login({
 }) {
   const { setUsername, setLinkdingUrl, setToken } = useSettingsStore.getState();
 
-  if (!username || !linkdingUrl || !token) return false;
+  try {
+    if (!username || !linkdingUrl || !token) throw new Error("Missing credentials.");
 
-  const isValid = await validate({ token });
+    const { isValid, errorMessage } = await validate({ token });
 
-  if (isValid) {
+    if (!isValid && errorMessage) throw new Error(errorMessage);
+
     setUsername(username);
     setLinkdingUrl(linkdingUrl);
     setToken(token);
-    return true;
-  } else {
-    console.error("Failed to validate Linkding API token.");
-    return false;
+    return {
+      isValid,
+      errorMessage,
+    };
+  } catch (error) {
+    const errorMessage = getErrorMessage(error);
+    return {
+      isValid: false,
+      errorMessage,
+    };
   }
 }
 
@@ -33,21 +42,32 @@ export function logout() {
   setToken(null);
 }
 
-export async function isAuthenticated(): Promise<boolean> {
+export async function isAuthenticated() {
   const { username, linkdingUrl, token } = useSettingsStore.getState();
 
-  if (!username || !linkdingUrl || !token) {
-    return false;
-  }
-
-  if (!navigator.onLine) {
-    return true;
-  }
-
   try {
-    return await validate({ token });
+    if (!username || !linkdingUrl || !token) throw new Error("Missing credentials.");
+
+    if (!navigator.onLine) {
+      return {
+        isValid: true,
+        errorMessage: null,
+      };
+    }
+
+    const { isValid, errorMessage } = await validate({ token });
+
+    if (!isValid && errorMessage) throw new Error(errorMessage);
+    return {
+      isValid,
+      errorMessage: null,
+    };
   } catch (error) {
-    return true;
+    const errorMessage = getErrorMessage(error);
+    return {
+      isValid: false,
+      errorMessage,
+    };
   }
 }
 
@@ -61,8 +81,20 @@ async function validate({ token }: { token: string }) {
       },
     });
 
-    return res.ok;
-  } catch (error) {
-    return false;
+    if (!res.ok) {
+      throw new Error("Could not validate the API token.");
+    }
+
+    return {
+      isValid: true,
+      errorMessage: null,
+    };
+  } catch (error: unknown) {
+    const errorMessage = getErrorMessage(error);
+
+    return {
+      isValid: false,
+      errorMessage,
+    };
   }
 }

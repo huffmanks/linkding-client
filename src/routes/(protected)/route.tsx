@@ -8,8 +8,9 @@ import Sidebar from "@/components/blocks/sidebar";
 export const Route = createFileRoute("/(protected)")({
   component: RouteComponent,
   beforeLoad: async () => {
-    const authed = await isAuthenticated();
-    if (!authed) {
+    const { isValid } = await isAuthenticated();
+
+    if (!isValid) {
       throw redirect({ to: "/" });
     }
   },
