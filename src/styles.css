@@ -129,6 +129,27 @@
   }
 }
 
+.view-content {
+  view-transition-name: bookmark-view;
+}
+
+::view-transition-old(bookmark-view) {
+  --tw-exit-opacity: 0;
+  --tw-exit-translate-x: -20px;
+  animation: exit 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+::view-transition-new(bookmark-view) {
+  --tw-enter-opacity: 0;
+  --tw-enter-translate-x: 60px;
+  animation: enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+::view-transition-group(bookmark-view) {
+  background: transparent;
+  transition: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 /* ===== Scrollbar CSS ===== */
 html {
   scrollbar-gutter: stable;

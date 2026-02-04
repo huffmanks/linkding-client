@@ -8,6 +8,8 @@ import reportWebVitals from "@/reportWebVitals.ts";
 import { routeTree } from "@/routeTree.gen";
 import "@/styles.css";
 
+import DefaultErrorComponent from "@/components/default-error-component";
+import DefaultNotFoundComponent from "@/components/default-not-found-component";
 import ThemeWatcher from "@/components/theme-watcher";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -21,7 +23,8 @@ const router = createRouter({
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
-  defaultNotFoundComponent: () => <div>404 page not found</div>,
+  defaultNotFoundComponent: () => <DefaultNotFoundComponent />,
+  defaultErrorComponent: (props) => <DefaultErrorComponent {...props} />,
 });
 
 declare module "@tanstack/react-router" {

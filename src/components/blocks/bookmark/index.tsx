@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { LayoutGridIcon, ListIcon, Table2Icon } from "lucide-react";
+import { flushSync } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
 
 import { usePagination } from "@/hooks/use-pagination";
@@ -64,11 +65,19 @@ export default function BookmarkWrapper({
   }
 
   function handleValueChange(values: string[]) {
-    const nextValue = values[values.length - 1] as View;
+    const nextView = values[values.length - 1] as View;
+    if (!nextView) return;
 
-    if (nextValue) {
-      setView(nextValue);
+    if (!document.startViewTransition) {
+      setView(nextView);
+      return;
     }
+
+    document.startViewTransition(() => {
+      flushSync(() => {
+        setView(nextView);
+      });
+    });
   }
 
   const {
@@ -117,29 +126,31 @@ export default function BookmarkWrapper({
         </ToggleGroup>
       </div>
 
-      {view === "grid" && (
-        <BookmarkGridView
-          bookmarks={bookmarkData.results}
-          handleOpenSheet={handleOpenSheet}
-          handleOpenChange={handleOpenChange}
-        />
-      )}
+      <div className="view-content overflow-hidden">
+        {view === "grid" && (
+          <BookmarkGridView
+            bookmarks={bookmarkData.results}
+            handleOpenSheet={handleOpenSheet}
+            handleOpenChange={handleOpenChange}
+          />
+        )}
 
-      {view === "list" && (
-        <BookmarkListView
-          bookmarks={bookmarkData.results}
-          handleOpenSheet={handleOpenSheet}
-          handleOpenChange={handleOpenChange}
-        />
-      )}
+        {view === "list" && (
+          <BookmarkListView
+            bookmarks={bookmarkData.results}
+            handleOpenSheet={handleOpenSheet}
+            handleOpenChange={handleOpenChange}
+          />
+        )}
 
-      {view === "table" && (
-        <BookmarkTableView
-          bookmarks={bookmarkData.results}
-          handleOpenSheet={handleOpenSheet}
-          handleOpenChange={handleOpenChange}
-        />
-      )}
+        {view === "table" && (
+          <BookmarkTableView
+            bookmarks={bookmarkData.results}
+            handleOpenSheet={handleOpenSheet}
+            handleOpenChange={handleOpenChange}
+          />
+        )}
+      </div>
 
       {selectedBookmark && (
         <BookmarkSheet
