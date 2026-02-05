@@ -147,6 +147,11 @@ export function joinUrlPath(url: string | null, path: string | null) {
   return `${cleanBase}${normalizedPath}`;
 }
 
+export function cleanUrl(url: string | null | undefined) {
+  if (!url) return "";
+  return url.replace(/^https?:\/\/[^\/]+/, "");
+}
+
 export function getErrorMessage(error: unknown) {
   if (!(error instanceof Error)) {
     return String(error);

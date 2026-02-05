@@ -58,6 +58,8 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
       } else {
         mutate(processed);
       }
+
+      form.reset();
     },
   });
 

@@ -14,9 +14,13 @@ RUN pnpm run build \
     && pnpm store prune
 
 # --- STAGE 1: Runner ---
-FROM nginxinc/nginx-unprivileged:alpine AS runner
+FROM oven/bun:1.1-slim AS runner
 
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY --from=builder /app/nginx/default.conf.template /etc/nginx/templates/default.conf.template
+WORKDIR /app
 
-EXPOSE 8080
+COPY --from=builder /app/dist ./dist
+COPY server.mjs .
+
+EXPOSE 3000
+
+CMD ["bun", "run", "server.mjs"]

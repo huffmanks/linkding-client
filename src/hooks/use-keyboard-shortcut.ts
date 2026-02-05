@@ -12,14 +12,14 @@ export function useKeyboardShortcut(
   callback: () => void,
   options: ShortcutOptions = {}
 ) {
+  const { mod, shift, alt, preventDefault = true } = options;
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      const { mod, shift, alt, preventDefault = true } = options;
+      if (!event.key) return;
 
       const isKeyMatch = event.key.toLowerCase() === key.toLowerCase();
-
       const isModMatch = mod ? event.metaKey || event.ctrlKey : true;
-
       const isShiftMatch = shift !== undefined ? event.shiftKey === shift : true;
       const isAltMatch = alt !== undefined ? event.altKey === alt : true;
 
@@ -31,5 +31,5 @@ export function useKeyboardShortcut(
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [key, callback, JSON.stringify(options)]);
+  }, [key, callback, mod, shift, alt, preventDefault]);
 }

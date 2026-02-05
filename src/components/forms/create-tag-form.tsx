@@ -1,9 +1,11 @@
 import type { Dispatch, SetStateAction } from "react";
 
 import { useForm } from "@tanstack/react-form";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import z from "zod";
 
 import { useCreateTag } from "@/lib/mutations";
+import { getAllQueryOptions } from "@/lib/queries";
 
 import type { ActiveModal } from "@/components/blocks/sidebar";
 import CustomFieldError from "@/components/forms/custom-field-error";
@@ -24,6 +26,7 @@ interface AddTagFormProps {
 
 export function CreateTagForm({ setOpenTagModal }: AddTagFormProps) {
   const { mutate, isPending } = useCreateTag();
+  const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
   const form = useForm({
     defaultValues: {
@@ -31,6 +34,7 @@ export function CreateTagForm({ setOpenTagModal }: AddTagFormProps) {
     },
     onSubmit: async ({ value }) => {
       mutate(value);
+      form.reset();
       setOpenTagModal(null);
     },
   });
@@ -53,7 +57,14 @@ export function CreateTagForm({ setOpenTagModal }: AddTagFormProps) {
               <form.Field
                 name="name"
                 validators={{
-                  onChange: z.string().min(1, "Name is required."),
+                  onChange: z
+                    .string()
+                    .min(1, "Name is required.")
+                    .refine(
+                      (val) =>
+                        !data?.results.some((tag) => tag.name.toLowerCase() === val.toLowerCase()),
+                      { message: "A tag with this name already exists." }
+                    ),
                 }}
                 children={(field) => (
                   <Field data-invalid={!field.state.meta.isValid}>
@@ -64,7 +75,11 @@ export function CreateTagForm({ setOpenTagModal }: AddTagFormProps) {
                       value={field.state.value}
                       aria-invalid={!field.state.meta.isValid}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value || "";
+                        const formattedValue = val.toLowerCase().replace(/\s+/g, "-");
+                        field.handleChange(formattedValue);
+                      }}
                     />
                     <FieldDescription>
                       Tag names are case-insensitive and cannot contain spaces (spaces will be

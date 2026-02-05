@@ -18,7 +18,7 @@ export const Route = createFileRoute("/")({
 
 function App() {
   return (
-    <FullScreenWrapper>
+    <FullScreenWrapper className="min-h-svh justify-center">
       <LoginForm />
     </FullScreenWrapper>
   );

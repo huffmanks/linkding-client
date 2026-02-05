@@ -1,4 +1,5 @@
 import { useSettingsStore } from "@/lib/store";
+import { cleanUrl } from "@/lib/utils";
 
 export async function linkdingFetch<T>(
   endpoint: string,
@@ -27,5 +28,12 @@ export async function linkdingFetch<T>(
     throw new Error(`API Error: ${response.status} ${response.statusText}`);
   }
 
-  return await response.json();
+  const data = await response.json();
+
+  return JSON.parse(JSON.stringify(data), (_key, value) => {
+    if (typeof value === "string" && value.includes("/static/")) {
+      return cleanUrl(value);
+    }
+    return value;
+  });
 }

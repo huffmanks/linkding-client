@@ -56,7 +56,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   }
 
   return (
-    <form {...props} onSubmit={handleSubmit}>
+    <form {...props} autoComplete="off" onSubmit={handleSubmit}>
       <Label htmlFor="search" className="sr-only">
         Search
       </Label>
@@ -67,6 +67,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           id="search"
           value={searchInput}
           placeholder="Search..."
+          autoComplete="off"
           className="bg-background h-8 w-full shadow-none"
           onChange={handleChange}
         />

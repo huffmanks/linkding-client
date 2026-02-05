@@ -10,6 +10,16 @@ import { VitePWA } from "vite-plugin-pwa";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   return {
+    base: "/",
+    build: {
+      rollupOptions: {
+        output: {
+          assetFileNames: "app-assets/[name]-[hash][extname]",
+          chunkFileNames: "app-assets/[name]-[hash].js",
+          entryFileNames: "app-assets/[name]-[hash].js",
+        },
+      },
+    },
     plugins: [
       devtools(),
       tanstackRouter({
@@ -27,11 +37,8 @@ export default defineConfig(({ mode }) => {
           runtimeCaching: [
             {
               urlPattern: ({ url }) =>
-                url.pathname.startsWith("/favicons") ||
-                url.pathname.startsWith("/media") ||
-                url.pathname.startsWith("/static") ||
-                url.pathname.startsWith("/previews"),
-              handler: "CacheFirst",
+                /^\/(assets|favicons|media|previews|static)/.test(url.pathname),
+              handler: "StaleWhileRevalidate",
               options: {
                 cacheName: "linkding-assets",
                 expiration: {
@@ -45,24 +52,23 @@ export default defineConfig(({ mode }) => {
             },
             {
               urlPattern: ({ url }) => url.pathname.startsWith("/api"),
-              handler: "NetworkFirst",
+              handler: "StaleWhileRevalidate",
               options: {
-                cacheName: "api-data-cache",
+                cacheName: "linkding-api-data",
                 expiration: {
                   maxEntries: 1000,
                   maxAgeSeconds: 60 * 60 * 24 * 120,
                 },
-                networkTimeoutSeconds: 3,
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
               },
             },
             {
-              urlPattern: ({ request, url }) =>
-                request.destination === "document" &&
-                request.mode !== "navigate" &&
-                (url.pathname.startsWith("/media") || url.pathname.startsWith("/static")),
+              urlPattern: ({ url }) => url.pathname.startsWith("/app-assets"),
               handler: "StaleWhileRevalidate",
               options: {
-                cacheName: "linkding-html-archives",
+                cacheName: "app-assets",
                 expiration: {
                   maxEntries: 500,
                   maxAgeSeconds: 60 * 60 * 24 * 120,
@@ -78,7 +84,7 @@ export default defineConfig(({ mode }) => {
     ],
     server: {
       proxy: {
-        "/api": {
+        "^/(api|favicons|media|previews|static)": {
           target: "http://localhost:9090",
           changeOrigin: true,
         },

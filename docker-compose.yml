@@ -9,8 +9,8 @@ services:
     environment:
       LD_SUPERUSER_NAME: ${LD_SUPERUSER_NAME}
       LD_SUPERUSER_PASSWORD: ${LD_SUPERUSER_PASSWORD}
+      LD_CSRF_TRUSTED_ORIGINS: ${LD_CSRF_TRUSTED_ORIGINS}
       LD_USE_X_FORWARDED_HOST: "true"
-      LD_CSRF_TRUSTED_ORIGINS: "http://${APP_DOMAIN},https://${APP_DOMAIN}"
     restart: unless-stopped
   echo-link:
     build:
@@ -19,9 +19,8 @@ services:
     # image: huffmanks/echo-link@latest
     container_name: echo-link
     ports:
-      - "${APP_PORT:-3000}:8080"
+      - "3000:3000"
     environment:
-      APP_DOMAIN: ${APP_DOMAIN}
       LINKDING_CONTAINER_URL: ${LINKDING_CONTAINER_URL}
     depends_on:
       - linkding

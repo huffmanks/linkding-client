@@ -124,7 +124,7 @@ function Content({
         };
       });
 
-    let image = joinUrlPath(linkdingUrl, bookmark?.preview_image_url);
+    let image = bookmark?.preview_image_url;
 
     if (!image) {
       const latestImage = data.results

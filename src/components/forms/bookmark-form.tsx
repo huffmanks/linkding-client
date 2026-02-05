@@ -56,6 +56,7 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
       } else {
         mutate({ ...value, tag_names: value.tag_names.filter(Boolean) });
       }
+      form.reset();
     },
   });
 

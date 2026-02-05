@@ -7,7 +7,7 @@ export default function DefaultNotFoundComponent() {
   const router = useRouter();
   const canGoBack = useCanGoBack();
   return (
-    <FullScreenWrapper>
+    <FullScreenWrapper className="min-h-svh justify-center">
       <h1 className="mb-3 font-mono text-2xl">404 | Not found</h1>
       <p className="text-muted-foreground mb-6">This page does not exist.</p>
 

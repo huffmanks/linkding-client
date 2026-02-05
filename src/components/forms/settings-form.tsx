@@ -1,10 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import { LaptopIcon, LayoutGridIcon, ListIcon, MoonIcon, SunIcon, Table2Icon } from "lucide-react";
+import { toast } from "sonner";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
 import { UrlSchema, useSettingsStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import type { Theme, View } from "@/types";
 
 import CustomFieldError from "@/components/forms/custom-field-error";
@@ -73,12 +74,18 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
       limit,
     },
     onSubmit: async ({ value }) => {
-      setUsername(value.username);
-      setLinkdingUrl(value.linkdingUrl);
-      setView(value.view);
-      setTheme(value.theme);
-      setSidebarAddOpen(value.sidebarAddOpen);
-      setLimit(Number(value.limit));
+      try {
+        setUsername(value.username);
+        setLinkdingUrl(value.linkdingUrl);
+        setView(value.view);
+        setTheme(value.theme);
+        setSidebarAddOpen(value.sidebarAddOpen);
+        setLimit(Number(value.limit));
+        toast.success("Settings updated!");
+      } catch (error: unknown) {
+        const errorMessage = getErrorMessage(error);
+        toast.error(errorMessage);
+      }
     },
   });
 

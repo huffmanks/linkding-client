@@ -1,6 +1,14 @@
-export default function FullScreenWrapper({ children }: { children: React.ReactNode }) {
+import { cn } from "@/lib/utils";
+
+export default function FullScreenWrapper({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+    <div className={cn("flex w-full items-center p-6", className)}>
       <div className="w-full max-w-sm">{children}</div>
     </div>
   );

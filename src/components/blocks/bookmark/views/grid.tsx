@@ -121,7 +121,7 @@ function CardImage({ bookmark }: { bookmark: Bookmark }) {
   const assets = useMemo(() => {
     if (isLoading || !data?.results) return null;
 
-    let image = joinUrlPath(linkdingUrl, bookmark?.preview_image_url);
+    let image = bookmark?.preview_image_url;
 
     if (!image) {
       const latestImage = data.results
