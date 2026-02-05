@@ -1,7 +1,7 @@
 "use client";
 
-import { useNavigate } from "@tanstack/react-router";
-import { LogOut } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { LogOutIcon, SettingsIcon } from "lucide-react";
 
 import { logout } from "@/lib/auth";
 import { useSettingsStore } from "@/lib/store";
@@ -64,8 +64,22 @@ export function NavUser() {
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />
+
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                nativeButton={false}
+                render={
+                  <Link to="/dashboard/settings">
+                    <SettingsIcon />
+                    <span>Settings</span>
+                  </Link>
+                }></DropdownMenuItem>
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
-              <LogOut />
+              <LogOutIcon />
               <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
