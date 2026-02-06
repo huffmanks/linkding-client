@@ -52,15 +52,11 @@ export default defineConfig(({ mode }) => {
             },
             {
               urlPattern: ({ url }) => url.pathname.startsWith("/api"),
-              handler: "StaleWhileRevalidate",
+              handler: "NetworkOnly",
               options: {
-                cacheName: "linkding-api-data",
-                expiration: {
-                  maxEntries: 1000,
-                  maxAgeSeconds: 60 * 60 * 24 * 120,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
+                backgroundSync: {
+                  name: "api-retry",
+                  options: { maxRetentionTime: 24 * 60 },
                 },
               },
             },

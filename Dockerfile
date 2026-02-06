@@ -1,26 +1,34 @@
-# --- STAGE 0: Builder ---
-FROM node:22.18.0-alpine AS builder
+# --- STAGE 0: Build Frontend ---
+FROM node:22.18.0-alpine AS frontend-builder
 
 WORKDIR /app
 
 COPY package*.json pnpm-lock.yaml ./
 
-RUN corepack enable \
-    && pnpm install --frozen-lockfile
+RUN corepack enable && pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm run build \
-    && pnpm store prune
+RUN pnpm run build
 
-# --- STAGE 1: Runner ---
-FROM oven/bun:1.1-slim AS runner
+# --- STAGE 1: Build Go ---
+FROM golang:1.23-alpine AS go-builder
 
 WORKDIR /app
 
-COPY --from=builder /app/dist ./dist
-COPY server.mjs .
+COPY server.go .
+
+RUN go mod init proxy-server && \
+    CGO_ENABLED=0 GOOS=linux go build -o main server.go
+
+# --- STAGE 2: Runner ---
+FROM alpine:3.23 AS runner
+
+WORKDIR /app
+
+COPY --from=frontend-builder /app/dist ./dist
+COPY --from=go-builder /app/main .
 
 EXPOSE 3000
 
-CMD ["bun", "run", "server.mjs"]
+CMD ["./main"]

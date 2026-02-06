@@ -10,8 +10,10 @@ export function getContext() {
     defaultOptions: {
       queries: {
         networkMode: "offlineFirst",
-        staleTime: Infinity,
+        staleTime: 0,
         gcTime,
+        refetchOnWindowFocus: true,
+        retry: 3,
       },
     },
   });
