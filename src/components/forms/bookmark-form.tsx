@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { useCreateBookmark, useEditBookmark } from "@/lib/mutations";
@@ -26,6 +27,8 @@ type BookmarkFormProps = React.ComponentProps<"div"> & {
 };
 
 export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProps) {
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
   const { mutate, isPending } = useCreateBookmark();
   const { mutateAsync } = useEditBookmark();
 
@@ -57,6 +60,12 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
         mutate({ ...value, tag_names: value.tag_names.filter(Boolean) });
       }
       form.reset();
+
+      if (canGoBack) {
+        router.history.back();
+      } else {
+        router.navigate({ to: "/dashboard" });
+      }
     },
   });
 

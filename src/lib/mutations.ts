@@ -3,13 +3,13 @@ import { toast } from "sonner";
 
 import { linkdingFetch } from "@/lib/api";
 import { useSettingsStore } from "@/lib/store";
-import type { BookmarkInsert, FolderInsert, TagInsert } from "@/types";
+import type { Bookmark, BookmarkInsert, Folder, FolderInsert, TagInsert } from "@/types";
 
 export function useCreateBookmark() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newBookmark: BookmarkInsert) =>
+    mutationFn: async (newBookmark: BookmarkInsert): Promise<Bookmark> =>
       await linkdingFetch("bookmarks", {
         method: "POST",
         body: JSON.stringify(newBookmark),
@@ -106,7 +106,7 @@ export function useCreateFolder() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (newFolder: FolderInsert) =>
+    mutationFn: async (newFolder: FolderInsert): Promise<Folder> =>
       await linkdingFetch("bundles", {
         method: "POST",
         body: JSON.stringify(newFolder),

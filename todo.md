@@ -2,12 +2,11 @@
 
 ## Navigation & Routing
 
-- [ ] After creating/editing a bookmark/folder
-  - [ ] If folder go to folder.
-  - [ ] If bookmark canGoBack > goBack, if not go to /dashboard.
-- [ ] Add a logo next to the sidebar expand button that links to the homepage (omit if using mobile bottom navigation).
-- [ ] On mobile, replace the sidebar with a bottom navigation bar (Add, Bookmarks, Folders, Tags, Settings).
+- [x] On mobile, replace the sidebar with a bottom navigation bar (Add, Bookmarks, Folders, Tags, Settings).
+  - [ ] Active state on button.
 - [ ] Move Admin and LD links into the user dropdown menu on mobile.
+- [ ] Create [tags page](<src/routes/(protected)/dashboard/tags/index.tsx>)
+- [ ] Create [folders page](<src/routes/(protected)/dashboard/folders/index.tsx>)
 
 ## Error & Empty States
 

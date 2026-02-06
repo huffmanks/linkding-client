@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import z from "zod";
 
 import { useCreateFolder, useEditFolder } from "@/lib/mutations";
@@ -24,8 +25,9 @@ type FolderFormProps = React.ComponentProps<"div"> & {
 };
 
 export function FolderForm({ folder, className, ...props }: FolderFormProps) {
-  const { mutate, isPending } = useCreateFolder();
-  const { mutateAsync } = useEditFolder();
+  const navigate = useNavigate();
+  const { mutateAsync: createFolder, isPending } = useCreateFolder();
+  const { mutateAsync: editFolder } = useEditFolder();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
@@ -53,13 +55,17 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
     defaultValues,
     onSubmit: async ({ value }) => {
       const processed = processValue({ value, returnType: "string" });
+      let paramId: number;
       if (folder?.id) {
-        mutateAsync({ id: folder.id, modifiedFolder: processed });
+        await editFolder({ id: folder.id, modifiedFolder: processed });
+        paramId = folder.id;
       } else {
-        mutate(processed);
+        const newFolder = await createFolder(processed);
+        paramId = newFolder.id;
       }
 
       form.reset();
+      navigate({ to: "/dashboard/folders/$id", params: { id: String(paramId) } });
     },
   });
 
