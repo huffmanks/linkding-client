@@ -32,13 +32,7 @@
 
 ## Search Enhancements
 
-- [ ] Autofocus and auto-select search input text on focus (not only via Cmd+K).
-- [ ] Add a clear (×) button to the search input.
 - [ ] When typing `#` in search, show a dropdown of existing tags.
-
-## Mobile & Touch UX
-
-- [ ] Ensure all tooltips support touch interactions, not hover-only behavior.
 
 ## Data Validation & Duplication Checks
 

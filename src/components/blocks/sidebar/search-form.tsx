@@ -1,10 +1,12 @@
 import { useRef, useState } from "react";
 
 import { useNavigate, useSearch } from "@tanstack/react-router";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, XIcon } from "lucide-react";
 
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
+import { cn } from "@/lib/utils";
 
+import { Button } from "@/components/ui/button";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
 import { Kbd } from "@/components/ui/kbd";
 import { Label } from "@/components/ui/label";
@@ -25,11 +27,7 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     if (e.target.value === "") {
-      setSearchInput("");
-      navigate({
-        search: undefined,
-        replace: true,
-      });
+      clearSearch();
       return;
     }
 
@@ -38,6 +36,14 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     }
 
     setSearchInput(e.target.value);
+  }
+
+  function clearSearch() {
+    setSearchInput("");
+    navigate({
+      search: undefined,
+      replace: true,
+    });
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -70,9 +76,19 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
           autoComplete="off"
           className="bg-background h-8 w-full shadow-none"
           onChange={handleChange}
+          onFocus={() => inputRef.current?.select()}
         />
         <InputGroupAddon>
           <SearchIcon className="text-muted-foreground" />
+        </InputGroupAddon>
+        <InputGroupAddon align="inline-end">
+          <Button
+            className={cn(searchInput === "" ? "invisible opacity-0" : "visible opacity-100")}
+            size="icon-xs"
+            variant="ghost"
+            onClick={clearSearch}>
+            <XIcon />
+          </Button>
         </InputGroupAddon>
         <InputGroupAddon align="inline-end">
           <Kbd>⌘K</Kbd>

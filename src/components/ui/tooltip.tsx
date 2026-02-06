@@ -1,21 +1,43 @@
+import * as React from "react";
+
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip";
 
 import { cn } from "@/lib/utils";
+
+const TooltipContext = React.createContext<{
+  open: boolean;
+  setOpen: (open: boolean) => void;
+} | null>(null);
 
 function TooltipProvider({ delay = 0, ...props }: TooltipPrimitive.Provider.Props) {
   return <TooltipPrimitive.Provider data-slot="tooltip-provider" delay={delay} {...props} />;
 }
 
 function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
+  const [open, setOpen] = React.useState(false);
   return (
-    <TooltipProvider>
-      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
-    </TooltipProvider>
+    <TooltipContext.Provider value={{ open, setOpen }}>
+      <TooltipProvider>
+        <TooltipPrimitive.Root data-slot="tooltip" open={open} onOpenChange={setOpen} {...props} />
+      </TooltipProvider>
+    </TooltipContext.Provider>
   );
 }
 
 function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
+  const context = React.useContext(TooltipContext);
+  return (
+    <TooltipPrimitive.Trigger
+      data-slot="tooltip-trigger"
+      className="cursor-pointer touch-none select-none"
+      tabIndex={0}
+      onTouchStart={() => {
+        context?.setOpen(!context.open);
+      }}
+      onContextMenu={(e) => e.preventDefault()}
+      {...props}
+    />
+  );
 }
 
 function TooltipContent({
