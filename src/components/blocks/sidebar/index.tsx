@@ -28,7 +28,7 @@ export default function Sidebar() {
               <AppSidebar setActiveModal={setActiveModal} />
             )}
             <SidebarInset className="min-w-0">
-              <div className={cn("p-4", isMobile ? "pb-26" : "pb-4")}>
+              <div className={cn("p-4", isMobile ? "pb-28" : "pb-4")}>
                 <Outlet />
               </div>
             </SidebarInset>

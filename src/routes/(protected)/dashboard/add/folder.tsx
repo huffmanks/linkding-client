@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { FolderForm } from "@/components/forms/folder-form";
 
-export const Route = createFileRoute("/(protected)/dashboard/folders/add")({
+export const Route = createFileRoute("/(protected)/dashboard/add/folder")({
   component: RouteComponent,
 });
 

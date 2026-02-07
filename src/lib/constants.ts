@@ -16,12 +16,12 @@ export const SIDEBAR_NAV_MAIN = [
     items: [
       {
         name: "Bookmark",
-        url: "/dashboard/bookmarks/add",
+        url: "/dashboard/add/bookmark",
         isActive: false,
       },
       {
         name: "Folder",
-        url: "/dashboard/folders/add",
+        url: "/dashboard/add/folder",
         isActive: false,
       },
       {

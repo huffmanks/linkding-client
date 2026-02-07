@@ -2,8 +2,6 @@
 
 ## Navigation & Routing
 
-- [x] On mobile, replace the sidebar with a bottom navigation bar (Add, Bookmarks, Folders, Tags, Settings).
-  - [ ] Active state on button.
 - [ ] Move Admin and LD links into the user dropdown menu on mobile.
 - [ ] Create [tags page](<src/routes/(protected)/dashboard/tags/index.tsx>)
 - [ ] Create [folders page](<src/routes/(protected)/dashboard/folders/index.tsx>)

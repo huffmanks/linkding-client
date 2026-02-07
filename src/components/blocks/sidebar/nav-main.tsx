@@ -9,6 +9,7 @@ import { ChevronRightIcon, FolderIcon, HashIcon } from "lucide-react";
 import { SIDEBAR_NAV_MAIN } from "@/lib/constants";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
+import { checkActive } from "@/lib/utils";
 import type { SidebarNavItem, SidebarSubNavItem } from "@/types";
 
 import type { ActiveModal } from "@/components/blocks/sidebar";
@@ -37,9 +38,6 @@ export function NavMain({ setActiveModal }: NavMainProps) {
   const { isMobile, setOpenMobile } = useSidebar();
   const { pathname } = useLocation();
 
-  const checkActive = (url?: string, name?: string) =>
-    (!!url && pathname === url) || (!!url && pathname === "/dashobard" && name === "Bookmarks");
-
   const folderItems =
     folders?.results?.map((item) => {
       const url = `/dashboard/folders/${item.id}`;
@@ -47,7 +45,7 @@ export function NavMain({ setActiveModal }: NavMainProps) {
       return {
         name: item.name,
         url,
-        isActive: checkActive(url),
+        isActive: checkActive({ pathname, url }),
       };
     }) || [];
 
@@ -57,7 +55,7 @@ export function NavMain({ setActiveModal }: NavMainProps) {
       return {
         name: item.name,
         url,
-        isActive: checkActive(url),
+        isActive: checkActive({ pathname, url }),
       };
     }) || [];
 
@@ -66,12 +64,12 @@ export function NavMain({ setActiveModal }: NavMainProps) {
       const subItems =
         item.items?.map((sub) => ({
           ...sub,
-          isActive: checkActive(sub.url),
+          isActive: checkActive({ pathname, url: sub.url }),
         })) || [];
 
       return {
         ...item,
-        isActive: checkActive(item.url),
+        isActive: checkActive({ pathname, url: item.url }),
         items: subItems,
       };
     }),

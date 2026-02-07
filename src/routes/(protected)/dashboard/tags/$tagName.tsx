@@ -78,7 +78,7 @@ function EmptyTag({ name }: { name: string }) {
 
           <Button
             nativeButton={false}
-            render={<Link to="/dashboard/bookmarks/add">Create bookmark</Link>}></Button>
+            render={<Link to="/dashboard/add/bookmark">Create bookmark</Link>}></Button>
         </div>
       </EmptyContent>
     </Empty>

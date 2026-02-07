@@ -152,6 +152,26 @@ export function cleanUrl(url: string | null | undefined) {
   return url.replace(/^https?:\/\/[^\/]+/, "");
 }
 
+export function checkActive({
+  pathname,
+  url,
+  name,
+}: {
+  pathname: string;
+  url?: string;
+  name?: string;
+}) {
+  if (!url) return false;
+
+  if (pathname === "/dashboard" && name === "Bookmarks") return true;
+
+  if (pathname.startsWith(url) && name === "Add") return true;
+
+  if (pathname === url) return true;
+
+  return false;
+}
+
 export function getErrorMessage(error: unknown) {
   if (!(error instanceof Error)) {
     return String(error);
