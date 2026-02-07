@@ -1,8 +1,7 @@
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { EllipsisVerticalIcon } from "lucide-react";
 
 import { useDeleteFolder } from "@/lib/mutations";
-import type { Folder } from "@/types";
 
 import {
   AlertDialog,
@@ -26,22 +25,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface ActionDropdownProps {
-  folder: Folder;
+  id: number;
+  name: string;
 }
 
-export default function FolderActionDropdown({ folder }: ActionDropdownProps) {
+export default function FolderActionDropdown({ id, name }: ActionDropdownProps) {
   const { mutateAsync } = useDeleteFolder();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   function handleEdit() {
-    navigate({ to: "/dashboard/folders/$id/edit", params: { id: String(folder.id) } });
+    navigate({ to: "/dashboard/folders/$id/edit", params: { id: String(id) } });
   }
 
   async function handleDelete() {
-    mutateAsync(folder.id);
+    mutateAsync(id);
 
     navigate({ to: "/dashboard" });
   }
+
+  const isFoldersPath = pathname === "/dashboard/folders";
+
   return (
     <AlertDialog>
       <DropdownMenu>
@@ -53,7 +57,17 @@ export default function FolderActionDropdown({ folder }: ActionDropdownProps) {
           }></DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuGroup>
-            <DropdownMenuLabel className="truncate">{folder.name}</DropdownMenuLabel>
+            <DropdownMenuLabel className="truncate">{name}</DropdownMenuLabel>
+            {isFoldersPath && (
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={handleEdit}
+                render={
+                  <Link to="/dashboard/folders/$id" params={{ id: String(id) }}>
+                    View
+                  </Link>
+                }></DropdownMenuItem>
+            )}
             <DropdownMenuItem className="cursor-pointer" onClick={handleEdit}>
               Edit
             </DropdownMenuItem>

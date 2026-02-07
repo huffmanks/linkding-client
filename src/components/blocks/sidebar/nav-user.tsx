@@ -1,10 +1,13 @@
-"use client";
+import * as React from "react";
 
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOutIcon, SettingsIcon } from "lucide-react";
+import { LogOutIcon } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
 
 import { logout } from "@/lib/auth";
+import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
 import { useSettingsStore } from "@/lib/store";
+import { joinUrlPath } from "@/lib/utils";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -20,9 +23,27 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui
 
 export function NavUser() {
   const navigate = useNavigate();
-
-  const username = useSettingsStore((state) => state.username);
+  const { linkdingUrl, username } = useSettingsStore(
+    useShallow((state) => ({
+      linkdingUrl: state.linkdingUrl,
+      username: state.username,
+    }))
+  );
   const initial = username ? username.charAt(0).toUpperCase() : "E";
+
+  const items = React.useMemo(() => {
+    return SIDEBAR_NAV_SECONDARY.map((item) => {
+      const newItem = { ...item };
+
+      if (!linkdingUrl) return newItem;
+
+      if (newItem.isExternal) {
+        newItem.url = joinUrlPath(linkdingUrl, newItem.url || null);
+      }
+
+      return newItem;
+    });
+  }, [linkdingUrl]);
 
   function handleLogout() {
     logout();
@@ -66,15 +87,44 @@ export function NavUser() {
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                nativeButton={false}
-                render={
-                  <Link to="/dashboard/settings">
-                    <SettingsIcon />
-                    <span>Settings</span>
-                  </Link>
-                }></DropdownMenuItem>
+              {items.slice(0, 1).map((item) => (
+                <DropdownMenuItem
+                  key={item.url}
+                  className="cursor-pointer"
+                  nativeButton={false}
+                  render={
+                    <Link
+                      to={item.url}
+                      target={item.isExternal ? "_blank" : "_self"}
+                      rel={item.isExternal ? "noopener noreferrer" : undefined}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </Link>
+                  }></DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs font-normal tracking-wide uppercase">
+                Linkding
+              </DropdownMenuLabel>
+              {items.slice(1).map((item) => (
+                <DropdownMenuItem
+                  key={item.url}
+                  className="cursor-pointer"
+                  nativeButton={false}
+                  render={
+                    <Link
+                      to={item.url}
+                      target={item.isExternal ? "_blank" : "_self"}
+                      rel={item.isExternal ? "noopener noreferrer" : undefined}>
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </Link>
+                  }></DropdownMenuItem>
+              ))}
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />

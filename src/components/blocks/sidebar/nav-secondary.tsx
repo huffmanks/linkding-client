@@ -1,10 +1,10 @@
 import * as React from "react";
 
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 
 import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
 import { useSettingsStore } from "@/lib/store";
-import { joinUrlPath } from "@/lib/utils";
+import { checkActive, joinUrlPath } from "@/lib/utils";
 
 import {
   SidebarGroup,
@@ -20,18 +20,28 @@ import {
 export function NavSecondary({
   ...props
 }: {} & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  const { pathname } = useLocation();
   const { isMobile, setOpenMobile } = useSidebar();
   const linkdingUrl = useSettingsStore((state) => state.linkdingUrl);
 
   const items = React.useMemo(() => {
     return SIDEBAR_NAV_SECONDARY.map((item) => {
       const newItem = { ...item };
-      if (!!linkdingUrl && (newItem.name === "Admin" || newItem.name === "Web UI")) {
+
+      if (!linkdingUrl) return newItem;
+
+      if (newItem.isExternal) {
         newItem.url = joinUrlPath(linkdingUrl, newItem.url || null);
+      } else {
+        return {
+          ...newItem,
+          isActive: checkActive({ pathname, url: newItem.url }),
+        };
       }
+
       return newItem;
     });
-  }, [linkdingUrl]);
+  }, [linkdingUrl, pathname]);
 
   function handleCloseSidebar(isExternal: boolean) {
     if (isExternal || !isMobile) return;
@@ -47,6 +57,7 @@ export function NavSecondary({
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
                 size="sm"
+                isActive={item.isActive}
                 render={
                   <Link
                     to={item.url}

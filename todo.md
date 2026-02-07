@@ -2,9 +2,7 @@
 
 ## Navigation & Routing
 
-- [ ] Move Admin and LD links into the user dropdown menu on mobile.
-- [ ] Create [tags page](<src/routes/(protected)/dashboard/tags/index.tsx>)
-- [ ] Create [folders page](<src/routes/(protected)/dashboard/folders/index.tsx>)
+- [ ] Finish [tags page](<src/routes/(protected)/dashboard/tags/index.tsx>)
 
 ## Error & Empty States
 
@@ -42,8 +40,13 @@
 - [ ] Display LD preferences as disabled in the Settings page (user profile data from: `GET /api/user/profile/`).
 - [ ] Add a “Clear all offline cache”, with toggle checkboxes for each type, action in Settings.
 - [ ] Add an environment variable for offline cache retention (default: 120 days).
+- [ ] Add batch deletion to folders, bookmarks.
 
 ## Background Sync
 
 - [ ] Use persistMutationClient and a mutation recovery logic, or use Workbox Background Sync to replay failed API calls when the connection returns.
 - [ ] Set up the Offline Mutation recovery so users can perform actions like "Add Item" while offline
+
+## Login
+
+- [ ] Provide a direct link to http://localhost:9090/settings/integrations so they can easily create an API token.

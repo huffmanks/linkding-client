@@ -1,13 +1,11 @@
-import type { Dispatch, SetStateAction } from "react";
-
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import z from "zod";
 
 import { useCreateTag } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
+import { useGlobalModal } from "@/providers/global-modal-context";
 
-import type { ActiveModal } from "@/components/blocks/sidebar";
 import CustomFieldError from "@/components/forms/custom-field-error";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,12 +18,9 @@ import {
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-interface AddTagFormProps {
-  setOpenTagModal: Dispatch<SetStateAction<ActiveModal>>;
-}
-
-export function CreateTagForm({ setOpenTagModal }: AddTagFormProps) {
+export function CreateTagForm() {
   const { mutate, isPending } = useCreateTag();
+  const { closeGlobalModal } = useGlobalModal();
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
   const form = useForm({
@@ -35,7 +30,7 @@ export function CreateTagForm({ setOpenTagModal }: AddTagFormProps) {
     onSubmit: async ({ value }) => {
       mutate(value);
       form.reset();
-      setOpenTagModal(null);
+      closeGlobalModal();
     },
   });
 

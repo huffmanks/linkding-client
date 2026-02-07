@@ -16,7 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { linkdingFetch } from "@/lib/api";
 import { useDeleteBookmark } from "@/lib/mutations";
 import { useSettingsStore } from "@/lib/store";
-import { formatToLocalTime, joinUrlPath } from "@/lib/utils";
+import { formatToLocalTime, getRelativeTimeString, joinUrlPath } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
 import TagCloud from "@/components/blocks/bookmark/tag-cloud";
@@ -262,8 +262,8 @@ function Content({
       </section>
 
       <section className="text-muted-foreground mb-5 space-y-1 text-xs">
-        <p>Created: {bookmark.date_added}</p>
-        <p>Last modified: {bookmark.date_modified}</p>
+        <p>Created: {getRelativeTimeString(bookmark.date_added)}</p>
+        <p>Last modified: {getRelativeTimeString(bookmark.date_modified)}</p>
       </section>
       <section className="flex justify-end">
         <div className="flex items-center gap-2">

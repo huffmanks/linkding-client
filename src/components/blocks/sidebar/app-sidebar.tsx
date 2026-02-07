@@ -16,13 +16,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import type { ActiveModal } from ".";
+type AppSidebarProps = React.ComponentProps<typeof Sidebar>;
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-  setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
-};
-
-export function AppSidebar({ setActiveModal, ...props }: AppSidebarProps) {
+export function AppSidebar({ ...props }: AppSidebarProps) {
   return (
     <Sidebar className="top-(--header-height) h-[calc(100svh-var(--header-height))]!" {...props}>
       <SidebarHeader>
@@ -55,7 +51,7 @@ export function AppSidebar({ setActiveModal, ...props }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain setActiveModal={setActiveModal} />
+        <NavMain />
       </SidebarContent>
       <SidebarFooter>
         <NavSecondary className="mt-auto" />

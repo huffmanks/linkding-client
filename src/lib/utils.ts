@@ -55,8 +55,16 @@ export function processValue<T extends Value, R extends ReturnType>({
   return result as ProcessedValue<T, R>;
 }
 
-export function getRelativeTimeString(date: Date | number, lang = navigator.language): string {
-  const timeMs = typeof date === "number" ? date : date.getTime();
+export function getRelativeTimeString(
+  date: Date | string | number,
+  lang = navigator.language
+): string {
+  const timeMs =
+    typeof date === "number"
+      ? date
+      : typeof date === "string"
+        ? new Date(date).getTime()
+        : date.getTime();
   const diff = timeMs - Date.now();
   const absDiff = Math.abs(diff);
 
@@ -166,10 +174,10 @@ export function checkActive({
   if (pathname === "/dashboard" && name === "Bookmarks") return true;
 
   if (pathname.startsWith(url) && name === "Add") return true;
+  if (pathname.startsWith(url) && name === "Folders") return true;
+  if (pathname.startsWith(url) && name === "Tags") return true;
 
-  if (pathname === url) return true;
-
-  return false;
+  return pathname === url;
 }
 
 export function getErrorMessage(error: unknown) {

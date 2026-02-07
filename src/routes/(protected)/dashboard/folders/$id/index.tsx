@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
-import EmptyFolder from "@/routes/(protected)/dashboard/folders/-components/empty-folder";
+import { EmptyFolder } from "@/routes/(protected)/dashboard/folders/-components/empty-folder";
 import FolderActionDropdown from "@/routes/(protected)/dashboard/folders/-components/folder-action-dropdown";
 import type { BookmarkSearch } from "@/types";
 
@@ -50,7 +50,7 @@ function FolderComponent() {
       offset={offset}
       onOffsetChange={onOffsetChange}
       emptyComponent={<EmptyFolder id={folder.id} name={folder.name} />}>
-      <FolderActionDropdown folder={folder} />
+      <FolderActionDropdown id={folder.id} name={folder.name} />
     </BookmarkWrapper>
   );
 }

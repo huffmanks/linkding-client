@@ -10,9 +10,9 @@ import { SIDEBAR_NAV_MAIN } from "@/lib/constants";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
 import { checkActive } from "@/lib/utils";
+import { useGlobalModal } from "@/providers/global-modal-context";
 import type { SidebarNavItem, SidebarSubNavItem } from "@/types";
 
-import type { ActiveModal } from "@/components/blocks/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
@@ -27,11 +27,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-interface NavMainProps {
-  setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
-}
-
-export function NavMain({ setActiveModal }: NavMainProps) {
+export function NavMain() {
   const { data: folders } = useSuspenseQuery(getAllQueryOptions.folders);
   const { data: tags } = useSuspenseQuery(getAllQueryOptions.tags);
 
@@ -59,6 +55,9 @@ export function NavMain({ setActiveModal }: NavMainProps) {
       };
     }) || [];
 
+  const folderHasItems = folderItems.length > 0;
+  const tagHasItems = tagItems.length > 0;
+
   const items = [
     ...SIDEBAR_NAV_MAIN.map((item) => {
       const subItems =
@@ -75,17 +74,23 @@ export function NavMain({ setActiveModal }: NavMainProps) {
     }),
     {
       name: "Folders",
+      url: folderHasItems ? undefined : "/dashboard/folders",
       icon: FolderIcon,
-      isActive: folderItems.some((folder) => folder.isActive),
-      isCollapsible: true,
-      items: folderItems,
+      isActive: folderHasItems
+        ? folderItems.some((folder) => folder.isActive)
+        : checkActive({ pathname, url: "/dashboard/folders", name: "Folders" }),
+      isCollapsible: folderHasItems,
+      items: folderHasItems ? folderItems : undefined,
     },
     {
       name: "Tags",
+      url: tagHasItems ? undefined : "/dashboard/tags",
       icon: HashIcon,
-      isActive: tagItems.some((tag) => tag.isActive),
-      isCollapsible: true,
-      items: tagItems,
+      isActive: tagHasItems
+        ? tagItems.some((tag) => tag.isActive)
+        : checkActive({ pathname, url: "/dashboard/tags", name: "Tags" }),
+      isCollapsible: tagHasItems,
+      items: tagHasItems ? tagItems : undefined,
     },
   ] as SidebarNavItem[];
 
@@ -95,23 +100,24 @@ export function NavMain({ setActiveModal }: NavMainProps) {
     }
   }
 
+  function renderSidebarItem(item: SidebarNavItem) {
+    if (item.url) {
+      return <NavLinkItem key={item.name} item={item} handleCloseSidebar={handleCloseSidebar} />;
+    }
+
+    if (item.isCollapsible) {
+      return (
+        <NavCollapsibleItem key={item.name} item={item} handleCloseSidebar={handleCloseSidebar} />
+      );
+    }
+
+    return null;
+  }
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel className="sr-only">Items</SidebarGroupLabel>
-      <SidebarMenu>
-        {items.map((item) =>
-          item?.url ? (
-            <NavLinkItem key={item.name} item={item} handleCloseSidebar={handleCloseSidebar} />
-          ) : item?.isCollapsible ? (
-            <NavCollapsibleItem
-              key={item.name}
-              item={item}
-              handleCloseSidebar={handleCloseSidebar}
-              setActiveModal={setActiveModal}
-            />
-          ) : null
-        )}
-      </SidebarMenu>
+      <SidebarMenu>{items.map(renderSidebarItem)}</SidebarMenu>
     </SidebarGroup>
   );
 }
@@ -140,15 +146,15 @@ function NavLinkItem({
 function SubNavItems({
   items = [],
   handleCloseSidebar,
-  setActiveModal,
 }: {
   items?: SidebarSubNavItem[];
   handleCloseSidebar: () => void;
-  setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
 }) {
+  const { setActiveGlobalModal } = useGlobalModal();
+
   function handleClick() {
     handleCloseSidebar();
-    setActiveModal("tag-form");
+    setActiveGlobalModal("tag-form");
   }
   return (
     <>
@@ -176,11 +182,9 @@ function SubNavItems({
 function NavCollapsibleItem({
   item,
   handleCloseSidebar,
-  setActiveModal,
 }: {
   item: SidebarNavItem;
   handleCloseSidebar: () => void;
-  setActiveModal: React.Dispatch<React.SetStateAction<ActiveModal>>;
 }) {
   const sidebarAddOpen = useSettingsStore((state) => state.sidebarAddOpen);
   const isAdd = item.name === "Add";
@@ -192,8 +196,6 @@ function NavCollapsibleItem({
     }
   }, [sidebarAddOpen, isAdd]);
 
-  const hasItems = !!item.items?.length;
-
   return (
     <Collapsible
       open={isOpen}
@@ -201,7 +203,6 @@ function NavCollapsibleItem({
       render={
         <SidebarMenuItem>
           <CollapsibleTrigger
-            disabled={!hasItems}
             nativeButton={false}
             render={
               <SidebarMenuAction
@@ -212,29 +213,19 @@ function NavCollapsibleItem({
                       <item.icon />
                       <span>{item.name}</span>
                     </span>
-                    {hasItems && (
-                      <ChevronRightIcon
-                        aria-label="toggle"
-                        className="transition-transform group-data-panel-open:rotate-90"
-                      />
-                    )}
+                    <ChevronRightIcon
+                      aria-label="toggle"
+                      className="transition-transform group-data-panel-open:rotate-90"
+                    />
                   </div>
                 }></SidebarMenuAction>
             }></CollapsibleTrigger>
 
-          {hasItems ? (
-            <>
-              <CollapsibleContent className="py-2">
-                <SidebarMenuSub className="scrollbar max-h-48 overflow-y-auto">
-                  <SubNavItems
-                    items={item.items}
-                    handleCloseSidebar={handleCloseSidebar}
-                    setActiveModal={setActiveModal}
-                  />
-                </SidebarMenuSub>
-              </CollapsibleContent>
-            </>
-          ) : null}
+          <CollapsibleContent className="py-2">
+            <SidebarMenuSub className="scrollbar max-h-48 overflow-y-auto">
+              <SubNavItems items={item.items} handleCloseSidebar={handleCloseSidebar} />
+            </SidebarMenuSub>
+          </CollapsibleContent>
         </SidebarMenuItem>
       }></Collapsible>
   );

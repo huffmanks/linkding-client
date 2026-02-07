@@ -1,4 +1,11 @@
-import { BookmarkIcon, PlusIcon, SettingsIcon, ShieldUserIcon } from "lucide-react";
+import {
+  BookmarkIcon,
+  FolderIcon,
+  HashIcon,
+  PlusIcon,
+  SettingsIcon,
+  ShieldUserIcon,
+} from "lucide-react";
 
 import type { SidebarNavItem } from "@/types";
 
@@ -60,5 +67,38 @@ export const SIDEBAR_NAV_SECONDARY = [
     isActive: false,
     isExternal: true,
     icon: LinkdingIcon,
+  },
+] as SidebarNavItem[];
+
+export const DRAWER_MOBILE_NAV = [
+  {
+    name: "Bookmarks",
+    url: "/dashboard",
+    isActive: false,
+    icon: BookmarkIcon,
+  },
+  {
+    name: "Folders",
+    url: "/dashboard/folders",
+    isActive: false,
+    icon: FolderIcon,
+  },
+  {
+    name: "Add",
+    url: "/dashboard/add",
+    isActive: false,
+    icon: PlusIcon,
+  },
+  {
+    name: "Tags",
+    url: "/dashboard/tags",
+    isActive: false,
+    icon: HashIcon,
+  },
+  {
+    name: "Settings",
+    url: "/dashboard/settings",
+    isActive: false,
+    icon: SettingsIcon,
   },
 ] as SidebarNavItem[];
