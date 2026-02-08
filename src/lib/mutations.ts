@@ -14,8 +14,7 @@ export function useCreateBookmark() {
         method: "POST",
         body: JSON.stringify(newBookmark),
       }),
-    onError: async (err) => {
-      console.error("Failed to create bookmark:", err);
+    onError: async () => {
       toast.error("Failed to create bookmark.");
     },
     onSuccess: () => {
@@ -42,14 +41,13 @@ export function useEditBookmark() {
         method: "PUT",
         body: JSON.stringify(modifiedBookmark),
       }),
-    onError: async (err) => {
-      console.error("Failed to update bookmark:", err);
+    onError: async () => {
       toast.error("Failed to update bookmark.");
     },
     onSuccess: () => {
       toast.success("Bookmark has been updated.");
     },
-    onSettled: async (_, _err, id) => {
+    onSettled: async (_data, _err, id) => {
       await queryClient.invalidateQueries({ queryKey: ["bookmarks", id] });
     },
   });
@@ -88,15 +86,14 @@ export function useDeleteBookmark() {
 
       return { previousBookmarks };
     },
-    onError: async (err, _, context) => {
+    onError: async (_err, _vars, context) => {
       await queryClient.setQueryData(["bookmarks"], context?.previousBookmarks);
-      console.error("Failed to delete bookmark:", err);
       toast.error("Failed to delete bookmark.");
     },
     onSuccess: () => {
       toast.success("Bookmark has been deleted.");
     },
-    onSettled: async (_, _err, id) => {
+    onSettled: async (_data, _err, id) => {
       await queryClient.invalidateQueries({ queryKey: ["bookmarks", id] });
     },
   });
@@ -111,8 +108,7 @@ export function useCreateFolder() {
         method: "POST",
         body: JSON.stringify(newFolder),
       }),
-    onError: async (err) => {
-      console.error("Failed to create folder:", err);
+    onError: async () => {
       toast.error("Failed to create folder.");
     },
     onSuccess: () => {
@@ -133,14 +129,13 @@ export function useEditFolder() {
         method: "PUT",
         body: JSON.stringify(modifiedFolder),
       }),
-    onError: async (err) => {
-      console.error("Failed to update folder:", err);
+    onError: async () => {
       toast.error("Failed to update folder.");
     },
     onSuccess: () => {
       toast.success("Folder has been updated.");
     },
-    onSettled: async (_, _err, id) => {
+    onSettled: async (_data, _err, id) => {
       await queryClient.invalidateQueries({ queryKey: ["bundles", id] });
     },
   });
@@ -184,15 +179,14 @@ export function useDeleteFolder() {
 
       return { previousFolders };
     },
-    onError: async (err, _, context) => {
+    onError: async (_err, _vars, context) => {
       await queryClient.setQueryData(["bundles"], context?.previousFolders);
-      console.error("Failed to delete folder:", err);
       toast.error("Failed to delete folder.");
     },
     onSuccess: () => {
       toast.success("Folder has been deleted.");
     },
-    onSettled: async (_, _err, id) => {
+    onSettled: async (_data, _err, id) => {
       await queryClient.invalidateQueries({ queryKey: ["bundles", id] });
     },
   });
@@ -207,8 +201,7 @@ export function useCreateTag() {
         method: "POST",
         body: JSON.stringify(newTag),
       }),
-    onError: async (err) => {
-      console.error("Failed to create tag:", err);
+    onError: async () => {
       toast.error("Failed to create tag.");
     },
     onSuccess: () => {

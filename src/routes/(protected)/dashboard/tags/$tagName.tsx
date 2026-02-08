@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
@@ -18,7 +18,24 @@ export const Route = createFileRoute("/(protected)/dashboard/tags/$tagName")({
   loaderDeps: ({ search: { offset } }) => ({ offset: offset ?? 0 }),
   loader: async ({ context: { queryClient }, params: { tagName }, deps: { offset } }) => {
     const { limit } = useSettingsStore.getState();
-    queryClient.ensureQueryData(getAllQueryOptions.bookmarksByTagName(tagName, offset, limit));
+    try {
+      const tags = await queryClient.ensureQueryData(getAllQueryOptions.tags);
+
+      const tagExists = tags.results.some((t) => t.name.toLowerCase() === tagName.toLowerCase());
+
+      if (!tagExists) {
+        throw notFound();
+      }
+
+      await queryClient.ensureQueryData(
+        getAllQueryOptions.bookmarksByTagName(tagName, offset, limit)
+      );
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("404")) {
+        throw notFound();
+      }
+      throw error;
+    }
   },
 });
 

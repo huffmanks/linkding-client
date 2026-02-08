@@ -1,10 +1,5 @@
 # Todos
 
-## Error & Empty States
-
-- [ ] Make the 404 page full-screen and vertically/horizontally centered when not in sidebar view.
-- [ ] Apply the same full-screen centered layout to generic error pages.
-
 ## Bookmark States & Indicators
 
 - [ ] Display bookmark state indicators:

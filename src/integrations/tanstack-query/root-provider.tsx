@@ -13,7 +13,10 @@ export function getContext() {
         staleTime: 0,
         gcTime,
         refetchOnWindowFocus: true,
-        retry: 3,
+        retry: (failureCount, error: any) => {
+          if (error.status === 404 || error.message?.includes("404")) return false;
+          return failureCount < 3;
+        },
       },
     },
   });

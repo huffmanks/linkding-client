@@ -48,7 +48,6 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
         navigate({ to: "/dashboard" });
       } catch (error) {
         const errorMessage = getErrorMessage(error);
-        console.error(errorMessage);
         toast.error(errorMessage);
       }
     },

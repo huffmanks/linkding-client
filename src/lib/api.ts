@@ -25,7 +25,9 @@ export async function linkdingFetch<T>(
   });
 
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+    const error = new Error(`API Error: ${response.status} ${response.statusText}`) as any;
+    error.status = response.status;
+    throw error;
   }
 
   const data = await response.json();

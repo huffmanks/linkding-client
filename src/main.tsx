@@ -25,7 +25,7 @@ const router = createRouter({
   scrollRestoration: true,
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
-  defaultNotFoundComponent: () => <DefaultNotFoundComponent />,
+  defaultNotFoundComponent: (props) => <DefaultNotFoundComponent {...props} />,
   defaultErrorComponent: (props) => <DefaultErrorComponent {...props} />,
 });
 
