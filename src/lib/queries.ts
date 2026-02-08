@@ -21,6 +21,14 @@ export const getAllQueryOptions = {
     queryKey: ["bundles"],
     queryFn: () => linkdingFetch<PaginatedResponse<Folder>>("bundles"),
   }),
+  folderList: (offset: number = 0, limit: number = 10) =>
+    queryOptions({
+      queryKey: ["bundles", { offset, limit }],
+      queryFn: () =>
+        linkdingFetch<PaginatedResponse<Folder>>("bundles", {
+          params: { offset: String(offset), limit: String(limit) },
+        }),
+    }),
   folderById: (id: string) =>
     queryOptions({
       queryKey: ["bundles", id],
@@ -38,6 +46,14 @@ export const getAllQueryOptions = {
     queryKey: ["tags"],
     queryFn: () => linkdingFetch<PaginatedResponse<Tag>>("tags"),
   }),
+  tagList: (offset: number = 0, limit: number = 10) =>
+    queryOptions({
+      queryKey: ["tags", { offset, limit }],
+      queryFn: () =>
+        linkdingFetch<PaginatedResponse<Tag>>("tags", {
+          params: { offset: String(offset), limit: String(limit) },
+        }),
+    }),
   bookmarksByTagName: (tagName: string, offset: number = 0, limit: number = 10) =>
     queryOptions({
       queryKey: ["bookmarks", { q: `#${tagName}`, offset, limit }],

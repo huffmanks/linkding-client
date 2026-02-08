@@ -33,6 +33,10 @@ export type BookmarkSearch = {
   bundle?: string;
 };
 
+export type TableList = {
+  offset?: number;
+};
+
 export type Bookmark = BookmarkInsert & {
   id: number;
   web_archive_snapshot_url: string | null;

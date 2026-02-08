@@ -146,6 +146,7 @@ export default function BookmarkWrapper({
         {view === "table" && (
           <BookmarkTableView
             bookmarks={bookmarkData.results}
+            count={bookmarkData.count}
             handleOpenSheet={handleOpenSheet}
             handleOpenChange={handleOpenChange}
           />

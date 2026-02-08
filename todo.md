@@ -1,9 +1,5 @@
 # Todos
 
-## Navigation & Routing
-
-- [ ] Finish [tags page](<src/routes/(protected)/dashboard/tags/index.tsx>)
-
 ## Error & Empty States
 
 - [ ] Make the 404 page full-screen and vertically/horizontally centered when not in sidebar view.
@@ -47,6 +43,12 @@
 - [ ] Use persistMutationClient and a mutation recovery logic, or use Workbox Background Sync to replay failed API calls when the connection returns.
 - [ ] Set up the Offline Mutation recovery so users can perform actions like "Add Item" while offline
 
+## UI
+
+- [ ] Fix list view hover/focus state (green border is weird).
+- [ ] Grid/list view add url below/above title.
+
 ## Login
 
 - [ ] Provide a direct link to http://localhost:9090/settings/integrations so they can easily create an API token.
+- [ ] On logout only delete token, prepopulate url name, change username to name.

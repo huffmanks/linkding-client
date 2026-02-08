@@ -7,6 +7,7 @@ import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -14,12 +15,14 @@ import {
 
 interface BookmarkTableViewProps {
   bookmarks: Bookmark[];
+  count: number;
   handleOpenSheet: (bookmark: Bookmark) => void;
   handleOpenChange: (open: boolean) => void;
 }
 
 export default function BookmarkTableView({
   bookmarks,
+  count,
   handleOpenSheet,
   handleOpenChange,
 }: BookmarkTableViewProps) {
@@ -79,7 +82,7 @@ export default function BookmarkTableView({
                   <span className="text-muted-foreground">No description</span>
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className="flex items-center justify-end">
                 <ActionDropdown
                   bookmark={bookmark}
                   handleOpenSheet={handleOpenSheet}
@@ -89,6 +92,11 @@ export default function BookmarkTableView({
             </TableRow>
           ))}
         </TableBody>
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={5}>Total: {count}</TableCell>
+          </TableRow>
+        </TableFooter>
       </Table>
     </div>
   );
