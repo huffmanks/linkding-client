@@ -1,11 +1,12 @@
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 import z from "zod";
 
 import { useCreateFolder, useEditFolder } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { cn, processValue, stringToStringArray } from "@/lib/utils";
+import { cn, getErrorMessage, processValue, stringToStringArray } from "@/lib/utils";
 import type { Folder } from "@/types";
 
 import { ComboboxCreate } from "@/components/forms/combobox-create";
@@ -30,6 +31,7 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
   const { mutateAsync: editFolder } = useEditFolder();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
+  const { data: folders } = useSuspenseQuery(getAllQueryOptions.folders);
 
   const defaultValues = {
     name: folder?.name ?? "",
@@ -54,18 +56,30 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      const processed = processValue({ value, returnType: "string" });
-      let paramId: number;
-      if (folder?.id) {
-        await editFolder({ id: folder.id, modifiedFolder: processed });
-        paramId = folder.id;
-      } else {
-        const newFolder = await createFolder(processed);
-        paramId = newFolder.id;
-      }
+      try {
+        const processed = processValue({ value, returnType: "string" });
+        let paramId: number;
+        if (folder?.id) {
+          await editFolder({ id: folder.id, modifiedFolder: processed });
+          paramId = folder.id;
+        } else {
+          const doesFolderWithSameNameExist = folders.results.some(
+            (f) => f.name.toLowerCase() === processed.name.toLowerCase()
+          );
+          if (doesFolderWithSameNameExist) {
+            throw new Error("Folder already exists with that name.");
+          }
 
-      form.reset();
-      navigate({ to: "/dashboard/folders/$id", params: { id: String(paramId) } });
+          const newFolder = await createFolder(processed);
+          paramId = newFolder.id;
+        }
+
+        form.reset();
+        navigate({ to: "/dashboard/folders/$id", params: { id: String(paramId) } });
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        toast.error(errorMessage);
+      }
     },
   });
 

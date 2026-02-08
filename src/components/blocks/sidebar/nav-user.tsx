@@ -61,8 +61,8 @@ export function NavUser() {
               <SidebarMenuButton
                 size="default"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-auto p-0">
-                <Avatar className="size-8 rounded-lg">
-                  <AvatarFallback className="rounded-lg">{initial}</AvatarFallback>
+                <Avatar className="size-8">
+                  <AvatarFallback>{initial}</AvatarFallback>
                 </Avatar>
               </SidebarMenuButton>
             }></DropdownMenuTrigger>
@@ -74,8 +74,8 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuLabel className="p-0 font-normal">
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="size-8 rounded-lg">
-                    <AvatarFallback className="rounded-lg">{initial}</AvatarFallback>
+                  <Avatar className="size-8">
+                    <AvatarFallback>{initial}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{username}</span>

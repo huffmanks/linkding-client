@@ -1,11 +1,12 @@
 import { useForm } from "@tanstack/react-form";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { useCreateBookmark, useEditBookmark } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
 import { ComboboxCreate } from "@/components/forms/combobox-create";
@@ -29,8 +30,10 @@ type BookmarkFormProps = React.ComponentProps<"div"> & {
 export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProps) {
   const router = useRouter();
   const canGoBack = useCanGoBack();
-  const { mutate, isPending } = useCreateBookmark();
-  const { mutateAsync } = useEditBookmark();
+
+  const queryClient = useQueryClient();
+  const { mutateAsync: createBookmark, isPending } = useCreateBookmark();
+  const { mutateAsync: editBookmark } = useEditBookmark();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
@@ -54,17 +57,29 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      if (bookmark?.id) {
-        mutateAsync({ id: bookmark.id, modifiedBookmark: value });
-      } else {
-        mutate({ ...value, tag_names: value.tag_names.filter(Boolean) });
-      }
-      form.reset();
+      try {
+        if (bookmark?.id) {
+          await editBookmark({ id: bookmark.id, modifiedBookmark: value });
+        } else {
+          const check = await queryClient.fetchQuery(
+            getAllQueryOptions.bookmarkCheckIfExists(value.url)
+          );
+          if (check.bookmark?.id) {
+            throw new Error("Bookmark already exists with that url.");
+          }
 
-      if (canGoBack) {
-        router.history.back();
-      } else {
-        router.navigate({ to: "/dashboard" });
+          await createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
+        }
+        form.reset();
+
+        if (canGoBack) {
+          router.history.back();
+        } else {
+          router.navigate({ to: "/dashboard" });
+        }
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        toast.error(errorMessage);
       }
     },
   });

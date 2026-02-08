@@ -16,8 +16,8 @@ export type Token = z.infer<typeof TokenSchema>;
 export type Url = z.infer<typeof UrlSchema>;
 
 type SettingsStoreState = {
-  username: string | null;
-  linkdingUrl: Url | null;
+  username: string;
+  linkdingUrl: Url;
   token: Token | null;
   view: View;
   theme: Theme;
@@ -26,8 +26,8 @@ type SettingsStoreState = {
 };
 
 type SettingsStoreActions = {
-  setUsername: (username: string | null) => void;
-  setLinkdingUrl: (linkdingUrl: Url | null) => void;
+  setUsername: (username: string) => void;
+  setLinkdingUrl: (linkdingUrl: Url) => void;
   setToken: (token: Token | null) => void;
   setView: (view: View) => void;
   setTheme: (theme: Theme) => void;
@@ -37,8 +37,8 @@ type SettingsStoreActions = {
 };
 
 const initialSettingsStoreState: SettingsStoreState = {
-  username: null,
-  linkdingUrl: null,
+  username: "admin",
+  linkdingUrl: "http://localhost:9090",
   token: null,
   view: "grid",
   theme: "system",

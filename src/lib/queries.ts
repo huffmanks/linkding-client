@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 
 import { linkdingFetch } from "@/lib/api";
-import type { Bookmark, Folder, PaginatedResponse, Tag } from "@/types";
+import type { Bookmark, BookmarkCheck, Folder, PaginatedResponse, Tag } from "@/types";
 
 export const getAllQueryOptions = {
   bookmarks: (q: string = "", offset: number = 0, limit: number = 10) =>
@@ -16,6 +16,14 @@ export const getAllQueryOptions = {
     queryOptions({
       queryKey: ["bookmarks", id],
       queryFn: () => linkdingFetch<Bookmark>(`bookmarks/${id}`),
+    }),
+  bookmarkCheckIfExists: (url: string = "") =>
+    queryOptions({
+      queryKey: ["bookmarksCheck", { url }],
+      queryFn: () =>
+        linkdingFetch<BookmarkCheck>("bookmarks/check", {
+          params: { url: String(url) },
+        }),
     }),
   folders: queryOptions({
     queryKey: ["bundles"],

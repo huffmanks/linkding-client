@@ -25,12 +25,6 @@
 
 - [ ] When typing `#` in search, show a dropdown of existing tags.
 
-## Data Validation & Duplication Checks
-
-- [ ] Before creating a bookmark, check if a bookmark with the same URL already exists. (check bookmark existence by URL:
-      `GET /api/bookmarks/check/?url=https%3A%2F%2Fexample.com`.)
-- [ ] Before creating a folder, check if a folder with the same name already exists.
-
 ## Settings & Preferences
 
 - [ ] Display LD preferences as disabled in the Settings page (user profile data from: `GET /api/user/profile/`).
@@ -47,8 +41,3 @@
 
 - [ ] Fix list view hover/focus state (green border is weird).
 - [ ] Grid/list view add url below/above title.
-
-## Login
-
-- [ ] Provide a direct link to http://localhost:9090/settings/integrations so they can easily create an API token.
-- [ ] On logout only delete token, prepopulate url name, change username to name.

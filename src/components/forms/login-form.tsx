@@ -5,10 +5,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
+import { useShallow } from "zustand/react/shallow";
 
 import { login } from "@/lib/auth";
-import { TokenSchema, UrlSchema } from "@/lib/store";
-import { cn, getErrorMessage } from "@/lib/utils";
+import { TokenSchema, UrlSchema, useSettingsStore } from "@/lib/store";
+import { cn, getErrorMessage, joinUrlPath } from "@/lib/utils";
 
 import CustomFieldError from "@/components/forms/custom-field-error";
 import { Button } from "@/components/ui/button";
@@ -24,10 +25,17 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
   const [showToken, setShowToken] = useState(false);
 
+  const { username, linkdingUrl } = useSettingsStore(
+    useShallow((state) => ({
+      username: state.username,
+      linkdingUrl: state.linkdingUrl,
+    }))
+  );
+
   const form = useForm({
     defaultValues: {
-      username: "admin",
-      linkdingUrl: "http://localhost:9090",
+      username,
+      linkdingUrl,
       token: "",
     },
     onSubmit: async ({ value }) => {
@@ -79,11 +87,11 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
               <form.Field
                 name="username"
                 validators={{
-                  onBlur: z.string().min(1, "Username is required."),
+                  onBlur: z.string().min(1, "Name is required."),
                 }}
                 children={(field) => (
                   <Field data-invalid={!field.state.meta.isValid}>
-                    <FieldLabel htmlFor="username">Username</FieldLabel>
+                    <FieldLabel htmlFor="username">Name</FieldLabel>
                     <Input
                       id="username"
                       type="text"
@@ -131,7 +139,19 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                 }}
                 children={(field) => (
                   <Field data-invalid={!field.state.meta.isValid}>
-                    <FieldLabel htmlFor="token">Linkding API token</FieldLabel>
+                    <div className="flex items-center">
+                      <FieldLabel htmlFor="token">Linkding API token</FieldLabel>
+                      <a
+                        href={joinUrlPath(
+                          field.form.getFieldValue("linkdingUrl"),
+                          "/settings/integrations"
+                        )}
+                        className="text-foreground/70 hover:text-primary focus-within:text-primary ml-auto inline-block text-sm underline-offset-4 outline-none focus-within:underline hover:underline"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        Need an API token?
+                      </a>
+                    </div>
 
                     <InputGroup>
                       <InputGroupInput
@@ -144,6 +164,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                         onChange={(e) => field.handleChange(e.target.value)}
                       />
                       <InputGroupAddon
+                        className="cursor-pointer"
                         align="inline-end"
                         onClick={() => setShowToken((prev) => !prev)}>
                         {showToken ? (

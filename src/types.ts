@@ -59,6 +59,10 @@ export type BookmarkInsert = {
   tag_names: string[];
 };
 
+export type BookmarkCheck = {
+  bookmark: Bookmark | null;
+};
+
 export type Asset = {
   id: number;
   bookmark: number;
