@@ -20,11 +20,11 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
     const { limit } = useSettingsStore.getState();
 
     try {
-      const folder = await queryClient.ensureQueryData(getAllQueryOptions.folderById(id));
+      await queryClient.ensureQueryData(getAllQueryOptions.folderById(id));
 
       await queryClient.ensureQueryData(getAllQueryOptions.bookmarksByFolderId(id, offset, limit));
 
-      return folder;
+      return { id };
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
         throw notFound();
@@ -36,13 +36,14 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
 });
 
 function FolderComponent() {
-  const folder = Route.useLoaderData();
+  const { id } = Route.useLoaderData();
   const { offset } = Route.useSearch();
   const limit = useSettingsStore((state) => state.limit);
   const navigate = useNavigate({ from: Route.fullPath });
 
+  const { data: folder } = useSuspenseQuery(getAllQueryOptions.folderById(id));
   const { data: bookmarks } = useSuspenseQuery(
-    getAllQueryOptions.bookmarksByFolderId(String(folder.id), offset, limit)
+    getAllQueryOptions.bookmarksByFolderId(id, offset, limit)
   );
 
   function onOffsetChange(newOffset: number) {

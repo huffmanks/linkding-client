@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { getAllQueryOptions } from "@/lib/queries";
@@ -8,7 +9,8 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/edit")(
   component: RouteComponent,
   loader: async ({ context: { queryClient }, params: { id } }) => {
     try {
-      return await queryClient.ensureQueryData(getAllQueryOptions.folderById(id));
+      await queryClient.ensureQueryData(getAllQueryOptions.folderById(id));
+      return { id };
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
         throw notFound();
@@ -19,7 +21,8 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/edit")(
 });
 
 function RouteComponent() {
-  const folder = Route.useLoaderData();
+  const { id } = Route.useLoaderData();
+  const { data: folder } = useSuspenseQuery(getAllQueryOptions.folderById(id));
 
   return (
     <div className="max-w-lg pb-8 sm:px-4">

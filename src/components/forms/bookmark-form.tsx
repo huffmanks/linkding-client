@@ -45,10 +45,10 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
     is_archived: bookmark?.is_archived ?? false,
     unread: bookmark?.unread ?? false,
     shared: bookmark?.shared ?? false,
-    tag_names: bookmark?.tag_names ?? [""],
+    tag_names: bookmark?.tag_names ?? [],
   };
 
-  const tagItems = data?.results?.map((item) => item.name) || [];
+  const tagItems = data.results.map((item) => item.name) || [];
 
   const initialItems = [...new Set([...tagItems, ...defaultValues.tag_names])].sort((a, b) =>
     a.localeCompare(b)
@@ -69,8 +69,8 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
           }
 
           await createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
+          form.reset();
         }
-        form.reset();
 
         if (canGoBack) {
           router.history.back();

@@ -34,5 +34,4 @@
 
 ## UI
 
-- [ ] Fix list view hover/focus state (green border is weird).
 - [ ] Grid/list view add url below/above title.

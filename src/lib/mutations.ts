@@ -47,8 +47,8 @@ export function useEditBookmark() {
     onSuccess: () => {
       toast.success("Bookmark has been updated.");
     },
-    onSettled: async (_data, _err, id) => {
-      await queryClient.invalidateQueries({ queryKey: ["bookmarks", id] });
+    onSettled: async (_data, _err, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ["bookmarks", String(id)] });
     },
   });
 }
@@ -93,8 +93,8 @@ export function useDeleteBookmark() {
     onSuccess: () => {
       toast.success("Bookmark has been deleted.");
     },
-    onSettled: async (_data, _err, id) => {
-      await queryClient.invalidateQueries({ queryKey: ["bookmarks", id] });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["bookmarks"] });
     },
   });
 }
@@ -135,8 +135,8 @@ export function useEditFolder() {
     onSuccess: () => {
       toast.success("Folder has been updated.");
     },
-    onSettled: async (_data, _err, id) => {
-      await queryClient.invalidateQueries({ queryKey: ["bundles", id] });
+    onSettled: async (_data, _err, { id }) => {
+      await queryClient.invalidateQueries({ queryKey: ["bundles", String(id)] });
     },
   });
 }
@@ -186,8 +186,8 @@ export function useDeleteFolder() {
     onSuccess: () => {
       toast.success("Folder has been deleted.");
     },
-    onSettled: async (_data, _err, id) => {
-      await queryClient.invalidateQueries({ queryKey: ["bundles", id] });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["bundles"] });
     },
   });
 }

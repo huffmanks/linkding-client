@@ -1,3 +1,4 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { getAllQueryOptions } from "@/lib/queries";
@@ -8,7 +9,8 @@ export const Route = createFileRoute("/(protected)/dashboard/bookmarks/$id/edit"
   component: RouteComponent,
   loader: async ({ context: { queryClient }, params: { id } }) => {
     try {
-      return await queryClient.ensureQueryData(getAllQueryOptions.bookmarkById(id));
+      await queryClient.ensureQueryData(getAllQueryOptions.bookmarkById(id));
+      return { id };
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
         throw notFound();
@@ -19,7 +21,8 @@ export const Route = createFileRoute("/(protected)/dashboard/bookmarks/$id/edit"
 });
 
 function RouteComponent() {
-  const bookmark = Route.useLoaderData();
+  const { id } = Route.useLoaderData();
+  const { data: bookmark } = useSuspenseQuery(getAllQueryOptions.bookmarkById(id));
 
   return (
     <div className="max-w-lg pb-8 sm:px-4">
