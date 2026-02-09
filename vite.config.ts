@@ -30,49 +30,48 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       VitePWA({
         disable: mode === "development",
+        strategies: "injectManifest",
+        srcDir: "src",
+        filename: "sw.ts",
         registerType: "autoUpdate",
-        workbox: {
+        injectManifest: {
           globPatterns: ["**/*.{css,html,js,json,webmanifest,ico,png,svg,otf,ttf,woff,woff2}"],
-          navigateFallback: "/index.html",
-          runtimeCaching: [
+          swDest: "dist/sw.js",
+        },
+        manifest: {
+          short_name: "EchoLink",
+          name: "EchoLink",
+          description: "Self-hosted client app for Linkding.",
+          start_url: ".",
+          display: "standalone",
+          theme_color: "#15ba81",
+          background_color: "#0a0a0a",
+          icons: [
             {
-              urlPattern: ({ url }) =>
-                /^\/(assets|favicons|media|previews|static)/.test(url.pathname),
-              handler: "StaleWhileRevalidate",
-              options: {
-                cacheName: "linkding-assets",
-                expiration: {
-                  maxEntries: 5000,
-                  maxAgeSeconds: 60 * 60 * 24 * 120,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
+              src: "favicon.svg",
+              sizes: "128x128 64x64 48x48 32x32 24x24 16x16",
+              type: "image/svg+xml",
             },
             {
-              urlPattern: ({ url }) => url.pathname.startsWith("/api"),
-              handler: "NetworkOnly",
-              options: {
-                backgroundSync: {
-                  name: "api-retry",
-                  options: { maxRetentionTime: 24 * 60 },
-                },
-              },
+              src: "pwa-64x64.png",
+              type: "image/png",
+              sizes: "64x64",
             },
             {
-              urlPattern: ({ url }) => url.pathname.startsWith("/app-assets"),
-              handler: "StaleWhileRevalidate",
-              options: {
-                cacheName: "app-assets",
-                expiration: {
-                  maxEntries: 500,
-                  maxAgeSeconds: 60 * 60 * 24 * 120,
-                },
-                cacheableResponse: {
-                  statuses: [0, 200],
-                },
-              },
+              src: "pwa-192x192.png",
+              type: "image/png",
+              sizes: "192x192",
+            },
+            {
+              src: "pwa-512x512.png",
+              type: "image/png",
+              sizes: "512x512",
+            },
+            {
+              src: "maskable-icon-512x512.png",
+              type: "image/png",
+              sizes: "512x512",
+              purpose: "maskable",
             },
           ],
         },

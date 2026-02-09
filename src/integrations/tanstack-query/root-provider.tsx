@@ -3,7 +3,12 @@ import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
-const gcTime = 1000 * 60 * 60 * 24 * 120; // 120 days
+import { DEFAULT_TTL } from "@/lib/constants";
+import { useSettingsStore } from "@/lib/store";
+
+const { cacheTtl } = useSettingsStore.getState();
+
+const gcTime = Number(cacheTtl) ?? DEFAULT_TTL;
 
 export function getContext() {
   const queryClient = new QueryClient({

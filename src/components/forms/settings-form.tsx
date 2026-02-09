@@ -4,12 +4,15 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
+import { CACHE_TTL_OPTIONS } from "@/lib/constants";
 import { UrlSchema, useSettingsStore } from "@/lib/store";
 import { cn, getErrorMessage } from "@/lib/utils";
-import type { Theme, View } from "@/types";
+import { useBackgroundSync } from "@/providers/background-sync";
+import type { CacheName, Theme, View } from "@/types";
 
 import CustomFieldError from "@/components/forms/custom-field-error";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Field,
   FieldContent,
@@ -41,12 +44,14 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
     theme,
     sidebarAddOpen,
     limit,
+    cacheTtl,
     setUsername,
     setLinkdingUrl,
     setView,
     setTheme,
     setSidebarAddOpen,
     setLimit,
+    setCacheTtl,
   } = useSettingsStore(
     useShallow((state) => ({
       username: state.username,
@@ -55,23 +60,30 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
       theme: state.theme,
       sidebarAddOpen: state.sidebarAddOpen,
       limit: state.limit,
+      cacheTtl: state.cacheTtl,
       setUsername: state.setUsername,
       setLinkdingUrl: state.setLinkdingUrl,
       setView: state.setView,
       setTheme: state.setTheme,
       setSidebarAddOpen: state.setSidebarAddOpen,
       setLimit: state.setLimit,
+      setCacheTtl: state.setCacheTtl,
     }))
   );
 
+  const { updateTtl, purgeAssets } = useBackgroundSync();
+
   const form = useForm({
     defaultValues: {
-      username: username ?? "",
-      linkdingUrl: linkdingUrl ?? "",
+      username,
+      linkdingUrl,
       view,
       theme,
       sidebarAddOpen,
       limit,
+      cacheTtl: String(cacheTtl),
+      appCache: false,
+      linkdingCache: false,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -81,6 +93,11 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
         setTheme(value.theme);
         setSidebarAddOpen(value.sidebarAddOpen);
         setLimit(Number(value.limit));
+
+        setCacheTtl(value.cacheTtl);
+        updateTtl("linkdingAssetsTtl", Number(value.cacheTtl));
+        updateTtl("appAssetsTtl", Number(value.cacheTtl));
+
         toast.success("Settings updated!");
       } catch (error: unknown) {
         const errorMessage = getErrorMessage(error);
@@ -88,6 +105,39 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
       }
     },
   });
+
+  function handlePurgeCache() {
+    const isAppCache = form.getFieldValue("appCache");
+    const isLinkdingCache = form.getFieldValue("linkdingCache");
+
+    if (!isAppCache && !isLinkdingCache) {
+      toast.error("Select at least one cache to clear.");
+      return;
+    }
+
+    const cachesToPurge: CacheName[] = [];
+
+    if (isAppCache) {
+      cachesToPurge.push("app-assets");
+    }
+    if (isLinkdingCache) {
+      cachesToPurge.push("linkding-assets");
+      cachesToPurge.push("linkding-api-get");
+    }
+
+    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+      cachesToPurge.forEach((cache) => purgeAssets(cache));
+
+      form.setFieldValue("appCache", false);
+      form.setFieldValue("linkdingCache", false);
+
+      toast.success("Requested cache clear", {
+        description: "The selected data will be refreshed on next load.",
+      });
+    } else {
+      toast.error("Service Worker not active. Cannot clear cache.");
+    }
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -280,6 +330,91 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
             />
           </FieldGroup>
         </FieldSet>
+
+        <FieldSeparator className="my-4" />
+
+        <FieldGroup>
+          <FieldSet>
+            <FieldLegend className="text-muted-foreground">Cache settings</FieldLegend>
+            <FieldGroup className="mb-3">
+              <form.Field
+                name="cacheTtl"
+                children={(field) => (
+                  <Field>
+                    <FieldLabel htmlFor="cacheTtl">Cache TTL</FieldLabel>
+                    <Select
+                      name={field.name}
+                      value={field.state.value}
+                      onValueChange={(val) => field.handleChange(val ?? "")}>
+                      <SelectTrigger id="cacheTtl">
+                        <SelectValue>
+                          {CACHE_TTL_OPTIONS.find((opt) => opt.value === field.state.value)?.label}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CACHE_TTL_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={String(option.value)}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <div className="mb-2">
+              <FieldLabel className="text-destructive mb-1">Danger Zone</FieldLabel>
+              <FieldDescription>
+                Use this to clear cached data if things aren’t updating correctly.
+              </FieldDescription>
+            </div>
+            <FieldGroup data-slot="checkbox-group" className="mb-3">
+              <form.Field
+                name="appCache"
+                children={(field) => (
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id="appCache"
+                      name={field.name}
+                      checked={field.state.value}
+                      onBlur={field.handleBlur}
+                      onCheckedChange={(val) => field.handleChange(val)}
+                    />
+                    <FieldLabel htmlFor="appCache" className="font-normal">
+                      EchoLink
+                    </FieldLabel>
+                  </Field>
+                )}
+              />
+
+              <form.Field
+                name="linkdingCache"
+                children={(field) => (
+                  <Field orientation="horizontal">
+                    <Checkbox
+                      id="linkdingCache"
+                      name={field.name}
+                      checked={field.state.value}
+                      onBlur={field.handleBlur}
+                      onCheckedChange={(val) => field.handleChange(val)}
+                    />
+                    <FieldLabel htmlFor="linkdingCache" className="font-normal">
+                      Linkding
+                    </FieldLabel>
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <Button
+              variant="destructive"
+              type="button"
+              className="cursor-pointer"
+              onClick={handlePurgeCache}>
+              Clear cache
+            </Button>
+          </FieldSet>
+        </FieldGroup>
 
         <FieldSeparator className="my-4" />
 

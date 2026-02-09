@@ -97,3 +97,10 @@ export type FolderInsert = {
   all_tags: string;
   excluded_tags: string;
 };
+
+export type SyncConfigKey = "linkdingAssetsTtl" | "appAssetsTtl";
+export type SyncConfig = {
+  [K in SyncConfigKey]?: number;
+};
+
+export type CacheName = "linkding-assets" | "linkding-api-get" | "app-assets";

@@ -15,6 +15,11 @@ export function useCreateBookmark() {
         body: JSON.stringify(newBookmark),
       }),
     onError: async () => {
+      if (!navigator.onLine) {
+        toast.info("Offline: Bookmark queued for sync.");
+        return;
+      }
+
       toast.error("Failed to create bookmark.");
     },
     onSuccess: () => {
@@ -42,6 +47,11 @@ export function useEditBookmark() {
         body: JSON.stringify(modifiedBookmark),
       }),
     onError: async () => {
+      if (!navigator.onLine) {
+        toast.info("Offline: Bookmark queued for sync.");
+        return;
+      }
+
       toast.error("Failed to update bookmark.");
     },
     onSuccess: () => {
@@ -87,6 +97,11 @@ export function useDeleteBookmark() {
       return { previousBookmarks };
     },
     onError: async (_err, _vars, context) => {
+      if (!navigator.onLine) {
+        toast.info("Offline: Bookmark queued for sync.");
+        return;
+      }
+
       await queryClient.setQueryData(["bookmarks"], context?.previousBookmarks);
       toast.error("Failed to delete bookmark.");
     },
@@ -109,6 +124,11 @@ export function useCreateFolder() {
         body: JSON.stringify(newFolder),
       }),
     onError: async () => {
+      if (!navigator.onLine) {
+        toast.info("Offline: Folder queued for sync.");
+        return;
+      }
+
       toast.error("Failed to create folder.");
     },
     onSuccess: () => {
@@ -130,6 +150,11 @@ export function useEditFolder() {
         body: JSON.stringify(modifiedFolder),
       }),
     onError: async () => {
+      if (!navigator.onLine) {
+        toast.info("Offline: Folder queued for sync.");
+        return;
+      }
+
       toast.error("Failed to update folder.");
     },
     onSuccess: () => {
@@ -180,6 +205,11 @@ export function useDeleteFolder() {
       return { previousFolders };
     },
     onError: async (_err, _vars, context) => {
+      if (!navigator.onLine) {
+        toast.info("Offline: Folder queued for sync.");
+        return;
+      }
+
       await queryClient.setQueryData(["bundles"], context?.previousFolders);
       toast.error("Failed to delete folder.");
     },
@@ -202,6 +232,11 @@ export function useCreateTag() {
         body: JSON.stringify(newTag),
       }),
     onError: async () => {
+      if (!navigator.onLine) {
+        toast.info("Offline: Tag queued for sync.");
+        return;
+      }
+
       toast.error("Failed to create tag.");
     },
     onSuccess: () => {

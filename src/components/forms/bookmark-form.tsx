@@ -54,6 +54,20 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
     a.localeCompare(b)
   );
 
+  async function checkDuplicateUrl(url: string): Promise<boolean> {
+    try {
+      const check = await queryClient.fetchQuery(getAllQueryOptions.bookmarkCheckIfExists(url));
+
+      if (check.bookmark?.id) {
+        toast.error("Bookmark already exists with that url.");
+        return true;
+      }
+    } catch (e) {
+      toast.warning("Offline: Skipping duplicate check.");
+    }
+    return false;
+  }
+
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
@@ -61,12 +75,8 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
         if (bookmark?.id) {
           await editBookmark({ id: bookmark.id, modifiedBookmark: value });
         } else {
-          const check = await queryClient.fetchQuery(
-            getAllQueryOptions.bookmarkCheckIfExists(value.url)
-          );
-          if (check.bookmark?.id) {
-            throw new Error("Bookmark already exists with that url.");
-          }
+          const exists = await checkDuplicateUrl(value.url);
+          if (exists) return;
 
           await createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
           form.reset();

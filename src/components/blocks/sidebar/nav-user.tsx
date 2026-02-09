@@ -1,7 +1,8 @@
-import * as React from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Link, useNavigate } from "@tanstack/react-router";
 import { LogOutIcon } from "lucide-react";
+import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 
 import { logout } from "@/lib/auth";
@@ -9,7 +10,9 @@ import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
 import { useSettingsStore } from "@/lib/store";
 import { joinUrlPath } from "@/lib/utils";
 
+import { OnlineStatus } from "@/components/online-status";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,10 +22,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 
 export function NavUser() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const navigate = useNavigate();
+
   const { linkdingUrl, username } = useSettingsStore(
     useShallow((state) => ({
       linkdingUrl: state.linkdingUrl,
@@ -31,7 +35,7 @@ export function NavUser() {
   );
   const initial = username ? username.charAt(0).toUpperCase() : "E";
 
-  const items = React.useMemo(() => {
+  const items = useMemo(() => {
     return SIDEBAR_NAV_SECONDARY.map((item) => {
       const newItem = { ...item };
 
@@ -51,90 +55,111 @@ export function NavUser() {
     navigate({ to: "/" });
   }
 
+  useEffect(() => {
+    function toggleStatus() {
+      const status = navigator.onLine;
+      setIsOnline(status);
+
+      if (status) {
+        toast.success("Back online", { description: "Connection restored." });
+      } else {
+        toast.error("Offline mode", { description: "Changes will be synced later." });
+      }
+    }
+
+    window.addEventListener("online", toggleStatus);
+    window.addEventListener("offline", toggleStatus);
+
+    return () => {
+      window.removeEventListener("online", toggleStatus);
+      window.removeEventListener("offline", toggleStatus);
+    };
+  }, []);
+
   return (
-    <SidebarMenu className="w-auto">
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="cursor-pointer"
-            render={
-              <SidebarMenuButton
-                size="default"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-auto p-0">
+    <div className="w-auto">
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          className="cursor-pointer"
+          render={
+            <Button variant="ghost" size="default" className="w-auto rounded-full p-0">
+              <div className="relative">
+                <Avatar className="size-8">
+                  <AvatarFallback className="bg-background">{initial}</AvatarFallback>
+                </Avatar>
+                <OnlineStatus isOnline={isOnline} />
+              </div>
+            </Button>
+          }></DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="min-w-56 rounded-lg"
+          side="top"
+          align="end"
+          sideOffset={-35}>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="p-0 font-normal">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="size-8">
                   <AvatarFallback>{initial}</AvatarFallback>
                 </Avatar>
-              </SidebarMenuButton>
-            }></DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="min-w-56 rounded-lg"
-            side="bottom"
-            align="end"
-            sideOffset={4}>
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="size-8">
-                    <AvatarFallback>{initial}</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{username}</span>
-                  </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{username}</span>
                 </div>
-              </DropdownMenuLabel>
-            </DropdownMenuGroup>
+                <OnlineStatus isOnline={isOnline} justIndicator={false} />
+              </div>
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
 
-            <DropdownMenuSeparator />
+          <DropdownMenuSeparator />
 
-            <DropdownMenuGroup>
-              {items.slice(0, 1).map((item) => (
-                <DropdownMenuItem
-                  key={item.url}
-                  className="cursor-pointer"
-                  nativeButton={false}
-                  render={
-                    <Link
-                      to={item.url}
-                      target={item.isExternal ? "_blank" : "_self"}
-                      rel={item.isExternal ? "noopener noreferrer" : undefined}>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </Link>
-                  }></DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
+          <DropdownMenuGroup>
+            {items.slice(0, 1).map((item) => (
+              <DropdownMenuItem
+                key={item.url}
+                className="cursor-pointer"
+                nativeButton={false}
+                render={
+                  <Link
+                    to={item.url}
+                    target={item.isExternal ? "_blank" : "_self"}
+                    rel={item.isExternal ? "noopener noreferrer" : undefined}>
+                    <item.icon />
+                    <span>{item.name}</span>
+                  </Link>
+                }></DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
 
-            <DropdownMenuSeparator />
+          <DropdownMenuSeparator />
 
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="text-xs font-normal tracking-wide uppercase">
-                Linkding
-              </DropdownMenuLabel>
-              {items.slice(1).map((item) => (
-                <DropdownMenuItem
-                  key={item.url}
-                  className="cursor-pointer"
-                  nativeButton={false}
-                  render={
-                    <Link
-                      to={item.url}
-                      target={item.isExternal ? "_blank" : "_self"}
-                      rel={item.isExternal ? "noopener noreferrer" : undefined}>
-                      <item.icon />
-                      <span>{item.name}</span>
-                    </Link>
-                  }></DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-xs font-normal tracking-wide uppercase">
+              Linkding
+            </DropdownMenuLabel>
+            {items.slice(1).map((item) => (
+              <DropdownMenuItem
+                key={item.url}
+                className="cursor-pointer"
+                nativeButton={false}
+                render={
+                  <Link
+                    to={item.url}
+                    target={item.isExternal ? "_blank" : "_self"}
+                    rel={item.isExternal ? "noopener noreferrer" : undefined}>
+                    <item.icon />
+                    <span>{item.name}</span>
+                  </Link>
+                }></DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
 
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
-              <LogOutIcon />
-              <span>Log out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="cursor-pointer" onClick={handleLogout}>
+            <LogOutIcon />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

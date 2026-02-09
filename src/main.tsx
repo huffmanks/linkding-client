@@ -4,6 +4,7 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 
 import * as TanStackQueryProvider from "@/integrations/tanstack-query/root-provider.tsx";
+import { BackgroundSyncProvider } from "@/providers/background-sync";
 import { GlobalModalProvider } from "@/providers/global-modal-context";
 import ThemeWatcher from "@/providers/theme-watcher";
 import reportWebVitals from "@/reportWebVitals.ts";
@@ -42,10 +43,12 @@ if (rootElement && !rootElement.innerHTML) {
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
         <ThemeWatcher />
-        <GlobalModalProvider>
-          <RouterProvider router={router} />
-          <GlobalModal />
-        </GlobalModalProvider>
+        <BackgroundSyncProvider>
+          <GlobalModalProvider>
+            <RouterProvider router={router} />
+            <GlobalModal />
+          </GlobalModalProvider>
+        </BackgroundSyncProvider>
         <Toaster richColors />
       </TanStackQueryProvider.Provider>
     </StrictMode>

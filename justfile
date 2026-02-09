@@ -1,44 +1,51 @@
-set dotenv-load
+base_compose := "docker compose -f docker-compose.yml"
 
-base_compose_command := "docker compose -f docker-compose.yml"
+# --- Public Recipes ---
 
-# List available commands
 default:
-	@just --list
+    @just --list
 
-# Setup pre-reqs (.env, mkcert => *-key.pem, *.pem)
-init:
-    cp .env.example .env && mkcert your.domain.com
+# Start environment (e.g., just up prod)
+up profile="dev":
+    @test -f .env.{{profile}} || (echo "Error: .env.{{profile}} missing!" && exit 1)
+    @echo "Starting {{profile}} environment..."
+    @just -E .env.{{profile}} _up-{{profile}}
 
-# Start (DEV) environment
-dev:
-    @just -E .env _dev-up-all
+# Stop environment (default: dev)
+down profile="dev":
+    @echo "Stopping {{profile}} environment..."
+    @just -E .env.{{profile}} _down-{{profile}}
 
-# Start (PROD) environment
-prod:
-    @just -E .env _prod-up-all
+# Setup pre-reqs
+init domain:
+    @for env in dev test prod; do \
+        if [ ! -f .env.$env ]; then \
+            cp .env.example .env.$env; \
+            echo "Created .env.$env"; \
+        else \
+            echo ".env.$env already exists, skipping..."; \
+        fi; \
+    done
+    mkcert -install {{domain}}
 
-# Shut services (Docker, Caddy)
-down:
-    @just -E .env _docker-caddy-down
+# --- Internal Helpers ---
+_up-dev:
+    {{base_compose}} up -d linkding
+    pnpm dev
 
-# --- HIDDEN ---
+_up-test:
+    {{base_compose}} up --build --force-recreate -d
 
-_dev-up-all: _docker-dev-up
-	@echo "Starting dev server..."
-	pnpm dev
-
-_docker-dev-up:
-	{{base_compose_command}} up -d linkding
-
-_docker-prod-up:
-	{{base_compose_command}} up --build --force-recreate -d
-
-_prod-up-all: _docker-prod-up
-    @echo "Starting caddy proxy..."
+_up-prod: _up-test
     sudo caddy start
 
-_docker-caddy-down:
-    @echo "Stopping caddy proxy..."
-    -sudo caddy stop 2>/dev/null || true
-    {{base_compose_command}} down
+_down-base:
+    {{base_compose}} down
+
+_down-dev: _down-base
+
+_down-test: _down-base
+
+_down-prod:
+    -sudo caddy stop
+    {{base_compose}} down

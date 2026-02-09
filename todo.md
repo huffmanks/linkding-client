@@ -23,14 +23,12 @@
 ## Settings & Preferences
 
 - [ ] Display LD preferences as disabled in the Settings page (user profile data from: `GET /api/user/profile/`).
-- [ ] Add a “Clear all offline cache”, with toggle checkboxes for each type, action in Settings.
-- [ ] Add an environment variable for offline cache retention (default: 120 days).
 - [ ] Add batch deletion to folders, bookmarks.
 
 ## Background Sync
 
-- [ ] Use persistMutationClient and a mutation recovery logic, or use Workbox Background Sync to replay failed API calls when the connection returns.
-- [ ] Set up the Offline Mutation recovery so users can perform actions like "Add Item" while offline
+- [ ] Offline for (/dashboard) route gives error.
+- [ ] Check/test all routes and apis work/handle offline.
 
 ## UI
 

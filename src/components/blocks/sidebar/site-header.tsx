@@ -48,6 +48,7 @@ export function SiteHeader() {
 
         <div className="flex w-full items-center justify-between gap-4">
           <SearchForm className="w-full sm:w-auto" />
+
           <NavUser />
         </div>
       </div>
