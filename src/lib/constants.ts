@@ -90,18 +90,21 @@ export const DRAWER_MOBILE_NAV = [
     name: "Folders",
     url: "/dashboard/folders",
     isActive: false,
+    isCollapsible: true,
     icon: FolderIcon,
   },
   {
     name: "Add",
     url: "/dashboard/add",
     isActive: false,
+    isCollapsible: true,
     icon: PlusIcon,
   },
   {
     name: "Tags",
     url: "/dashboard/tags",
     isActive: false,
+    isCollapsible: true,
     icon: HashIcon,
   },
   {

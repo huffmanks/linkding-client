@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { Link, useLocation } from "@tanstack/react-router";
+import { ExternalLinkIcon } from "lucide-react";
 
 import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
 import { useSettingsStore } from "@/lib/store";
@@ -60,12 +61,16 @@ export function NavSecondary({
                 isActive={item.isActive}
                 render={
                   <Link
+                    className="justify-between"
                     to={item.url}
                     target={item.isExternal ? "_blank" : "_self"}
                     rel={item.isExternal ? "noopener noreferrer" : undefined}
                     onClick={() => handleCloseSidebar(!!item.isExternal)}>
-                    <item.icon />
-                    <span>{item.name}</span>
+                    <div className="flex items-center gap-2">
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.isExternal && <ExternalLinkIcon />}
                   </Link>
                 }></SidebarMenuButton>
             </SidebarMenuItem>
@@ -84,12 +89,16 @@ export function NavSecondary({
                 size="sm"
                 render={
                   <Link
+                    className="justify-between"
                     to={item.url}
                     target={item.isExternal ? "_blank" : "_self"}
                     rel={item.isExternal ? "noopener noreferrer" : undefined}
                     onClick={() => handleCloseSidebar(!!item.isExternal)}>
-                    <item.icon />
-                    <span>{item.name}</span>
+                    <div className="flex items-center gap-2">
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.isExternal && <ExternalLinkIcon />}
                   </Link>
                 }></SidebarMenuButton>
             </SidebarMenuItem>

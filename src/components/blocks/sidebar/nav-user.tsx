@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Link, useNavigate } from "@tanstack/react-router";
-import { LogOutIcon } from "lucide-react";
+import { ExternalLinkIcon, LogOutIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 
@@ -143,11 +143,15 @@ export function NavUser() {
                 nativeButton={false}
                 render={
                   <Link
+                    className="justify-between"
                     to={item.url}
                     target={item.isExternal ? "_blank" : "_self"}
                     rel={item.isExternal ? "noopener noreferrer" : undefined}>
-                    <item.icon />
-                    <span>{item.name}</span>
+                    <div className="flex items-center gap-2">
+                      <item.icon />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.isExternal && <ExternalLinkIcon />}
                   </Link>
                 }></DropdownMenuItem>
             ))}

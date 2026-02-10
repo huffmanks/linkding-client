@@ -74,22 +74,16 @@ export function NavMain() {
     }),
     {
       name: "Folders",
-      url: folderHasItems ? undefined : "/dashboard/folders",
       icon: FolderIcon,
-      isActive: folderHasItems
-        ? folderItems.some((folder) => folder.isActive)
-        : checkActive({ pathname, url: "/dashboard/folders", name: "Folders" }),
-      isCollapsible: folderHasItems,
+      isActive: folderItems.some((folder) => folder.isActive),
+      isCollapsible: true,
       items: folderHasItems ? folderItems : undefined,
     },
     {
       name: "Tags",
-      url: tagHasItems ? undefined : "/dashboard/tags",
       icon: HashIcon,
-      isActive: tagHasItems
-        ? tagItems.some((tag) => tag.isActive)
-        : checkActive({ pathname, url: "/dashboard/tags", name: "Tags" }),
-      isCollapsible: tagHasItems,
+      isActive: tagItems.some((tag) => tag.isActive),
+      isCollapsible: true,
       items: tagHasItems ? tagItems : undefined,
     },
   ] as SidebarNavItem[];
@@ -196,6 +190,8 @@ function NavCollapsibleItem({
     }
   }, [sidebarAddOpen, isAdd]);
 
+  const hasItems = !!item.items?.length;
+
   return (
     <Collapsible
       open={isOpen}
@@ -203,6 +199,7 @@ function NavCollapsibleItem({
       render={
         <SidebarMenuItem>
           <CollapsibleTrigger
+            disabled={!hasItems}
             nativeButton={false}
             render={
               <SidebarMenuAction
@@ -213,19 +210,23 @@ function NavCollapsibleItem({
                       <item.icon />
                       <span>{item.name}</span>
                     </span>
-                    <ChevronRightIcon
-                      aria-label="toggle"
-                      className="transition-transform group-data-panel-open:rotate-90"
-                    />
+                    {hasItems && (
+                      <ChevronRightIcon
+                        aria-label="toggle"
+                        className="transition-transform group-data-panel-open:rotate-90"
+                      />
+                    )}
                   </div>
                 }></SidebarMenuAction>
             }></CollapsibleTrigger>
 
-          <CollapsibleContent className="py-2">
-            <SidebarMenuSub className="scrollbar max-h-48 overflow-y-auto">
-              <SubNavItems items={item.items} handleCloseSidebar={handleCloseSidebar} />
-            </SidebarMenuSub>
-          </CollapsibleContent>
+          {hasItems && (
+            <CollapsibleContent className="py-2">
+              <SidebarMenuSub className="scrollbar max-h-48 overflow-y-auto">
+                <SubNavItems items={item.items} handleCloseSidebar={handleCloseSidebar} />
+              </SidebarMenuSub>
+            </CollapsibleContent>
+          )}
         </SidebarMenuItem>
       }></Collapsible>
   );

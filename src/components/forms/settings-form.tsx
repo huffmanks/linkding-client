@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import { CACHE_TTL_OPTIONS } from "@/lib/constants";
 import { UrlSchema, useSettingsStore } from "@/lib/store";
 import { cn, getErrorMessage } from "@/lib/utils";
@@ -72,6 +73,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
   );
 
   const { updateTtl, purgeAssets } = useBackgroundSync();
+  const isMobile = useIsMobile();
 
   const form = useForm({
     defaultValues: {
@@ -285,25 +287,28 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
               )}
             />
 
-            <form.Field
-              name="sidebarAddOpen"
-              children={(field) => (
-                <Field orientation="horizontal">
-                  <FieldContent>
-                    <FieldLabel htmlFor="sidebarAddOpen">Sidebar “Add” default open</FieldLabel>
-                    <FieldDescription>
-                      Choose whether the “Add” item in the sidebar is open or collapsed by default.
-                    </FieldDescription>
-                  </FieldContent>
-                  <Switch
-                    id="sidebarAddOpen"
-                    checked={field.state.value}
-                    onBlur={field.handleBlur}
-                    onCheckedChange={(checked) => field.handleChange(checked)}
-                  />
-                </Field>
-              )}
-            />
+            {!isMobile && (
+              <form.Field
+                name="sidebarAddOpen"
+                children={(field) => (
+                  <Field orientation="horizontal">
+                    <FieldContent>
+                      <FieldLabel htmlFor="sidebarAddOpen">Sidebar “Add” default open</FieldLabel>
+                      <FieldDescription>
+                        Choose whether the “Add” item in the sidebar is open or collapsed by
+                        default.
+                      </FieldDescription>
+                    </FieldContent>
+                    <Switch
+                      id="sidebarAddOpen"
+                      checked={field.state.value}
+                      onBlur={field.handleBlur}
+                      onCheckedChange={(checked) => field.handleChange(checked)}
+                    />
+                  </Field>
+                )}
+              />
+            )}
 
             <form.Field
               name="limit"
@@ -363,6 +368,15 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
                 )}
               />
             </FieldGroup>
+
+            <FieldGroup>
+              <Button className="text-foreground cursor-pointer" type="submit">
+                Update
+              </Button>
+            </FieldGroup>
+
+            <FieldSeparator className="my-4" />
+
             <div className="mb-2">
               <FieldLabel className="text-destructive mb-1">Danger Zone</FieldLabel>
               <FieldDescription>
@@ -414,14 +428,6 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
               Clear cache
             </Button>
           </FieldSet>
-        </FieldGroup>
-
-        <FieldSeparator className="my-4" />
-
-        <FieldGroup>
-          <Button className="text-foreground cursor-pointer" type="submit">
-            Update
-          </Button>
         </FieldGroup>
       </form>
     </div>
