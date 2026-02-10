@@ -20,6 +20,9 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
+    define: {
+      "self.__WB_DISABLE_DEV_LOGS": mode === "staging" ? "true" : "false",
+    },
     plugins: [
       devtools(),
       tanstackRouter({
@@ -30,6 +33,10 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       VitePWA({
         disable: mode === "development",
+        devOptions: {
+          enabled: mode !== "development",
+          type: "module",
+        },
         strategies: "injectManifest",
         srcDir: "src",
         filename: "sw.ts",

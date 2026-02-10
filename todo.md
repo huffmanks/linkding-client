@@ -33,3 +33,9 @@
 ## UI
 
 - [ ] Grid/list view add url below/above title.
+
+## Errors
+
+- [ ] [api error offline](src/lib/api.ts#L18)
+  - GET http://localhost:3001/api/bundles/8/ net::ERR_INTERNET_DISCONNECTED
+  - GET http://localhost:3001/api/bookmarks/?bundle=8&offset=0&limit=10 net::ERR_INTERNET_DISCONNECTED

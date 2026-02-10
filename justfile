@@ -18,7 +18,7 @@ down profile="dev":
 
 # Setup pre-reqs
 init domain:
-    @for env in dev test prod; do \
+    @for env in dev staging prod; do \
         if [ ! -f .env.$env ]; then \
             cp .env.example .env.$env; \
             echo "Created .env.$env"; \
@@ -33,10 +33,11 @@ _up-dev:
     {{base_compose}} up -d linkding
     pnpm dev
 
-_up-test:
-    {{base_compose}} up --build --force-recreate -d
+_up-staging:
+    {{base_compose}} up -d linkding
+    pnpm staging
 
-_up-prod: _up-test
+_up-prod: _up-staging
     sudo caddy start
 
 _down-base:
@@ -44,7 +45,7 @@ _down-base:
 
 _down-dev: _down-base
 
-_down-test: _down-base
+_down-staging: _down-base
 
 _down-prod:
     -sudo caddy stop

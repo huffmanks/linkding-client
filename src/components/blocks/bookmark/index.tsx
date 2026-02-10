@@ -12,6 +12,7 @@ import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
 import BookmarkTableView from "@/components/blocks/bookmark/views/table";
+import { EmptyCache } from "@/components/default-error-component";
 import {
   Pagination,
   PaginationContent,
@@ -97,7 +98,11 @@ export default function BookmarkWrapper({
     onOffsetChange,
   });
 
-  if (!bookmarkData?.results.length) {
+  if (!bookmarkData?.results) {
+    return <EmptyCache />;
+  }
+
+  if (!bookmarkData.results.length || bookmarkData.count === 0) {
     return emptyComponent;
   }
 

@@ -8,6 +8,7 @@
     "build": "vite build && tsc",
     "preview": "vite preview",
     "test": "vitest run",
+    "staging": "vite --port 3001 --host --mode staging",
     "lint": "eslint",
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",

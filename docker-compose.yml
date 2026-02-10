@@ -19,8 +19,9 @@ services:
     # image: huffmanks/echo-link@latest
     container_name: echo-link
     ports:
-      - "3000:3000"
+      - "${APP_PORT}:${APP_PORT}"
     environment:
+      APP_PORT: ${APP_PORT}
       LINKDING_CONTAINER_URL: ${LINKDING_CONTAINER_URL}
     depends_on:
       - linkding

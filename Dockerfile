@@ -29,6 +29,6 @@ WORKDIR /app
 COPY --from=frontend-builder /app/dist ./dist
 COPY --from=go-builder /app/main .
 
-EXPOSE 3000
+EXPOSE ${APP_PORT}
 
 CMD ["./main"]

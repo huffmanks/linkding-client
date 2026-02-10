@@ -4,13 +4,13 @@ import { precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
 import { NetworkFirst, NetworkOnly, StaleWhileRevalidate } from "workbox-strategies";
 
-import { DEFAULT_TTL } from "@/lib/constants";
-
 import type { SyncConfig, SyncConfigKey } from "./types";
 
 declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: any };
 
 precacheAndRoute(self.__WB_MANIFEST);
+
+const DEFAULT_TTL = 60 * 60 * 24 * 90;
 
 let CONFIG: SyncConfig = {
   linkdingAssetsTtl: DEFAULT_TTL,

@@ -47,8 +47,15 @@ func main() {
 		http.ServeFile(w, r, path)
 	})
 
-	log.Println("Server starting on :3000")
-	if err := http.ListenAndServe(":3000", nil); err != nil {
+	appPort := os.Getenv("APP_PORT")
+	if appPort == "" {
+		appPort = "3000"
+	}
+
+	addr := ":" + appPort
+	log.Printf("Server starting on %s", addr)
+
+	if err := http.ListenAndServe(addr, nil); err != nil {
 		log.Fatal(err)
 	}
 }
