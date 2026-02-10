@@ -8,6 +8,7 @@ import type { CacheName, SyncConfig, SyncConfigKey } from "@/types";
 
 interface BackgroundSyncContextType {
   isSyncing: boolean;
+  isOnline: boolean;
   purgeAssets: (cacheName: CacheName) => void;
   updateTtl: (key: SyncConfigKey, value: number) => void;
 }
@@ -16,6 +17,7 @@ const BackgroundSyncContext = createContext<BackgroundSyncContextType | undefine
 
 export function BackgroundSyncProvider({ children }: { children: React.ReactNode }) {
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const queryClient = useQueryClient();
 
   function purgeAssets(cacheName: CacheName) {
@@ -24,8 +26,6 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
         type: "PURGE_CACHE",
         cacheName,
       });
-
-      toast.success("Caches cleared! Refreshing data...");
     }
   }
 
@@ -51,6 +51,18 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
   }, []);
 
   useEffect(() => {
+    const updateStatus = () => setIsOnline(navigator.onLine);
+
+    window.addEventListener("online", updateStatus);
+    window.addEventListener("offline", updateStatus);
+
+    return () => {
+      window.removeEventListener("online", updateStatus);
+      window.removeEventListener("offline", updateStatus);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
     const handleMessage = (event: MessageEvent) => {
@@ -64,10 +76,6 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
       }
 
       if (event.data?.type === "SYNC_FAILED") setIsSyncing(false);
-
-      if (event.data?.type === "CACHE_PURGED") {
-        toast.info(`Cache ${event.data.cacheName} cleared.`);
-      }
     };
 
     navigator.serviceWorker.addEventListener("message", handleMessage);
@@ -75,7 +83,7 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
   }, [queryClient]);
 
   return (
-    <BackgroundSyncContext.Provider value={{ isSyncing, purgeAssets, updateTtl }}>
+    <BackgroundSyncContext.Provider value={{ isSyncing, isOnline, purgeAssets, updateTtl }}>
       {children}
     </BackgroundSyncContext.Provider>
   );

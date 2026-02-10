@@ -70,6 +70,11 @@ export function CreateTagForm() {
                       value={field.state.value}
                       aria-invalid={!field.state.meta.isValid}
                       onBlur={field.handleBlur}
+                      onFocus={(e) => {
+                        setTimeout(() => {
+                          e.target.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }, 150);
+                      }}
                       onChange={(e) => {
                         const val = e.target.value || "";
                         const formattedValue = val.toLowerCase().replace(/\s+/g, "-");

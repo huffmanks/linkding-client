@@ -3,10 +3,12 @@ import { toast } from "sonner";
 
 import { linkdingFetch } from "@/lib/api";
 import { useSettingsStore } from "@/lib/store";
+import { useBackgroundSync } from "@/providers/background-sync";
 import type { Bookmark, BookmarkInsert, Folder, FolderInsert, TagInsert } from "@/types";
 
 export function useCreateBookmark() {
   const queryClient = useQueryClient();
+  const { isOnline } = useBackgroundSync();
 
   return useMutation({
     mutationFn: async (newBookmark: BookmarkInsert): Promise<Bookmark> =>
@@ -15,7 +17,7 @@ export function useCreateBookmark() {
         body: JSON.stringify(newBookmark),
       }),
     onError: async () => {
-      if (!navigator.onLine) {
+      if (!isOnline) {
         toast.info("Offline: Bookmark queued for sync.");
         return;
       }
@@ -33,6 +35,7 @@ export function useCreateBookmark() {
 
 export function useEditBookmark() {
   const queryClient = useQueryClient();
+  const { isOnline } = useBackgroundSync();
 
   return useMutation({
     mutationFn: async ({
@@ -47,7 +50,7 @@ export function useEditBookmark() {
         body: JSON.stringify(modifiedBookmark),
       }),
     onError: async () => {
-      if (!navigator.onLine) {
+      if (!isOnline) {
         toast.info("Offline: Bookmark queued for sync.");
         return;
       }
@@ -65,6 +68,7 @@ export function useEditBookmark() {
 
 export function useDeleteBookmark() {
   const queryClient = useQueryClient();
+  const { isOnline } = useBackgroundSync();
   const { token } = useSettingsStore.getState();
 
   return useMutation({
@@ -97,7 +101,7 @@ export function useDeleteBookmark() {
       return { previousBookmarks };
     },
     onError: async (_err, _vars, context) => {
-      if (!navigator.onLine) {
+      if (!isOnline) {
         toast.info("Offline: Bookmark queued for sync.");
         return;
       }
@@ -116,6 +120,7 @@ export function useDeleteBookmark() {
 
 export function useCreateFolder() {
   const queryClient = useQueryClient();
+  const { isOnline } = useBackgroundSync();
 
   return useMutation({
     mutationFn: async (newFolder: FolderInsert): Promise<Folder> =>
@@ -124,7 +129,7 @@ export function useCreateFolder() {
         body: JSON.stringify(newFolder),
       }),
     onError: async () => {
-      if (!navigator.onLine) {
+      if (!isOnline) {
         toast.info("Offline: Folder queued for sync.");
         return;
       }
@@ -142,6 +147,7 @@ export function useCreateFolder() {
 
 export function useEditFolder() {
   const queryClient = useQueryClient();
+  const { isOnline } = useBackgroundSync();
 
   return useMutation({
     mutationFn: async ({ id, modifiedFolder }: { id: number; modifiedFolder: FolderInsert }) =>
@@ -150,7 +156,7 @@ export function useEditFolder() {
         body: JSON.stringify(modifiedFolder),
       }),
     onError: async () => {
-      if (!navigator.onLine) {
+      if (!isOnline) {
         toast.info("Offline: Folder queued for sync.");
         return;
       }
@@ -168,6 +174,7 @@ export function useEditFolder() {
 
 export function useDeleteFolder() {
   const queryClient = useQueryClient();
+  const { isOnline } = useBackgroundSync();
   const { token } = useSettingsStore.getState();
 
   return useMutation({
@@ -205,7 +212,7 @@ export function useDeleteFolder() {
       return { previousFolders };
     },
     onError: async (_err, _vars, context) => {
-      if (!navigator.onLine) {
+      if (!isOnline) {
         toast.info("Offline: Folder queued for sync.");
         return;
       }
@@ -224,6 +231,7 @@ export function useDeleteFolder() {
 
 export function useCreateTag() {
   const queryClient = useQueryClient();
+  const { isOnline } = useBackgroundSync();
 
   return useMutation({
     mutationFn: async (newTag: TagInsert) =>
@@ -232,7 +240,7 @@ export function useCreateTag() {
         body: JSON.stringify(newTag),
       }),
     onError: async () => {
-      if (!navigator.onLine) {
+      if (!isOnline) {
         toast.info("Offline: Tag queued for sync.");
         return;
       }

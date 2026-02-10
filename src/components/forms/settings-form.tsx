@@ -72,7 +72,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
     }))
   );
 
-  const { updateTtl, purgeAssets } = useBackgroundSync();
+  const { isOnline, updateTtl, purgeAssets } = useBackgroundSync();
   const isMobile = useIsMobile();
 
   const form = useForm({
@@ -109,6 +109,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
   });
 
   function handlePurgeCache() {
+    if (!isOnline) return;
     const isAppCache = form.getFieldValue("appCache");
     const isLinkdingCache = form.getFieldValue("linkdingCache");
 
@@ -380,7 +381,8 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
             <div className="mb-2">
               <FieldLabel className="text-destructive mb-1">Danger Zone</FieldLabel>
               <FieldDescription>
-                Use this to clear cached data if things aren’t updating correctly.
+                Use this to clear cached data if things aren’t updating correctly. This is disabled
+                if offline.
               </FieldDescription>
             </div>
             <FieldGroup data-slot="checkbox-group" className="mb-3">
@@ -390,6 +392,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
                   <Field orientation="horizontal">
                     <Checkbox
                       id="appCache"
+                      disabled={!isOnline}
                       name={field.name}
                       checked={field.state.value}
                       onBlur={field.handleBlur}
@@ -408,6 +411,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
                   <Field orientation="horizontal">
                     <Checkbox
                       id="linkdingCache"
+                      disabled={!isOnline}
                       name={field.name}
                       checked={field.state.value}
                       onBlur={field.handleBlur}
@@ -421,9 +425,10 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
               />
             </FieldGroup>
             <Button
+              disabled={!isOnline}
               variant="destructive"
               type="button"
-              className="cursor-pointer"
+              className="enabled:cursor-pointer"
               onClick={handlePurgeCache}>
               Clear cache
             </Button>

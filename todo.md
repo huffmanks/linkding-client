@@ -26,8 +26,6 @@
 
 - [ ] Display LD preferences as disabled in the Settings page (user profile data from: `GET /api/user/profile/`).
 - [ ] Add batch deletion to folders, bookmarks.
-- [ ] When offline disable clear cache button and check boxes.
-- [ ] Check cache button purgeAssets not working and showing undefined in toast.
 - [ ] Show stats page (like karakeep).
 
 ## Background Sync
@@ -44,5 +42,5 @@
 ## UI
 
 - [ ] Grid/list view add url below/above title.
-- [ ] On mobile tag dialog push dialog up. Most of it is blocked by keyboard.
+- [x] On mobile tag dialog push dialog up. Most of it is blocked by keyboard. (need to test on mobile)
 - [ ] Bug when submitting tag ghost focus from either drawer or modal.

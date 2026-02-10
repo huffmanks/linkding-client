@@ -7,6 +7,7 @@ import {
 import { DatabaseZapIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useBackgroundSync } from "@/providers/background-sync";
 
 import FullScreenWrapper from "@/components/full-screen-wrapper";
 import { Button } from "@/components/ui/button";
@@ -21,11 +22,12 @@ import {
 
 export default function DefaultErrorComponent(props: ErrorComponentProps) {
   const { pathname } = useLocation();
+  const { isOnline } = useBackgroundSync();
 
   const isDashboardRoute = pathname.startsWith("/dashboard");
   return (
     <FullScreenWrapper className={cn(!isDashboardRoute && "min-h-svh justify-center")}>
-      {!navigator.onLine ? <EmptyCache /> : <ErrorDisplay {...props} />}
+      {!isOnline ? <EmptyCache /> : <ErrorDisplay {...props} />}
     </FullScreenWrapper>
   );
 }
