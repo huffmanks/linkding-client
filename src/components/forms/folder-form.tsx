@@ -60,7 +60,7 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
         const processed = processValue({ value, returnType: "string" });
         let paramId: number;
         if (folder?.id) {
-          await editFolder({ id: folder.id, modifiedFolder: processed });
+          await editFolder({ ...processed, id: folder.id });
           paramId = folder.id;
         } else {
           const doesFolderWithSameNameExist = folders.results.some(
@@ -70,7 +70,7 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
             throw new Error("Folder already exists with that name.");
           }
 
-          const newFolder = (await createFolder({ newFolder: processed })) as Folder;
+          const newFolder = (await createFolder(processed)) as Folder;
           paramId = newFolder.id;
         }
 

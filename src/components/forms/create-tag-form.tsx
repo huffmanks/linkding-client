@@ -28,7 +28,7 @@ export function CreateTagForm() {
       name: "",
     },
     onSubmit: async ({ value }) => {
-      await mutateAsync({ newTag: value });
+      await mutateAsync(value);
 
       form.reset();
       closeGlobalModal();

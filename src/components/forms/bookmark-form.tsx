@@ -73,14 +73,12 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
     onSubmit: async ({ value }) => {
       try {
         if (bookmark?.id) {
-          await editBookmark({ id: bookmark.id, modifiedBookmark: value });
+          await editBookmark({ ...value, id: bookmark.id });
         } else {
           const exists = await checkDuplicateUrl(value.url);
           if (exists) return;
 
-          await createBookmark({
-            newBookmark: { ...value, tag_names: value.tag_names.filter(Boolean) },
-          });
+          await createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
           form.reset();
         }
 

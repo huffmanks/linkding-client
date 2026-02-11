@@ -23,7 +23,7 @@ self.addEventListener("message", (event: ExtendableMessageEvent) => {
 
 const navigationRoute = new NavigationRoute(
   new NetworkFirst({
-    cacheName: "navigations",
+    cacheName: "app-navigations",
   }),
   {
     denylist: [/^\/assets\/.*\.html$/],
@@ -35,7 +35,34 @@ registerRoute(
   ({ url }) => /^\/(assets|favicons|media|previews|static)/.test(url.pathname),
   new StaleWhileRevalidate({
     cacheName: "linkding-assets",
-    plugins: [new ExpirationPlugin({ maxEntries: 5000, maxAgeSeconds: DEFAULT_TTL })],
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 5000,
+        maxAgeSeconds: DEFAULT_TTL,
+      }),
+    ],
+  })
+);
+
+registerRoute(
+  ({ url, request }) =>
+    (url.pathname.startsWith("/api") || url.pathname.includes("/assets")) &&
+    request.method === "GET",
+  new NetworkFirst({
+    cacheName: "linkding-api-cache",
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 1000,
+        maxAgeSeconds: DEFAULT_TTL,
+      }),
+      {
+        handlerDidError: async () => {
+          return new Response(JSON.stringify({ offline: true, results: [] }), {
+            headers: { "Content-Type": "application/json" },
+          });
+        },
+      },
+    ],
   })
 );
 
@@ -43,15 +70,12 @@ registerRoute(
   ({ url }) => url.pathname.startsWith("/app-assets"),
   new StaleWhileRevalidate({
     cacheName: "app-assets",
-    plugins: [new ExpirationPlugin({ maxEntries: 500, maxAgeSeconds: DEFAULT_TTL })],
-  })
-);
-
-registerRoute(
-  ({ url, request }) => url.pathname.startsWith("/api") && request.method === "GET",
-  new NetworkFirst({
-    cacheName: "linkding-api-cache",
-    plugins: [new ExpirationPlugin({ maxEntries: 500, maxAgeSeconds: DEFAULT_TTL })],
+    plugins: [
+      new ExpirationPlugin({
+        maxEntries: 500,
+        maxAgeSeconds: DEFAULT_TTL,
+      }),
+    ],
   })
 );
 

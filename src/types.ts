@@ -98,4 +98,4 @@ export type FolderInsert = {
   excluded_tags: string;
 };
 
-export type CacheName = "linkding-assets" | "linkding-api-cache" | "app-assets";
+export type CacheName = "linkding-assets" | "linkding-api-cache" | "app-assets" | "app-navigations";

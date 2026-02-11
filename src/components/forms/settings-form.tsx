@@ -112,6 +112,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
 
     if (isAppCache) {
       cachesToPurge.push("app-assets");
+      cachesToPurge.push("app-navigations");
     }
     if (isLinkdingCache) {
       cachesToPurge.push("linkding-assets");
