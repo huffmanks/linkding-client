@@ -107,7 +107,7 @@ function Content({
   const { mutateAsync } = useDeleteBookmark();
 
   async function handleDelete() {
-    mutateAsync({ id: bookmark.id });
+    mutateAsync(bookmark.id);
     handleOpenChange(false);
   }
 
