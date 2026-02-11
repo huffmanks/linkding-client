@@ -70,7 +70,7 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
             throw new Error("Folder already exists with that name.");
           }
 
-          const newFolder = await createFolder(processed);
+          const newFolder = (await createFolder({ newFolder: processed })) as Folder;
           paramId = newFolder.id;
         }
 

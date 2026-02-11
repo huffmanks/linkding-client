@@ -5,7 +5,6 @@ import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { CACHE_TTL_OPTIONS } from "@/lib/constants";
 import { UrlSchema, useSettingsStore } from "@/lib/store";
 import { cn, getErrorMessage } from "@/lib/utils";
 import { useBackgroundSync } from "@/providers/background-sync";
@@ -45,14 +44,12 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
     theme,
     sidebarAddOpen,
     limit,
-    cacheTtl,
     setUsername,
     setLinkdingUrl,
     setView,
     setTheme,
     setSidebarAddOpen,
     setLimit,
-    setCacheTtl,
   } = useSettingsStore(
     useShallow((state) => ({
       username: state.username,
@@ -61,18 +58,16 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
       theme: state.theme,
       sidebarAddOpen: state.sidebarAddOpen,
       limit: state.limit,
-      cacheTtl: state.cacheTtl,
       setUsername: state.setUsername,
       setLinkdingUrl: state.setLinkdingUrl,
       setView: state.setView,
       setTheme: state.setTheme,
       setSidebarAddOpen: state.setSidebarAddOpen,
       setLimit: state.setLimit,
-      setCacheTtl: state.setCacheTtl,
     }))
   );
 
-  const { isOnline, updateTtl, purgeAssets } = useBackgroundSync();
+  const { isOnline, purgeAssets } = useBackgroundSync();
   const isMobile = useIsMobile();
 
   const form = useForm({
@@ -83,7 +78,6 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
       theme,
       sidebarAddOpen,
       limit,
-      cacheTtl: String(cacheTtl),
       appCache: false,
       linkdingCache: false,
     },
@@ -95,10 +89,6 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
         setTheme(value.theme);
         setSidebarAddOpen(value.sidebarAddOpen);
         setLimit(Number(value.limit));
-
-        setCacheTtl(value.cacheTtl);
-        updateTtl("linkdingAssetsTtl", Number(value.cacheTtl));
-        updateTtl("appAssetsTtl", Number(value.cacheTtl));
 
         toast.success("Settings updated!");
       } catch (error: unknown) {
@@ -125,7 +115,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
     }
     if (isLinkdingCache) {
       cachesToPurge.push("linkding-assets");
-      cachesToPurge.push("linkding-api-get");
+      cachesToPurge.push("linkding-api-cache");
     }
 
     if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
@@ -340,51 +330,23 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
         <FieldSeparator className="my-4" />
 
         <FieldGroup>
+          <Button className="text-foreground cursor-pointer" type="submit">
+            Update
+          </Button>
+        </FieldGroup>
+
+        <FieldSeparator className="my-4" />
+
+        <FieldGroup>
           <FieldSet>
             <FieldLegend className="text-muted-foreground">Cache settings</FieldLegend>
             <FieldGroup className="mb-3">
-              <form.Field
-                name="cacheTtl"
-                children={(field) => (
-                  <Field>
-                    <FieldLabel htmlFor="cacheTtl">Cache TTL</FieldLabel>
-                    <Select
-                      name={field.name}
-                      value={field.state.value}
-                      onValueChange={(val) => field.handleChange(val ?? "")}>
-                      <SelectTrigger id="cacheTtl">
-                        <SelectValue>
-                          {CACHE_TTL_OPTIONS.find((opt) => opt.value === field.state.value)?.label}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CACHE_TTL_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={String(option.value)}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-
-            <FieldGroup>
-              <Button className="text-foreground cursor-pointer" type="submit">
-                Update
-              </Button>
-            </FieldGroup>
-
-            <FieldSeparator className="my-4" />
-
-            <div className="mb-2">
               <FieldLabel className="text-destructive mb-1">Danger Zone</FieldLabel>
               <FieldDescription>
                 Use this to clear cached data if things aren’t updating correctly. This is disabled
                 if offline.
               </FieldDescription>
-            </div>
+            </FieldGroup>
             <FieldGroup data-slot="checkbox-group" className="mb-3">
               <form.Field
                 name="appCache"

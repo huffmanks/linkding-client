@@ -78,7 +78,9 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
           const exists = await checkDuplicateUrl(value.url);
           if (exists) return;
 
-          await createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
+          await createBookmark({
+            newBookmark: { ...value, tag_names: value.tag_names.filter(Boolean) },
+          });
           form.reset();
         }
 

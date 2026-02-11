@@ -39,7 +39,7 @@ export default function FolderActionDropdown({ id, name }: ActionDropdownProps) 
   }
 
   async function handleDelete() {
-    mutateAsync(id);
+    mutateAsync({ id });
 
     navigate({ to: "/dashboard" });
   }

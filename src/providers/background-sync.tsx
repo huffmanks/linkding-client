@@ -3,14 +3,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { useSettingsStore } from "@/lib/store";
-import type { CacheName, SyncConfig, SyncConfigKey } from "@/types";
+import { linkdingFetch } from "@/lib/api";
+import { db } from "@/lib/db";
+import type { CacheName } from "@/types";
 
 interface BackgroundSyncContextType {
   isSyncing: boolean;
   isOnline: boolean;
   purgeAssets: (cacheName: CacheName) => void;
-  updateTtl: (key: SyncConfigKey, value: number) => void;
 }
 
 const BackgroundSyncContext = createContext<BackgroundSyncContextType | undefined>(undefined);
@@ -29,27 +29,6 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
     }
   }
 
-  function updateTtl(key: SyncConfigKey, value: number) {
-    const configUpdate: SyncConfig = { [key]: value };
-
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        type: "SYNC_CONFIG",
-        config: configUpdate,
-      });
-    }
-  }
-
-  useEffect(() => {
-    if (navigator.serviceWorker.controller) {
-      const { cacheTtl } = useSettingsStore.getState();
-      updateTtl("linkdingAssetsTtl", Number(cacheTtl));
-      updateTtl("appAssetsTtl", Number(cacheTtl));
-
-      toast.success("Cache TTL updated.");
-    }
-  }, []);
-
   useEffect(() => {
     const updateStatus = () => setIsOnline(navigator.onLine);
 
@@ -65,7 +44,7 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
-    const handleMessage = (event: MessageEvent) => {
+    function handleMessage(event: MessageEvent) {
       if (event.data?.type === "SYNC_STARTING") setIsSyncing(true);
 
       if (event.data?.type === "OFFLINE_SYNC_COMPLETED") {
@@ -76,14 +55,47 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
       }
 
       if (event.data?.type === "SYNC_FAILED") setIsSyncing(false);
-    };
+    }
 
+    async function flushOutbox() {
+      if (!isOnline || isSyncing) return;
+
+      const items = await db.outbox.orderBy("timestamp").toArray();
+      if (items.length === 0) return;
+
+      setIsSyncing(true);
+
+      for (const item of items) {
+        try {
+          await linkdingFetch(item.url, {
+            method: item.method,
+            body: JSON.stringify(item.body),
+          });
+
+          await db.outbox.delete(item.id!);
+        } catch (error) {
+          toast.error("Syncing failed for:", { description: `${item}, ${error}` });
+          break;
+        }
+      }
+
+      await queryClient.invalidateQueries();
+      setIsSyncing(false);
+    }
+
+    window.addEventListener("online", flushOutbox);
     navigator.serviceWorker.addEventListener("message", handleMessage);
-    return () => navigator.serviceWorker.removeEventListener("message", handleMessage);
+
+    flushOutbox();
+
+    return () => {
+      window.removeEventListener("online", flushOutbox);
+      navigator.serviceWorker.removeEventListener("message", handleMessage);
+    };
   }, [queryClient]);
 
   return (
-    <BackgroundSyncContext.Provider value={{ isSyncing, isOnline, purgeAssets, updateTtl }}>
+    <BackgroundSyncContext.Provider value={{ isSyncing, isOnline, purgeAssets }}>
       {children}
     </BackgroundSyncContext.Provider>
   );

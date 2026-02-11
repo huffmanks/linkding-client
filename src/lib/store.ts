@@ -2,7 +2,6 @@ import z from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { DEFAULT_TTL } from "@/lib/constants";
 import type { Theme, View } from "@/types";
 
 export const TokenSchema = z
@@ -24,7 +23,6 @@ type SettingsStoreState = {
   theme: Theme;
   sidebarAddOpen: boolean;
   limit: number;
-  cacheTtl: string;
 };
 
 type SettingsStoreActions = {
@@ -35,7 +33,6 @@ type SettingsStoreActions = {
   setTheme: (theme: Theme) => void;
   setSidebarAddOpen: (sidebarAddOpen: boolean) => void;
   setLimit: (limit: number) => void;
-  setCacheTtl: (cacheTtl: string) => void;
   reset: () => void;
 };
 
@@ -47,7 +44,6 @@ const initialSettingsStoreState: SettingsStoreState = {
   theme: "system",
   sidebarAddOpen: true,
   limit: 10,
-  cacheTtl: String(DEFAULT_TTL),
 };
 
 export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions>()(
@@ -61,7 +57,6 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
       setTheme: (theme) => set({ theme }),
       setSidebarAddOpen: (sidebarAddOpen) => set({ sidebarAddOpen }),
       setLimit: (limit) => set({ limit }),
-      setCacheTtl: (cacheTtl) => set({ cacheTtl }),
       reset: () => set(initialSettingsStoreState),
     }),
     {

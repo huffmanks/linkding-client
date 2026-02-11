@@ -1,14 +1,11 @@
+import { useState } from "react";
+
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
 import { DEFAULT_TTL } from "@/lib/constants";
-import { useSettingsStore } from "@/lib/store";
-
-const { cacheTtl } = useSettingsStore.getState();
-
-const gcTime = Number(cacheTtl) ?? DEFAULT_TTL;
 
 export function getContext() {
   const queryClient = new QueryClient({
@@ -16,7 +13,7 @@ export function getContext() {
       queries: {
         networkMode: "offlineFirst",
         staleTime: 0,
-        gcTime,
+        gcTime: DEFAULT_TTL,
         refetchOnWindowFocus: true,
         retry: (failureCount, error: any) => {
           if (error.status === 404 || error.message?.includes("404")) return false;
@@ -45,14 +42,19 @@ export function Provider({
   children: React.ReactNode;
   queryClient: QueryClient;
 }) {
+  const [isRestored, setIsRestored] = useState(false);
+
+  if (!isRestored) return null;
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{
         persister,
-        maxAge: gcTime,
+        maxAge: DEFAULT_TTL,
         buster: "v1.0.0",
-      }}>
+      }}
+      onSuccess={() => setIsRestored(true)}>
       {children}
     </PersistQueryClientProvider>
   );

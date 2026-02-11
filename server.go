@@ -6,7 +6,9 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 func main() {
@@ -19,6 +21,9 @@ func main() {
 	if err != nil {
 		log.Fatal("Invalid API_TARGET URL")
 	}
+
+	workDir, _ := os.Getwd()
+	staticDir := filepath.Join(workDir, "dist")
 
 	proxy := httputil.NewSingleHostReverseProxy(target)
 
@@ -36,15 +41,25 @@ func main() {
 			return
 		}
 
-		path := "./dist" + r.URL.Path
-		info, err := os.Stat(path)
+		requestedPath := filepath.Clean(r.URL.Path)
+		fpath := filepath.Join(staticDir, requestedPath)
 
-		if os.IsNotExist(err) || info.IsDir() || r.URL.Path == "/" {
-			http.ServeFile(w, r, "./dist/index.html")
+		if !strings.HasPrefix(fpath, filepath.Clean(staticDir)) {
+			http.Error(w, "Forbidden", http.StatusForbidden)
 			return
 		}
 
-		http.ServeFile(w, r, path)
+		if requestedPath == "/sw.js" || requestedPath == "/index.html" || requestedPath == "/" {
+			w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate")
+		}
+
+		info, err := os.Stat(fpath)
+		if err != nil || info.IsDir() {
+			http.ServeFile(w, r, filepath.Join(staticDir, "index.html"))
+			return
+		}
+
+		http.ServeFile(w, r, fpath)
 	})
 
 	appPort := os.Getenv("APP_PORT")

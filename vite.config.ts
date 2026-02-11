@@ -20,9 +20,6 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    define: {
-      "self.__WB_DISABLE_DEV_LOGS": mode === "staging" ? "true" : "false",
-    },
     plugins: [
       devtools(),
       tanstackRouter({

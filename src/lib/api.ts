@@ -7,8 +7,9 @@ export async function linkdingFetch<T>(
 ): Promise<T> {
   const { token } = useSettingsStore.getState();
 
-  const path = endpoint.endsWith("/") ? endpoint : `${endpoint}/`;
-  let url = `/api/${path}`;
+  const path = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
+  const normalizedPath = path.endsWith("/") ? path : `${path}/`;
+  let url = `/api/${normalizedPath}`;
 
   if (params) {
     const searchParams = new URLSearchParams(params);
@@ -25,10 +26,14 @@ export async function linkdingFetch<T>(
   });
 
   if (!response.ok) {
-    const error = new Error(`API Error: ${response.status} ${response.statusText}`) as any;
+    const errorData = await response.json().catch(() => ({}));
+    const error = new Error(errorData.detail || `API Error: ${response.status}`) as any;
     error.status = response.status;
+    error.response = response;
     throw error;
   }
+
+  if (response.status === 204) return {} as T;
 
   const data = await response.json();
 
