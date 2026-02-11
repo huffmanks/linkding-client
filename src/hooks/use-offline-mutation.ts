@@ -27,19 +27,21 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
 
   return useMutation({
     mutationFn: async (variables: TVariables) => {
-      let targetUrl = options.url;
+      let resourcePath = options.url;
       const idValue =
         typeof variables === "object" && variables !== null
           ? (variables as BaseEntity)[idField]
           : variables;
 
       if (["PUT", "PATCH", "DELETE"].includes(options.method) && idValue) {
-        targetUrl = targetUrl.endsWith("/") ? `${targetUrl}${idValue}` : `${targetUrl}/${idValue}`;
+        resourcePath = resourcePath.endsWith("/")
+          ? `${resourcePath}${idValue}`
+          : `${resourcePath}/${idValue}`;
       }
 
       if (!isOnline) {
         await db.outbox.add({
-          url: options.url,
+          resourcePath,
           method: options.method,
           body: variables,
           timestamp: Date.now(),
@@ -47,7 +49,7 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
         return { offline: true };
       }
 
-      return await linkdingFetch(targetUrl, {
+      return await linkdingFetch(resourcePath, {
         method: options.method,
         body: JSON.stringify(variables),
       });

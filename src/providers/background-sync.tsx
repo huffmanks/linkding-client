@@ -42,21 +42,6 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
   }, []);
 
   useEffect(() => {
-    if (!("serviceWorker" in navigator)) return;
-
-    function handleMessage(event: MessageEvent) {
-      if (event.data?.type === "SYNC_STARTING") setIsSyncing(true);
-
-      if (event.data?.type === "OFFLINE_SYNC_COMPLETED") {
-        setIsSyncing(false);
-
-        toast.success("Offline changes synced successfully!");
-        queryClient.invalidateQueries();
-      }
-
-      if (event.data?.type === "SYNC_FAILED") setIsSyncing(false);
-    }
-
     async function flushOutbox() {
       if (!isOnline || isSyncing) return;
 
@@ -67,7 +52,7 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
 
       for (const item of items) {
         try {
-          await linkdingFetch(item.url, {
+          await linkdingFetch(item.resourcePath, {
             method: item.method,
             body: JSON.stringify(item.body),
           });
@@ -84,15 +69,29 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
     }
 
     window.addEventListener("online", flushOutbox);
-    navigator.serviceWorker.addEventListener("message", handleMessage);
-
     flushOutbox();
+
+    const hasSW = "serviceWorker" in navigator && navigator.serviceWorker.controller;
+
+    function handleMessage(event: MessageEvent) {
+      if (event.data?.type === "SYNC_STARTING") setIsSyncing(true);
+      if (event.data?.type === "OFFLINE_SYNC_COMPLETED") {
+        setIsSyncing(false);
+        toast.success("Offline changes synced successfully!");
+        queryClient.invalidateQueries();
+      }
+      if (event.data?.type === "SYNC_FAILED") setIsSyncing(false);
+    }
+
+    if (hasSW) {
+      navigator.serviceWorker.addEventListener("message", handleMessage);
+    }
 
     return () => {
       window.removeEventListener("online", flushOutbox);
       navigator.serviceWorker.removeEventListener("message", handleMessage);
     };
-  }, [queryClient]);
+  }, [queryClient, isOnline]);
 
   return (
     <BackgroundSyncContext.Provider value={{ isSyncing, isOnline, purgeAssets }}>

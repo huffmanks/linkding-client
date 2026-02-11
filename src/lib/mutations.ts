@@ -4,7 +4,7 @@ import type { BookmarkInsert, FolderInsert, TagInsert } from "@/types";
 export function useCreateBookmark() {
   return useOfflineMutation<{ newBookmark: BookmarkInsert }>({
     queryKey: ["bookmarks"],
-    url: "/api/bookmarks",
+    url: "bookmarks",
     method: "POST",
   });
 }
@@ -12,7 +12,7 @@ export function useCreateBookmark() {
 export function useEditBookmark() {
   return useOfflineMutation<{ id: number; modifiedBookmark: BookmarkInsert }>({
     queryKey: ["bookmarks"],
-    url: "/api/bookmarks",
+    url: "bookmarks",
     method: "PUT",
     idField: "id",
   });
@@ -21,7 +21,7 @@ export function useEditBookmark() {
 export function useDeleteBookmark() {
   return useOfflineMutation<{ id: number }>({
     queryKey: ["bookmarks"],
-    url: "/api/bookmarks",
+    url: "bookmarks",
     method: "DELETE",
     idField: "id",
   });
@@ -30,7 +30,7 @@ export function useDeleteBookmark() {
 export function useCreateFolder() {
   return useOfflineMutation<{ newFolder: FolderInsert }>({
     queryKey: ["bundles"],
-    url: "/api/bundles",
+    url: "bundles",
     method: "POST",
   });
 }
@@ -38,7 +38,7 @@ export function useCreateFolder() {
 export function useEditFolder() {
   return useOfflineMutation<{ id: number; modifiedFolder: FolderInsert }>({
     queryKey: ["bundles"],
-    url: "/api/bundles",
+    url: "bundles",
     method: "PUT",
     idField: "id",
   });
@@ -47,7 +47,7 @@ export function useEditFolder() {
 export function useDeleteFolder() {
   return useOfflineMutation<{ id: number }>({
     queryKey: ["bundles"],
-    url: "/api/bundles",
+    url: "bundles",
     method: "DELETE",
     idField: "id",
   });
@@ -56,7 +56,7 @@ export function useDeleteFolder() {
 export function useCreateTag() {
   return useOfflineMutation<{ newTag: TagInsert }>({
     queryKey: ["tags"],
-    url: "/api/tags",
+    url: "tags",
     method: "POST",
   });
 }

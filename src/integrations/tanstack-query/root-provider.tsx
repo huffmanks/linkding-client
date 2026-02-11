@@ -1,7 +1,5 @@
-import { useState } from "react";
-
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, useIsRestoring } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { del, get, set } from "idb-keyval";
 
@@ -35,6 +33,13 @@ const persister = createAsyncStoragePersister({
   },
 });
 
+function LoadingGate({ children }: { children: React.ReactNode }) {
+  const isRestoring = useIsRestoring();
+
+  if (isRestoring) return null;
+  return <>{children}</>;
+}
+
 export function Provider({
   children,
   queryClient,
@@ -42,10 +47,6 @@ export function Provider({
   children: React.ReactNode;
   queryClient: QueryClient;
 }) {
-  const [isRestored, setIsRestored] = useState(false);
-
-  if (!isRestored) return null;
-
   return (
     <PersistQueryClientProvider
       client={queryClient}
@@ -53,9 +54,8 @@ export function Provider({
         persister,
         maxAge: DEFAULT_TTL,
         buster: "v1.0.0",
-      }}
-      onSuccess={() => setIsRestored(true)}>
-      {children}
+      }}>
+      <LoadingGate>{children}</LoadingGate>
     </PersistQueryClientProvider>
   );
 }

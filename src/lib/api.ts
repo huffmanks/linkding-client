@@ -7,8 +7,9 @@ export async function linkdingFetch<T>(
 ): Promise<T> {
   const { token } = useSettingsStore.getState();
 
-  const path = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
-  const normalizedPath = path.endsWith("/") ? path : `${path}/`;
+  const cleanEndpoint = endpoint.replace(/^\//, "");
+  const normalizedPath = cleanEndpoint.endsWith("/") ? cleanEndpoint : `${cleanEndpoint}/`;
+
   let url = `/api/${normalizedPath}`;
 
   if (params) {

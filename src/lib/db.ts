@@ -2,7 +2,7 @@ import Dexie, { type Table } from "dexie";
 
 export interface OutboxItem {
   id?: number;
-  url: string;
+  resourcePath: string;
   method: "POST" | "PUT" | "PATCH" | "DELETE";
   body: any;
   timestamp: number;
