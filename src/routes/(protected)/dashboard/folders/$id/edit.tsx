@@ -10,7 +10,6 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/edit")(
   loader: async ({ context: { queryClient }, params: { id } }) => {
     try {
       await queryClient.ensureQueryData(getAllQueryOptions.folderById(id));
-      return { id };
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
         throw notFound();
@@ -21,7 +20,7 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/edit")(
 });
 
 function RouteComponent() {
-  const { id } = Route.useLoaderData();
+  const { id } = Route.useParams();
   const { data: folder } = useSuspenseQuery(getAllQueryOptions.folderById(id));
 
   return (

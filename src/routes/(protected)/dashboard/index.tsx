@@ -44,6 +44,7 @@ function RouteComponent() {
       search: (prev): BookmarkSearch => ({ ...prev, offset: newOffset }),
     });
   }
+
   return (
     <BookmarkWrapper
       heading="Bookmarks"

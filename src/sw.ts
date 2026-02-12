@@ -21,14 +21,21 @@ self.addEventListener("message", (event: ExtendableMessageEvent) => {
   }
 });
 
-const navigationRoute = new NavigationRoute(
-  new NetworkFirst({
-    cacheName: "app-navigations",
-  }),
-  {
-    denylist: [/^\/assets\/.*\.html$/],
-  }
-);
+const networkFirstNavigation = new NetworkFirst({
+  cacheName: "app-navigations",
+  plugins: [
+    {
+      handlerDidError: async () => {
+        return (await caches.match("/index.html")) || Response.error();
+      },
+    },
+  ],
+});
+
+const navigationRoute = new NavigationRoute(networkFirstNavigation, {
+  denylist: [/^\/assets\/.*\.html$/],
+});
+
 registerRoute(navigationRoute);
 
 registerRoute(

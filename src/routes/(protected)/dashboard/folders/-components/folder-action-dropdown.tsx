@@ -30,7 +30,7 @@ interface ActionDropdownProps {
 }
 
 export default function FolderActionDropdown({ id, name }: ActionDropdownProps) {
-  const { mutateAsync } = useDeleteFolder();
+  const { mutate } = useDeleteFolder();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -39,7 +39,7 @@ export default function FolderActionDropdown({ id, name }: ActionDropdownProps) 
   }
 
   async function handleDelete() {
-    mutateAsync(id);
+    mutate(id);
 
     navigate({ to: "/dashboard" });
   }

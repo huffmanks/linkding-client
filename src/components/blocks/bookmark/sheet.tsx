@@ -104,10 +104,10 @@ function Content({
   });
 
   const linkdingUrl = useSettingsStore((state) => state.linkdingUrl);
-  const { mutateAsync } = useDeleteBookmark();
+  const { mutate } = useDeleteBookmark();
 
   async function handleDelete() {
-    mutateAsync(bookmark.id);
+    mutate(bookmark.id);
     handleOpenChange(false);
   }
 

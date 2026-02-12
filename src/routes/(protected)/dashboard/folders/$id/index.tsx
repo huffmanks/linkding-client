@@ -23,8 +23,6 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
       await queryClient.ensureQueryData(getAllQueryOptions.folderById(id));
 
       await queryClient.ensureQueryData(getAllQueryOptions.bookmarksByFolderId(id, offset, limit));
-
-      return { id };
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
         throw notFound();
@@ -36,7 +34,7 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
 });
 
 function FolderComponent() {
-  const { id } = Route.useLoaderData();
+  const { id } = Route.useParams();
   const { offset } = Route.useSearch();
   const limit = useSettingsStore((state) => state.limit);
   const navigate = useNavigate({ from: Route.fullPath });

@@ -10,7 +10,6 @@ export const Route = createFileRoute("/(protected)/dashboard/bookmarks/$id/edit"
   loader: async ({ context: { queryClient }, params: { id } }) => {
     try {
       await queryClient.ensureQueryData(getAllQueryOptions.bookmarkById(id));
-      return { id };
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
         throw notFound();
@@ -21,7 +20,7 @@ export const Route = createFileRoute("/(protected)/dashboard/bookmarks/$id/edit"
 });
 
 function RouteComponent() {
-  const { id } = Route.useLoaderData();
+  const { id } = Route.useParams();
   const { data: bookmark } = useSuspenseQuery(getAllQueryOptions.bookmarkById(id));
 
   return (

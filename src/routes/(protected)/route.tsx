@@ -16,6 +16,7 @@ export const Route = createFileRoute("/(protected)")({
   },
   loader: async ({ context: { queryClient } }) => {
     await Promise.all([
+      queryClient.ensureQueryData(getAllQueryOptions.bookmarks("", 0, 1000)),
       queryClient.ensureQueryData(getAllQueryOptions.folders),
       queryClient.ensureQueryData(getAllQueryOptions.tags),
     ]);

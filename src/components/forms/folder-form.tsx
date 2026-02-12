@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -26,9 +26,10 @@ type FolderFormProps = React.ComponentProps<"div"> & {
 };
 
 export function FolderForm({ folder, className, ...props }: FolderFormProps) {
-  const navigate = useNavigate();
-  const { mutateAsync: createFolder, isPending } = useCreateFolder();
-  const { mutateAsync: editFolder } = useEditFolder();
+  const router = useRouter();
+  const canGoBack = useCanGoBack();
+  const { mutate: createFolder, isPending } = useCreateFolder();
+  const { mutate: editFolder } = useEditFolder();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
   const { data: folders } = useSuspenseQuery(getAllQueryOptions.folders);
@@ -58,10 +59,9 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
     onSubmit: async ({ value }) => {
       try {
         const processed = processValue({ value, returnType: "string" });
-        let paramId: number;
+
         if (folder?.id) {
-          await editFolder({ ...processed, id: folder.id });
-          paramId = folder.id;
+          editFolder({ ...processed, id: folder.id });
         } else {
           const doesFolderWithSameNameExist = folders.results.some(
             (f) => f.name.toLowerCase() === processed.name.toLowerCase()
@@ -70,12 +70,15 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
             throw new Error("Folder already exists with that name.");
           }
 
-          const newFolder = (await createFolder(processed)) as Folder;
-          paramId = newFolder.id;
+          createFolder(processed);
         }
 
         form.reset();
-        navigate({ to: "/dashboard/folders/$id", params: { id: String(paramId) } });
+        if (canGoBack) {
+          router.history.back();
+        } else {
+          router.navigate({ to: "/dashboard" });
+        }
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         toast.error(errorMessage);

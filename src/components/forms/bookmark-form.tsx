@@ -32,8 +32,8 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
   const canGoBack = useCanGoBack();
 
   const queryClient = useQueryClient();
-  const { mutateAsync: createBookmark, isPending } = useCreateBookmark();
-  const { mutateAsync: editBookmark } = useEditBookmark();
+  const { mutate: createBookmark, isPending } = useCreateBookmark();
+  const { mutate: editBookmark } = useEditBookmark();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
@@ -73,12 +73,12 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
     onSubmit: async ({ value }) => {
       try {
         if (bookmark?.id) {
-          await editBookmark({ ...value, id: bookmark.id });
+          editBookmark({ ...value, id: bookmark.id });
         } else {
           const exists = await checkDuplicateUrl(value.url);
           if (exists) return;
 
-          await createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
+          createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
           form.reset();
         }
 

@@ -19,7 +19,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 
 export function CreateTagForm() {
-  const { mutateAsync, isPending } = useCreateTag();
+  const { mutate, isPending } = useCreateTag();
   const { closeGlobalModal } = useGlobalModal();
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
@@ -28,7 +28,7 @@ export function CreateTagForm() {
       name: "",
     },
     onSubmit: async ({ value }) => {
-      await mutateAsync(value);
+      mutate(value);
 
       form.reset();
       closeGlobalModal();
