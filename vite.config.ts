@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
       devtools(),
       tanstackRouter({
         target: "react",
-        autoCodeSplitting: true,
+        autoCodeSplitting: false,
       }),
       viteReact(),
       tailwindcss(),
