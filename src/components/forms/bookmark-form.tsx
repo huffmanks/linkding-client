@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { useCreateBookmark, useEditBookmark } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { cn, getErrorMessage, sleep } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import { useBackgroundSync } from "@/providers/background-sync";
 import type { Bookmark } from "@/types";
 
@@ -34,7 +34,7 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
   const { isOnline } = useBackgroundSync();
 
   const queryClient = useQueryClient();
-  const { mutate: createBookmark, isPending } = useCreateBookmark();
+  const { mutateAsync: createBookmark, isPending } = useCreateBookmark();
   const { mutate: editBookmark } = useEditBookmark();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
@@ -66,14 +66,13 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
           toast.error("Bookmark already exists with that url.");
           return true;
         }
+        return false;
       } else {
         return bookmarks.results.some(
           (bookmark) => bookmark.url.toLowerCase() === url.toLowerCase()
         );
       }
-    } catch (e) {
-      toast.warning("Offline: Skipping duplicate check.");
-    }
+    } catch (_error) {}
     return false;
   }
 
@@ -83,14 +82,24 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
       try {
         if (bookmark?.id) {
           editBookmark({ ...value, id: bookmark.id });
+
+          toast.success("Bookmark updated.");
         } else {
           const exists = await checkDuplicateUrl(value.url);
           if (exists) return;
 
-          createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
+          const result = await createBookmark({
+            ...value,
+            tag_names: value.tag_names.filter(Boolean),
+          });
 
-          await sleep(1000);
           form.reset();
+
+          if ("offline" in result && result.offline) {
+            toast.info("Added to queue. Will be created once connection is restored.");
+          } else {
+            toast.success("Bookmark created.");
+          }
         }
 
         if (canGoBack) {

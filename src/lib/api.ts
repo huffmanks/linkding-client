@@ -21,6 +21,7 @@ export async function linkdingFetch<T>(
 
   const response = await fetch(url, {
     ...options,
+    signal: AbortSignal.timeout(5000),
     headers: {
       Authorization: `Token ${token}`,
       "Content-Type": "application/json",

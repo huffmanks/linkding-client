@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import z from "zod";
 
 import { useCreateTag } from "@/lib/mutations";
@@ -19,7 +20,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input";
 
 export function CreateTagForm() {
-  const { mutate, isPending } = useCreateTag();
+  const { mutateAsync, isPending } = useCreateTag();
   const { closeGlobalModal } = useGlobalModal();
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
 
@@ -28,7 +29,13 @@ export function CreateTagForm() {
       name: "",
     },
     onSubmit: async ({ value }) => {
-      mutate(value);
+      const result = await mutateAsync(value);
+
+      if ("offline" in result && result.offline) {
+        toast.info("Added to queue. Will be created once connection is restored.");
+      } else {
+        toast.success("Tag created.");
+      }
 
       form.reset();
       closeGlobalModal();

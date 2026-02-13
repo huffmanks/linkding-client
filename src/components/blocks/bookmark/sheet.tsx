@@ -261,10 +261,13 @@ function Content({
         )}
       </section>
 
-      <section className="text-muted-foreground mb-5 space-y-1 text-xs">
-        <p>Created: {getRelativeTimeString(bookmark.date_added)}</p>
-        <p>Last modified: {getRelativeTimeString(bookmark.date_modified)}</p>
-      </section>
+      {bookmark?.date_added && bookmark?.date_modified && (
+        <section className="text-muted-foreground mb-5 space-y-1 text-xs">
+          <p>Created: {getRelativeTimeString(bookmark.date_added)}</p>
+          <p>Last modified: {getRelativeTimeString(bookmark.date_modified)}</p>
+        </section>
+      )}
+
       <section className="flex justify-end">
         <div className="flex items-center gap-2">
           <Button

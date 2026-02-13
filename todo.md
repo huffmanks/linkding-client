@@ -32,7 +32,7 @@
 
 - [x] Check/test all routes and apis work/handle offline.
 - [x] Edit forms (bookmark/folder): Get from cache if offline.
-- [ ] Create and edit form: add toast.
+- [x] Create and edit form: add toast.
 - [ ] If offline, hard refresh crashes.
 
 ## UI

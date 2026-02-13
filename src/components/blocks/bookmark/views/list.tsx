@@ -57,9 +57,11 @@ export default function BookmarkListView({
               {bookmark?.description && (
                 <p className="text-muted-foreground line-clamp-2 text-xs">{bookmark.description}</p>
               )}
-              <p className={cn("text-xs", !bookmark?.description && "mt-2")}>
-                {getRelativeTimeString(new Date(bookmark.date_added))}
-              </p>
+              {bookmark?.date_added && (
+                <p className={cn("text-xs", !bookmark?.description && "mt-2")}>
+                  {getRelativeTimeString(new Date(bookmark.date_added))}
+                </p>
+              )}
             </section>
             <section className="mb-2 flex items-center gap-1">
               <Tooltip>

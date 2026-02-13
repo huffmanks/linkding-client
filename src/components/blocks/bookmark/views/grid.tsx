@@ -55,9 +55,11 @@ export default function BookmarkGridView({
                   {bookmark.description}
                 </p>
               )}
-              <p className={cn("text-foreground text-xs", !bookmark?.description && "mt-2")}>
-                {getRelativeTimeString(new Date(bookmark.date_added))}
-              </p>
+              {bookmark?.date_added && (
+                <p className={cn("text-foreground text-xs", !bookmark?.description && "mt-2")}>
+                  {getRelativeTimeString(new Date(bookmark.date_added))}
+                </p>
+              )}
             </CardDescription>
             <CardAction>
               <ActionDropdown

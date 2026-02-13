@@ -18,15 +18,18 @@ interface OfflineMutationOptions<TVariables> {
   idField?: string;
 }
 
-export function useOfflineMutation<TVariables extends BaseEntity | string | number>(
-  options: OfflineMutationOptions<TVariables>
-) {
+type OfflineResult<T = unknown> = { offline: true } | T;
+
+export function useOfflineMutation<
+  TVariables extends BaseEntity | string | number,
+  TResult = unknown,
+>(options: OfflineMutationOptions<TVariables>) {
   const queryClient = useQueryClient();
   const { isOnline } = useBackgroundSync();
   const { idField = "id" } = options;
 
   return useMutation<
-    unknown,
+    OfflineResult<TResult>,
     unknown,
     TVariables,
     {
@@ -46,22 +49,33 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
           : `${resourcePath}/${idValue}`;
       }
 
-      if (!isOnline) {
-        await db.outbox.add({
-          resourcePath,
+      try {
+        if (!isOnline) {
+          await db.outbox.add({
+            resourcePath,
+            method: options.method,
+            body: variables,
+            timestamp: Date.now(),
+          });
+          return { offline: true };
+        }
+
+        return await linkdingFetch(resourcePath, {
           method: options.method,
-          body: variables,
-          timestamp: Date.now(),
+          body: JSON.stringify(variables),
         });
+      } catch (error) {
+        if (!isOnline || (error instanceof Error && error.name === "AbortError")) {
+          await db.outbox.add({
+            resourcePath,
+            method: options.method,
+            body: variables,
+            timestamp: Date.now(),
+          });
+        }
         return { offline: true };
       }
-
-      return await linkdingFetch(resourcePath, {
-        method: options.method,
-        body: JSON.stringify(variables),
-      });
     },
-
     onMutate: async (newVariables) => {
       await queryClient.cancelQueries({ queryKey: options.queryKey });
       const previousData = queryClient.getQueriesData({
@@ -154,7 +168,6 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
 
       return { previousData };
     },
-
     onError: (_err, _var, context) => {
       if (context?.previousData) {
         context?.previousData?.forEach(([key, data]) => {
@@ -162,7 +175,32 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
         });
       }
     },
+    onSuccess: (result: OfflineResult<TResult>, variables: TVariables) => {
+      if ((result as any)?.offline) return;
 
+      queryClient.setQueriesData({ queryKey: options.queryKey, exact: false }, (old: any) => {
+        if (!old) return old;
+
+        if (Array.isArray(old)) {
+          return old.map((item) =>
+            item[idField] === (variables as any)[idField] &&
+            (variables as any)[idField]?.startsWith("temp-")
+              ? { ...item, ...result }
+              : item
+          );
+        }
+
+        return {
+          ...old,
+          results: old.results?.map((item: any) =>
+            item[idField] === (variables as any)[idField] &&
+            (variables as any)[idField]?.startsWith("temp-")
+              ? { ...item, ...result }
+              : item
+          ),
+        };
+      });
+    },
     onSettled: () => {
       if (isOnline) {
         queryClient.invalidateQueries({ queryKey: options.queryKey });

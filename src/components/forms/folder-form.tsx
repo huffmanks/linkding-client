@@ -6,7 +6,7 @@ import z from "zod";
 
 import { useCreateFolder, useEditFolder } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { cn, getErrorMessage, processValue, sleep, stringToStringArray } from "@/lib/utils";
+import { cn, getErrorMessage, processValue, stringToStringArray } from "@/lib/utils";
 import type { Folder } from "@/types";
 
 import { ComboboxCreate } from "@/components/forms/combobox-create";
@@ -28,7 +28,7 @@ type FolderFormProps = React.ComponentProps<"div"> & {
 export function FolderForm({ folder, className, ...props }: FolderFormProps) {
   const router = useRouter();
   const canGoBack = useCanGoBack();
-  const { mutate: createFolder, isPending } = useCreateFolder();
+  const { mutateAsync: createFolder, isPending } = useCreateFolder();
   const { mutate: editFolder } = useEditFolder();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
@@ -62,6 +62,8 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
 
         if (folder?.id) {
           editFolder({ ...processed, id: folder.id });
+
+          toast.success("Folder updated.");
         } else {
           const doesFolderWithSameNameExist = folders.results.some(
             (f) => f.name.toLowerCase() === processed.name.toLowerCase()
@@ -70,10 +72,15 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
             throw new Error("Folder already exists with that name.");
           }
 
-          createFolder(processed);
+          const result = await createFolder(processed);
 
-          await sleep(1000);
           form.reset();
+
+          if ("offline" in result && result.offline) {
+            toast.info("Added to queue. Will be created once connection is restored.");
+          } else {
+            toast.success("Folder created.");
+          }
         }
 
         if (canGoBack) {
