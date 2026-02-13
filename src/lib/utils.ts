@@ -208,3 +208,7 @@ export function getErrorMessage(error: unknown) {
       return error.message || "An unexpected error occurred.";
   }
 }
+
+export function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}

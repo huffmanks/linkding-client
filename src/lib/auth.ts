@@ -10,7 +10,7 @@ export async function login({
   linkdingUrl: Url;
   token: Token;
 }) {
-  const { setUsername, setLinkdingUrl, setToken } = useSettingsStore.getState();
+  const { setUsername, setLinkdingUrl, setToken, setIsAuthenticated } = useSettingsStore.getState();
 
   try {
     if (!token) throw new Error("Missing API token.");
@@ -22,6 +22,7 @@ export async function login({
     setUsername(username);
     setLinkdingUrl(linkdingUrl);
     setToken(token);
+    setIsAuthenticated(true);
     return {
       isValid,
       errorMessage,
@@ -36,18 +37,19 @@ export async function login({
 }
 
 export function logout() {
-  const { setToken } = useSettingsStore.getState();
+  const { setToken, setIsAuthenticated } = useSettingsStore.getState();
 
+  setIsAuthenticated(false);
   setToken(null);
 }
 
-export async function isAuthenticated() {
-  const { token } = useSettingsStore.getState();
+export async function checkAuth() {
+  const { token, isAuthenticated } = useSettingsStore.getState();
 
   try {
     if (!token) throw new Error("Missing credentials.");
 
-    if (!navigator.onLine) {
+    if (!navigator.onLine || isAuthenticated) {
       return {
         isValid: true,
         errorMessage: null,

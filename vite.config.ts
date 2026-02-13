@@ -40,6 +40,7 @@ export default defineConfig(({ mode }) => {
         registerType: "autoUpdate",
         injectManifest: {
           globPatterns: ["**/*.{css,html,js,json,webmanifest,ico,png,svg,otf,ttf,woff,woff2}"],
+          globDirectory: "dist",
           swDest: "dist/sw.js",
         },
         manifest: {

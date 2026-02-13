@@ -23,6 +23,7 @@ type SettingsStoreState = {
   theme: Theme;
   sidebarAddOpen: boolean;
   limit: number;
+  isAuthenticated: boolean;
 };
 
 type SettingsStoreActions = {
@@ -33,6 +34,7 @@ type SettingsStoreActions = {
   setTheme: (theme: Theme) => void;
   setSidebarAddOpen: (sidebarAddOpen: boolean) => void;
   setLimit: (limit: number) => void;
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
   reset: () => void;
 };
 
@@ -44,6 +46,7 @@ const initialSettingsStoreState: SettingsStoreState = {
   theme: "system",
   sidebarAddOpen: true,
   limit: 10,
+  isAuthenticated: false,
 };
 
 export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions>()(
@@ -57,6 +60,7 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
       setTheme: (theme) => set({ theme }),
       setSidebarAddOpen: (sidebarAddOpen) => set({ sidebarAddOpen }),
       setLimit: (limit) => set({ limit }),
+      setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
       reset: () => set(initialSettingsStoreState),
     }),
     {

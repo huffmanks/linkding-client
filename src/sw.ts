@@ -26,7 +26,7 @@ const networkFirstNavigation = new NetworkFirst({
   plugins: [
     {
       handlerDidError: async () => {
-        return (await caches.match("/index.html")) || Response.error();
+        return await caches.match(new Request(self.registration.scope, { mode: "navigate" }));
       },
     },
   ],

@@ -4,7 +4,14 @@ import { linkdingFetch } from "@/lib/api";
 import type { Bookmark, BookmarkCheck, Folder, PaginatedResponse, Tag } from "@/types";
 
 export const getAllQueryOptions = {
-  bookmarks: (q: string = "", offset: number = 0, limit: number = 10) =>
+  bookmarks: queryOptions({
+    queryKey: ["bookmarks"],
+    queryFn: () =>
+      linkdingFetch<PaginatedResponse<Bookmark>>("bookmarks", {
+        params: { limit: String(1000) },
+      }),
+  }),
+  bookmarkList: (q: string = "", offset: number = 0, limit: number = 10) =>
     queryOptions({
       queryKey: ["bookmarks", { q, offset, limit }],
       queryFn: () =>

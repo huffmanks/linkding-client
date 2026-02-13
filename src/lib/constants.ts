@@ -16,13 +16,6 @@ export const APP_DESCRIPTION = "Self-hosted client app for Linkding.";
 
 export const DEFAULT_TTL = 60 * 60 * 24 * 90;
 
-export const CACHE_TTL_OPTIONS = [
-  { value: String(86400), label: "1 day" },
-  { value: String(604800), label: "7 days" },
-  { value: String(2592000), label: "30 days" },
-  { value: String(DEFAULT_TTL), label: "90 days" },
-];
-
 export const SIDEBAR_NAV_MAIN = [
   {
     name: "Add",

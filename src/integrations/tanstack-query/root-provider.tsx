@@ -10,9 +10,11 @@ export function getContext() {
     defaultOptions: {
       queries: {
         networkMode: "offlineFirst",
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: true,
         staleTime: 0,
         gcTime: DEFAULT_TTL,
-        refetchOnWindowFocus: true,
         retry: (failureCount, error: any) => {
           if (error.status === 404 || error.message?.includes("404")) return false;
           return failureCount < 3;

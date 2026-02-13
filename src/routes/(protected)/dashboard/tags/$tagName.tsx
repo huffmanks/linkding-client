@@ -1,10 +1,11 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 
+import { safeEnsure } from "@/lib/api";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
 import { EmptyTag } from "@/routes/(protected)/dashboard/tags/-components/empty-tag";
-import type { BookmarkSearch } from "@/types";
+import type { BookmarkSearch, PaginatedResponse, Tag } from "@/types";
 
 import BookmarkWrapper from "@/components/blocks/bookmark";
 
@@ -19,7 +20,10 @@ export const Route = createFileRoute("/(protected)/dashboard/tags/$tagName")({
   loader: async ({ context: { queryClient }, params: { tagName }, deps: { offset } }) => {
     const { limit } = useSettingsStore.getState();
     try {
-      const tags = await queryClient.ensureQueryData(getAllQueryOptions.tags);
+      const tags = (await safeEnsure(
+        queryClient,
+        getAllQueryOptions.tags
+      )) as PaginatedResponse<Tag>;
 
       const tagExists = tags.results.some((t) => t.name.toLowerCase() === tagName.toLowerCase());
 
@@ -27,9 +31,7 @@ export const Route = createFileRoute("/(protected)/dashboard/tags/$tagName")({
         throw notFound();
       }
 
-      await queryClient.ensureQueryData(
-        getAllQueryOptions.bookmarksByTagName(tagName, offset, limit)
-      );
+      await safeEnsure(queryClient, getAllQueryOptions.bookmarksByTagName(tagName, offset, limit));
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
         throw notFound();

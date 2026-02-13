@@ -30,17 +30,13 @@
 
 ## Background Sync
 
-- [ ] Offline for (/dashboard) route gives error.
-- [ ] Check/test all routes and apis work/handle offline.
-- [ ] Edit forms (bookmark/folder): Use query client cache first to send from route to form. This will allow prepopulating fields.
-- [ ] Create and edit form: Skip API post if offline like and pass to background sync.
-- [ ] If offline make hard refresh not load the browser offline page.
-- [ ] [api error offline](src/lib/api.ts#L18)
-  - GET http://localhost:3001/api/bundles/8/ net::ERR_INTERNET_DISCONNECTED
-  - GET http://localhost:3001/api/bookmarks/?bundle=8&offset=0&limit=10 net::ERR_INTERNET_DISCONNECTED
+- [x] Check/test all routes and apis work/handle offline.
+- [x] Edit forms (bookmark/folder): Get from cache if offline.
+- [ ] Create and edit form: add toast.
+- [ ] If offline, hard refresh crashes.
 
 ## UI
 
 - [ ] Grid/list view add url below/above title.
-- [x] On mobile tag dialog push dialog up. Most of it is blocked by keyboard. (need to test on mobile)
+- [x] [Dialog](src/components/ui/dialog.tsx#L60) On mobile tag dialog push dialog up. Most of it is blocked by keyboard. (need to test on mobile)
 - [ ] Bug when submitting tag ghost focus from either drawer or modal.

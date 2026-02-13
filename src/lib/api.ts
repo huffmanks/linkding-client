@@ -1,3 +1,5 @@
+import { QueryClient } from "@tanstack/react-query";
+
 import { useSettingsStore } from "@/lib/store";
 import { cleanUrl } from "@/lib/utils";
 
@@ -44,4 +46,17 @@ export async function linkdingFetch<T>(
     }
     return value;
   });
+}
+
+export async function safeEnsure(queryClient: QueryClient, options: any) {
+  const cached = queryClient.getQueryData(options.queryKey);
+  if (cached !== undefined) return cached;
+
+  try {
+    return await queryClient.ensureQueryData(options);
+  } catch {
+    const fallback = { results: [], offline: true };
+    queryClient.setQueryData(options.queryKey, fallback);
+    return fallback;
+  }
 }

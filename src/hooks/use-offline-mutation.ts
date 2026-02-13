@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { type QueryKey, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { linkdingFetch } from "@/lib/api";
 import { db } from "@/lib/db";
@@ -25,7 +25,14 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
   const { isOnline } = useBackgroundSync();
   const { idField = "id" } = options;
 
-  return useMutation({
+  return useMutation<
+    unknown,
+    unknown,
+    TVariables,
+    {
+      previousData: [QueryKey, unknown][];
+    }
+  >({
     mutationFn: async (variables: TVariables) => {
       let resourcePath = options.url;
       const idValue =
@@ -57,9 +64,35 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
 
     onMutate: async (newVariables) => {
       await queryClient.cancelQueries({ queryKey: options.queryKey });
-      const previousData = queryClient.getQueryData(options.queryKey);
+      const previousData = queryClient.getQueriesData({
+        queryKey: options.queryKey,
+      });
 
-      queryClient.setQueryData(options.queryKey, (old: any) => {
+      const updateEntityDetails = (vars: BaseEntity) => {
+        const id = vars[idField];
+        if (!id) return;
+
+        const rootKey = options.queryKey[0];
+
+        queryClient.setQueriesData(
+          {
+            predicate: (query) => {
+              const key = query.queryKey;
+
+              return (
+                Array.isArray(key) &&
+                key[0] === rootKey &&
+                key.length === 2 &&
+                typeof key[1] !== "object" &&
+                String(key[1]) === String(id)
+              );
+            },
+          },
+          (old: any) => (old ? { ...old, ...vars } : old)
+        );
+      };
+
+      const updater = (old: any) => {
         if (!old) return old;
 
         if (options.method === "DELETE") {
@@ -106,6 +139,8 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
             return old.map(updateFn);
           }
 
+          updateEntityDetails(vars);
+
           return {
             ...old,
             results: old.results?.map(updateFn),
@@ -113,14 +148,18 @@ export function useOfflineMutation<TVariables extends BaseEntity | string | numb
         }
 
         return old;
-      });
+      };
+
+      queryClient.setQueriesData({ queryKey: options.queryKey, exact: false }, updater);
 
       return { previousData };
     },
 
     onError: (_err, _var, context) => {
       if (context?.previousData) {
-        queryClient.setQueryData(options.queryKey, context.previousData);
+        context?.previousData?.forEach(([key, data]) => {
+          queryClient.setQueryData(key, data);
+        });
       }
     },
 

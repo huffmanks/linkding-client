@@ -6,7 +6,7 @@ import z from "zod";
 
 import { useCreateFolder, useEditFolder } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { cn, getErrorMessage, processValue, stringToStringArray } from "@/lib/utils";
+import { cn, getErrorMessage, processValue, sleep, stringToStringArray } from "@/lib/utils";
 import type { Folder } from "@/types";
 
 import { ComboboxCreate } from "@/components/forms/combobox-create";
@@ -71,9 +71,11 @@ export function FolderForm({ folder, className, ...props }: FolderFormProps) {
           }
 
           createFolder(processed);
+
+          await sleep(1000);
+          form.reset();
         }
 
-        form.reset();
         if (canGoBack) {
           router.history.back();
         } else {

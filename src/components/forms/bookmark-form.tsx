@@ -6,7 +6,8 @@ import { z } from "zod";
 
 import { useCreateBookmark, useEditBookmark } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { cn, getErrorMessage } from "@/lib/utils";
+import { cn, getErrorMessage, sleep } from "@/lib/utils";
+import { useBackgroundSync } from "@/providers/background-sync";
 import type { Bookmark } from "@/types";
 
 import { ComboboxCreate } from "@/components/forms/combobox-create";
@@ -30,12 +31,14 @@ type BookmarkFormProps = React.ComponentProps<"div"> & {
 export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProps) {
   const router = useRouter();
   const canGoBack = useCanGoBack();
+  const { isOnline } = useBackgroundSync();
 
   const queryClient = useQueryClient();
   const { mutate: createBookmark, isPending } = useCreateBookmark();
   const { mutate: editBookmark } = useEditBookmark();
 
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
+  const { data: bookmarks } = useSuspenseQuery(getAllQueryOptions.bookmarks);
 
   const defaultValues = {
     url: bookmark?.url ?? "",
@@ -56,11 +59,17 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
 
   async function checkDuplicateUrl(url: string): Promise<boolean> {
     try {
-      const check = await queryClient.fetchQuery(getAllQueryOptions.bookmarkCheckIfExists(url));
+      if (isOnline) {
+        const check = await queryClient.fetchQuery(getAllQueryOptions.bookmarkCheckIfExists(url));
 
-      if (check.bookmark?.id) {
-        toast.error("Bookmark already exists with that url.");
-        return true;
+        if (check.bookmark?.id) {
+          toast.error("Bookmark already exists with that url.");
+          return true;
+        }
+      } else {
+        return bookmarks.results.some(
+          (bookmark) => bookmark.url.toLowerCase() === url.toLowerCase()
+        );
       }
     } catch (e) {
       toast.warning("Offline: Skipping duplicate check.");
@@ -79,6 +88,8 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
           if (exists) return;
 
           createBookmark({ ...value, tag_names: value.tag_names.filter(Boolean) });
+
+          await sleep(1000);
           form.reset();
         }
 

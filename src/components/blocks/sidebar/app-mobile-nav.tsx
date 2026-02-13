@@ -34,11 +34,19 @@ export default function AppMobileNav() {
       let subItems: SubItem[] | undefined = undefined;
       if (newItem.name === "Folders" && folders?.results) {
         subItems = folders.results
-          .map((f) => ({ ...f, entityType: "folders" as const }))
+          .map((f) => ({
+            ...f,
+            entityType: "folders" as const,
+            params: { id: String(f.id) } as const,
+          }))
           .sort((a, b) => a.name.localeCompare(b.name));
       } else if (newItem.name === "Tags" && tags?.results) {
         subItems = tags.results
-          .map((t) => ({ ...t, entityType: "tags" as const }))
+          .map((t) => ({
+            ...t,
+            entityType: "tags" as const,
+            params: { tagName: String(t.name) } as const,
+          }))
           .sort((a, b) => a.name.localeCompare(b.name));
       }
 
@@ -97,6 +105,10 @@ type ExtendedSidebarNavItem = SidebarNavItem & {
 
 type SubItem = (Folder | Tag) & {
   entityType: "folders" | "tags";
+  params: {
+    id?: string;
+    tagName?: string;
+  };
 };
 
 function NavDrawer({ item }: { item: ExtendedSidebarNavItem }) {
@@ -120,7 +132,8 @@ function NavDrawer({ item }: { item: ExtendedSidebarNavItem }) {
             className={cn(
               "flex items-center justify-center rounded-full p-2 transition-colors",
               item.isActive && "bg-muted text-primary dark:bg-muted/50",
-              item.name === "Add" && "bg-foreground text-background"
+              item.name === "Add" && "bg-foreground text-background",
+              item.isActive && item.name === "Add" && "text-primary"
             )}>
             <item.icon className="size-6" />
           </div>
@@ -174,12 +187,8 @@ function NavDrawer({ item }: { item: ExtendedSidebarNavItem }) {
                   key={subItem.id}
                   closeDrawer={closeDrawer}
                   name={subItem.name}
-                  params={
-                    subItem.entityType === "tags"
-                      ? { tagName: String(subItem.name) }
-                      : { id: String(subItem.id) }
-                  }
-                  link={`/dashboard/${subItem.entityType}/$id`}
+                  params={subItem.params}
+                  link={`/dashboard/${subItem.entityType}/${subItem.entityType === "tags" ? subItem.params.tagName : subItem.params.id}`}
                 />
               ))}
             </div>

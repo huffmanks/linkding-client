@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 
+import { safeEnsure } from "@/lib/api";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
 import { EmptyFolder } from "@/routes/(protected)/dashboard/folders/-components/empty-folder";
@@ -20,9 +21,9 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
     const { limit } = useSettingsStore.getState();
 
     try {
-      await queryClient.ensureQueryData(getAllQueryOptions.folderById(id));
+      await safeEnsure(queryClient, getAllQueryOptions.folderById(id));
 
-      await queryClient.ensureQueryData(getAllQueryOptions.bookmarksByFolderId(id, offset, limit));
+      await safeEnsure(queryClient, getAllQueryOptions.bookmarksByFolderId(id, offset, limit));
     } catch (error) {
       if (error instanceof Error && error.message.includes("404")) {
         throw notFound();

@@ -2,6 +2,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BookmarkIcon } from "lucide-react";
 
+import { safeEnsure } from "@/lib/api";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
 import type { BookmarkSearch } from "@/types";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/(protected)/dashboard/")({
   loaderDeps: ({ search: { q, offset } }) => ({ q: q ?? "", offset: offset ?? 0 }),
   loader: async ({ context: { queryClient }, deps: { q, offset } }) => {
     const { limit } = useSettingsStore.getState();
-    await queryClient.ensureQueryData(getAllQueryOptions.bookmarks(q, offset, limit));
+    await safeEnsure(queryClient, getAllQueryOptions.bookmarkList(q, offset, limit));
   },
 });
 
@@ -37,7 +38,7 @@ function RouteComponent() {
   const limit = useSettingsStore((state) => state.limit);
   const navigate = useNavigate({ from: Route.fullPath });
 
-  const { data } = useSuspenseQuery(getAllQueryOptions.bookmarks(q, offset, limit));
+  const { data } = useSuspenseQuery(getAllQueryOptions.bookmarkList(q, offset, limit));
 
   function onOffsetChange(newOffset: number) {
     navigate({
