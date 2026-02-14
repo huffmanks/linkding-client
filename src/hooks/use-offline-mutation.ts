@@ -1,10 +1,11 @@
 import { type QueryKey, useMutation, useQueryClient } from "@tanstack/react-query";
+import { nanoid } from "nanoid";
 
 import { linkdingFetch } from "@/lib/api";
 import { db } from "@/lib/db";
 import { useBackgroundSync } from "@/providers/background-sync";
 
-const generateTempId = () => `temp-${crypto.randomUUID()}`;
+const generateTempId = () => `temp-${nanoid()}`;
 
 interface BaseEntity {
   [key: string]: any;

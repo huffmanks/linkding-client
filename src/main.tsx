@@ -49,7 +49,7 @@ if (rootElement && !rootElement.innerHTML) {
             <GlobalModal />
           </GlobalModalProvider>
         </BackgroundSyncProvider>
-        <Toaster richColors />
+        <Toaster richColors position={window.innerWidth <= 768 ? "top-center" : "bottom-right"} />
       </TanStackQueryProvider.Provider>
     </StrictMode>
   );

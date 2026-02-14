@@ -37,8 +37,9 @@ _up-staging:
     {{base_compose}} up -d linkding
     pnpm staging
 
-_up-prod: _up-staging
+_up-prod:
     sudo caddy start
+    {{base_compose}} up -d
 
 _down-base:
     {{base_compose}} down
