@@ -85,7 +85,7 @@ export default defineConfig(({ mode }) => {
     server: {
       proxy: {
         "^/(api|favicons|media|previews|static)": {
-          target: "http://localhost:9090",
+          target: "http://127.0.0.1:9090",
           changeOrigin: true,
         },
       },

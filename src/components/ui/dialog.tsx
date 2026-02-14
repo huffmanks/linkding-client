@@ -53,16 +53,12 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "bg-background data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 ring-foreground/10 fixed left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 gap-6 rounded-xl p-6 text-sm ring-1 duration-100 outline-none sm:max-w-md",
+          "-translate-y-1/2",
           // Dialog reposition if keyboard/input focused
           // Mobile positioning (Top-heavy centering)
-          // old
-          // "top-auto bottom-[calc(env(keyboard-inset-height,0px)+1rem)]",
-          //new
-          "top-[calc(50%-env(keyboard-inset-height,0px)/2)] -translate-y-1/2",
-          "max-h-[calc(100dvh-env(keyboard-inset-height,0px)-2rem)] overflow-y-auto",
-
+          "top-[calc(50%-env(keyboard-inset-height,0px)/2)] max-h-[calc(100dvh-env(keyboard-inset-height,0px)-2rem)]",
           // Desktop override
-          "sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2",
+          "sm:top-1/2 sm:bottom-auto sm:max-h-none",
           className
         )}
         {...props}>

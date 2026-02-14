@@ -65,15 +65,21 @@ export function useOfflineMutation<
           body: JSON.stringify(variables),
         });
       } catch (error) {
-        if (!isOnline || (error instanceof Error && error.name === "AbortError")) {
+        if (
+          error instanceof Error &&
+          (error.name === "AbortError" ||
+            error.message.includes("Failed to fetch") ||
+            error.message.includes("NetworkError"))
+        ) {
           await db.outbox.add({
             resourcePath,
             method: options.method,
             body: variables,
             timestamp: Date.now(),
           });
+          return { offline: true };
         }
-        return { offline: true };
+        throw error;
       }
     },
     onMutate: async (newVariables) => {
@@ -81,30 +87,6 @@ export function useOfflineMutation<
       const previousData = queryClient.getQueriesData({
         queryKey: options.queryKey,
       });
-
-      const updateEntityDetails = (vars: BaseEntity) => {
-        const id = vars[idField];
-        if (!id) return;
-
-        const rootKey = options.queryKey[0];
-
-        queryClient.setQueriesData(
-          {
-            predicate: (query) => {
-              const key = query.queryKey;
-
-              return (
-                Array.isArray(key) &&
-                key[0] === rootKey &&
-                key.length === 2 &&
-                typeof key[1] !== "object" &&
-                String(key[1]) === String(id)
-              );
-            },
-          },
-          (old: any) => (old ? { ...old, ...vars } : old)
-        );
-      };
 
       const updater = (old: any) => {
         if (!old) return old;
@@ -127,6 +109,10 @@ export function useOfflineMutation<
         }
 
         if (options.method === "POST") {
+          if (options.url === "bookmarks" || isOnline) {
+            return old;
+          }
+
           const newItem = {
             ...(newVariables as object),
             [idField]: generateTempId(),
@@ -146,18 +132,19 @@ export function useOfflineMutation<
 
         if (options.method === "PUT" || options.method === "PATCH") {
           const vars = newVariables as BaseEntity;
-          const updateFn = (item: any) =>
-            item[idField] === vars[idField] ? { ...item, ...vars } : item;
+
+          const mergeItem = (item: any) => {
+            if (String(item[idField]) !== String(vars[idField])) return item;
+            return { ...item, ...vars, _isOfflinePending: !isOnline };
+          };
 
           if (Array.isArray(old)) {
-            return old.map(updateFn);
+            return old.map(mergeItem);
           }
-
-          updateEntityDetails(vars);
 
           return {
             ...old,
-            results: old.results?.map(updateFn),
+            results: old.results?.map(mergeItem),
           };
         }
 
@@ -176,8 +163,6 @@ export function useOfflineMutation<
       }
     },
     onSuccess: (result: OfflineResult<TResult>, variables: TVariables) => {
-      if ((result as any)?.offline) return;
-
       queryClient.setQueriesData({ queryKey: options.queryKey, exact: false }, (old: any) => {
         if (!old) return old;
 
@@ -202,9 +187,7 @@ export function useOfflineMutation<
       });
     },
     onSettled: () => {
-      if (isOnline) {
-        queryClient.invalidateQueries({ queryKey: options.queryKey });
-      }
+      queryClient.invalidateQueries({ queryKey: options.queryKey });
     },
   });
 }

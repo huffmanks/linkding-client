@@ -48,7 +48,7 @@ export function CreateTagForm() {
         <DialogTitle>Add tag</DialogTitle>
         <DialogDescription>Create a new tag.</DialogDescription>
       </DialogHeader>
-      <div className="px-4 pb-4">
+      <div className="scrollbar overflow-y-auto px-4 pt-2 pb-6 sm:pt-0 sm:pb-4">
         <div className="flex flex-col gap-6">
           <form
             onSubmit={async (e) => {

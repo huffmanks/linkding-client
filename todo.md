@@ -30,13 +30,10 @@
 
 ## Background Sync
 
-- [x] Check/test all routes and apis work/handle offline.
-- [x] Edit forms (bookmark/folder): Get from cache if offline.
-- [x] Create and edit form: add toast.
 - [ ] If offline, hard refresh crashes.
+- [ ] If offline, optimisitic updates dont work for PUT/PATCH.
 
 ## UI
 
 - [ ] Grid/list view add url below/above title.
-- [x] [Dialog](src/components/ui/dialog.tsx#L60) On mobile tag dialog push dialog up. Most of it is blocked by keyboard. (need to test on mobile)
 - [ ] Bug when submitting tag ghost focus from either drawer or modal.

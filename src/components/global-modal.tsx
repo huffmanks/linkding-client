@@ -9,7 +9,7 @@ export default function GlobalModal() {
     <>
       {activeGlobalModal === "tag-form" && (
         <Dialog open onOpenChange={closeGlobalModal}>
-          <DialogContent>
+          <DialogContent className="flex flex-col">
             <CreateTagForm />
           </DialogContent>
         </Dialog>

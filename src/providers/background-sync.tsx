@@ -89,7 +89,10 @@ export function BackgroundSyncProvider({ children }: { children: React.ReactNode
 
     return () => {
       window.removeEventListener("online", flushOutbox);
-      navigator.serviceWorker.removeEventListener("message", handleMessage);
+
+      if (hasSW) {
+        navigator.serviceWorker.removeEventListener("message", handleMessage);
+      }
     };
   }, [queryClient, isOnline]);
 

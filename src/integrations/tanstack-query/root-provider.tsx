@@ -8,15 +8,19 @@ import { DEFAULT_TTL } from "@/lib/constants";
 export function getContext() {
   const queryClient = new QueryClient({
     defaultOptions: {
+      mutations: {
+        networkMode: "always",
+      },
       queries: {
         networkMode: "offlineFirst",
-        refetchOnMount: false,
+        refetchOnMount: true,
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
         staleTime: 0,
         gcTime: DEFAULT_TTL,
         retry: (failureCount, error: any) => {
           if (error.status === 404 || error.message?.includes("404")) return false;
+          if (!navigator.onLine) return false;
           return failureCount < 3;
         },
       },
