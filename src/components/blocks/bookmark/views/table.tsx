@@ -45,8 +45,8 @@ export default function BookmarkTableView({
               tabIndex={0}
               role="button"
               className={cn(
-                "hover:bg-muted/50 focus:bg-muted outline-none",
-                bookmark.unread && "bg-primary/15"
+                "hover:bg-muted/50 focus:bg-muted border-muted outline-none",
+                bookmark.unread && "bg-primary/10"
               )}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {

@@ -27,6 +27,24 @@ export function useToggleReadBookmark() {
   });
 }
 
+export function useToggleArchiveBookmark() {
+  return useOfflineMutation<Pick<BookmarkInsert, "is_archived"> & { id: number }, Bookmark>({
+    queryKey: ["bookmarks"],
+    url: "bookmarks",
+    method: "PATCH",
+    idField: "id",
+  });
+}
+
+export function useToggleShareBookmark() {
+  return useOfflineMutation<Pick<BookmarkInsert, "shared"> & { id: number }, Bookmark>({
+    queryKey: ["bookmarks"],
+    url: "bookmarks",
+    method: "PATCH",
+    idField: "id",
+  });
+}
+
 export function useDeleteBookmark() {
   return useOfflineMutation<number>({
     queryKey: ["bookmarks"],

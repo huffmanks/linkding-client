@@ -1,12 +1,5 @@
 # Todos
 
-## Bookmark States & Indicators
-
-- [ ] [Bookmark dropdown](src/components/blocks/bookmark/action-dropdown.tsx#L60)
-  - [ ] Unarchive/archive toggle.
-  - [ ] Shared/unshared toggle.
-  - [ ] Mark read/mark unread toggle.
-
 ## Bookmark List Actions
 
 - [ ] Add sorting options to the bookmarks action toolbar (title, date, etc.).

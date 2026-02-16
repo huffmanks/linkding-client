@@ -1,7 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { EllipsisVerticalIcon } from "lucide-react";
 
-import { useDeleteBookmark } from "@/lib/mutations";
+import {
+  useDeleteBookmark,
+  useToggleArchiveBookmark,
+  useToggleReadBookmark,
+  useToggleShareBookmark,
+} from "@/lib/mutations";
 import { cn } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
@@ -23,6 +28,7 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -39,10 +45,14 @@ export default function ActionDropdown({
   handleOpenChange,
   triggerButtonClassName,
 }: ActionDropdownProps) {
-  const { mutate } = useDeleteBookmark();
+  const { mutate: toggleReadBookmark } = useToggleReadBookmark();
+  const { mutate: toggleArchiveBookmark } = useToggleArchiveBookmark();
+  const { mutate: toggleShareBookmark } = useToggleShareBookmark();
+
+  const { mutate: deleteBookmark } = useDeleteBookmark();
 
   async function handleDelete() {
-    mutate(bookmark.id);
+    deleteBookmark(bookmark.id);
     handleOpenChange(false);
   }
   return (
@@ -72,7 +82,33 @@ export default function ActionDropdown({
                 </Link>
               }
             />
+          </DropdownMenuGroup>
 
+          <DropdownMenuSeparator />
+
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => toggleReadBookmark({ id: bookmark.id, unread: !bookmark.unread })}>
+              <span>Mark as {bookmark.unread ? "read" : "unread"}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() =>
+                toggleArchiveBookmark({ id: bookmark.id, is_archived: !bookmark.is_archived })
+              }>
+              <span>{bookmark.is_archived ? "Unarchive" : "Archive"}</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => toggleShareBookmark({ id: bookmark.id, shared: !bookmark.shared })}>
+              <span>{bookmark.shared ? "Unshare" : "Share"}</span>
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuGroup>
             <DropdownMenuItem className="w-full cursor-pointer" variant="destructive">
               <AlertDialogTrigger
                 className="w-full"
