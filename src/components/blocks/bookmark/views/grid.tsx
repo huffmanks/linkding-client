@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { GlobeIcon, ImageIcon, ShieldIcon } from "lucide-react";
+import { ImageIcon } from "lucide-react";
 
 import { linkdingFetch } from "@/lib/api";
 import { useSettingsStore } from "@/lib/store";
@@ -11,6 +11,7 @@ import type { Asset, Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
 import BookmarkFavicon from "@/components/blocks/bookmark/bookmark-favicon";
+import SharedButton from "@/components/blocks/bookmark/shared-button";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -20,7 +21,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BookmarkGridViewProps {
   bookmarks: Bookmark[];
@@ -36,9 +36,11 @@ export default function BookmarkGridView({
   return (
     <div className="grid gap-4 pb-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {bookmarks.map((bookmark) => (
-        <Card key={bookmark.id} className="gap-4 pt-0 pb-4">
-          <CardImage bookmark={bookmark} />
-          <CardHeader className="px-3">
+        <Card
+          key={bookmark.id}
+          className={cn("gap-4 pt-0 pb-4", bookmark.unread && "bg-primary/10")}>
+          <CardImage bookmark={bookmark} handleOpenSheet={handleOpenSheet} />
+          <CardHeader className="pr-1 pl-3.5">
             <CardTitle className="min-w-0">
               <a
                 className="decoration-primary hover:decoration-primary/70 focus-visible:decoration-primary/70 hover:text-primary/70 focus-visible:text-primary/70 flex items-center gap-2 underline underline-offset-4 transition-colors outline-none"
@@ -70,39 +72,32 @@ export default function BookmarkGridView({
               />
             </CardAction>
           </CardHeader>
-          <CardContent className="mt-auto px-3">
+          <CardContent className={cn("mt-auto px-3")}>
             <section className="flex items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Badge size="icon" variant="outline">
-                      {bookmark.shared ? (
-                        <GlobeIcon className="text-primary" />
-                      ) : (
-                        <ShieldIcon className="text-primary" />
-                      )}
-                    </Badge>
-                  }></TooltipTrigger>
-                <TooltipContent>
-                  <p>{bookmark.shared ? "Public" : "Private"}</p>
-                </TooltipContent>
-              </Tooltip>
+              <SharedButton
+                title={bookmark.title}
+                text={bookmark.description}
+                url={bookmark.url}
+                isShared={bookmark.shared}
+              />
 
-              <Badge variant="secondary">{bookmark.is_archived ? "Archived" : "Active"}</Badge>
+              {bookmark.is_archived && <Badge variant="secondary">Archived</Badge>}
 
               {bookmark?.tag_names &&
                 bookmark.tag_names.map((tag) => (
                   <Badge
                     key={tag}
+                    variant="invert"
                     render={
                       <Link
-                        className="hover:bg-muted! hover:text-primary/80 focus-visible:bg-muted! focus-visible:text-primary/80 transition-colors outline-none"
+                        className="transition-colors outline-none"
                         to="/dashboard/tags/$tagName"
                         params={{ tagName: tag }}
                         onClick={(e) => e.stopPropagation()}>
                         #{tag}
                       </Link>
-                    }></Badge>
+                    }
+                  />
                 ))}
             </section>
           </CardContent>
@@ -112,7 +107,13 @@ export default function BookmarkGridView({
   );
 }
 
-function CardImage({ bookmark }: { bookmark: Bookmark }) {
+function CardImage({
+  bookmark,
+  handleOpenSheet,
+}: {
+  bookmark: Bookmark;
+  handleOpenSheet: (bookmark: Bookmark) => void;
+}) {
   const { data, isLoading } = useQuery({
     queryKey: ["assets", bookmark.id],
     queryFn: () => linkdingFetch<{ results: Asset[] }>(`bookmarks/${bookmark.id}/assets`),
@@ -141,12 +142,15 @@ function CardImage({ bookmark }: { bookmark: Bookmark }) {
   }, [data?.results, isLoading]);
 
   return (
-    <a
-      className="block overflow-hidden rounded-t-lg transition-opacity outline-none hover:opacity-50 focus-visible:opacity-50"
-      tabIndex={-1}
-      href={bookmark.url}
-      target="_blank"
-      rel="noopener noreferrer">
+    <button
+      className="relative cursor-pointer"
+      aria-label="toggle expand sheet"
+      onClick={() => handleOpenSheet(bookmark)}>
+      {bookmark.unread && (
+        <div className="bg-primary/5 absolute inset-0">
+          <div className="bg-primary absolute top-2 left-2 size-2 rounded-full"></div>
+        </div>
+      )}
       {assets?.image ? (
         <img
           className="bg-muted h-40 w-full rounded-t-lg object-cover"
@@ -158,6 +162,6 @@ function CardImage({ bookmark }: { bookmark: Bookmark }) {
           <ImageIcon className="stroke-muted-foreground size-8 stroke-1" />
         </div>
       )}
-    </a>
+    </button>
   );
 }

@@ -18,6 +18,15 @@ export function useEditBookmark() {
   });
 }
 
+export function useToggleReadBookmark() {
+  return useOfflineMutation<Pick<BookmarkInsert, "unread"> & { id: number }, Bookmark>({
+    queryKey: ["bookmarks"],
+    url: "bookmarks",
+    method: "PATCH",
+    idField: "id",
+  });
+}
+
 export function useDeleteBookmark() {
   return useOfflineMutation<number>({
     queryKey: ["bookmarks"],

@@ -1,24 +1,18 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import {
-  ExternalLinkIcon,
-  FileCodeIcon,
-  GlobeIcon,
-  LandmarkIcon,
-  Link2Icon,
-  ShieldIcon,
-} from "lucide-react";
+import { ExternalLinkIcon, FileCodeIcon, LandmarkIcon, Link2Icon } from "lucide-react";
 import Markdown from "markdown-to-jsx";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { linkdingFetch } from "@/lib/api";
-import { useDeleteBookmark } from "@/lib/mutations";
+import { useDeleteBookmark, useToggleReadBookmark } from "@/lib/mutations";
 import { useSettingsStore } from "@/lib/store";
 import { formatToLocalTime, getRelativeTimeString, joinUrlPath } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
+import SharedButton from "@/components/blocks/bookmark/shared-button";
 import TagCloud from "@/components/blocks/bookmark/tag-cloud";
 import {
   AlertDialog,
@@ -49,7 +43,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BookmarkSheetProps {
   bookmark: Bookmark;
@@ -104,6 +97,8 @@ function Content({
   });
 
   const linkdingUrl = useSettingsStore((state) => state.linkdingUrl);
+  const { mutate: toggleReadBookmark } = useToggleReadBookmark();
+
   const { mutate } = useDeleteBookmark();
 
   async function handleDelete() {
@@ -142,6 +137,12 @@ function Content({
     };
   }, [data?.results, isLoading]);
 
+  useEffect(() => {
+    if (bookmark.unread) {
+      toggleReadBookmark({ id: bookmark.id, unread: false });
+    }
+  }, []);
+
   return (
     <div className="mt-3 px-4">
       <div className="mb-3">
@@ -155,23 +156,14 @@ function Content({
       </div>
 
       <section className="mb-3 flex items-center gap-1">
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <Badge size="icon" variant="outline">
-                {bookmark.shared ? (
-                  <GlobeIcon className="text-primary" />
-                ) : (
-                  <ShieldIcon className="text-primary" />
-                )}
-              </Badge>
-            }></TooltipTrigger>
-          <TooltipContent>
-            <p>{bookmark.shared ? "Public" : "Private"}</p>
-          </TooltipContent>
-        </Tooltip>
+        <SharedButton
+          title={bookmark.title}
+          text={bookmark.description}
+          url={bookmark.url}
+          isShared={bookmark.shared}
+        />
 
-        <Badge variant="secondary">{bookmark.is_archived ? "Archived" : "Active"}</Badge>
+        {bookmark.is_archived && <Badge variant="secondary">Archived</Badge>}
       </section>
 
       <section className="mb-5 space-y-1">

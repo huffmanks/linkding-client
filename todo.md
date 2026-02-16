@@ -2,14 +2,10 @@
 
 ## Bookmark States & Indicators
 
-- [ ] Display bookmark state indicators:
-  - [ ] Unread: show red dot.
-  - [ ] Read: no indicator.
-  - [ ] Archived: show archived badge.
-  - [ ] Unarchived: no indicator.
-  - [ ] Private: show lock or shield icon.
-  - [ ] Shared: show share icon.
-- [ ] Allow toggling archive and other bookmark states. (e.g. `POST /api/bookmarks/<id>/archive/`)
+- [ ] [Bookmark dropdown](src/components/blocks/bookmark/action-dropdown.tsx#L60)
+  - [ ] Unarchive/archive toggle.
+  - [ ] Shared/unshared toggle.
+  - [ ] Mark read/mark unread toggle.
 
 ## Bookmark List Actions
 
@@ -27,6 +23,8 @@
 - [ ] Display LD preferences as disabled in the Settings page (user profile data from: `GET /api/user/profile/`).
 - [ ] Add batch deletion to folders, bookmarks.
 - [ ] Show stats page (like karakeep).
+- [ ] Disable mark as read when bookmark sheet is open.
+- [ ] When creating bookmark, unread/archived/shared as default.
 
 ## Background Sync
 

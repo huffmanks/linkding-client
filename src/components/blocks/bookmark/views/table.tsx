@@ -1,4 +1,4 @@
-import { getCleanDomain } from "@/lib/utils";
+import { cn, getCleanDomain } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
@@ -44,7 +44,10 @@ export default function BookmarkTableView({
               key={bookmark.id}
               tabIndex={0}
               role="button"
-              className="hover:bg-muted/50 focus:bg-muted outline-none"
+              className={cn(
+                "hover:bg-muted/50 focus:bg-muted outline-none",
+                bookmark.unread && "bg-primary/15"
+              )}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();

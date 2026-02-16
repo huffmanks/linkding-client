@@ -54,7 +54,7 @@ export default function ActionDropdown({
               variant="ghost"
               size="icon-sm"
               className={cn("cursor-pointer", triggerButtonClassName)}>
-              <EllipsisVerticalIcon className="size-4" />
+              <EllipsisVerticalIcon className="text-muted-foreground size-4" />
             </Button>
           }></DropdownMenuTrigger>
         <DropdownMenuContent>

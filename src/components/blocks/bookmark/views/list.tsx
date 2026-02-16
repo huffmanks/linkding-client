@@ -1,13 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { GlobeIcon, ShieldIcon } from "lucide-react";
 
 import { cn, getRelativeTimeString } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
 import BookmarkFavicon from "@/components/blocks/bookmark/bookmark-favicon";
+import SharedButton from "@/components/blocks/bookmark/shared-button";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BookmarkListViewProps {
   bookmarks: Bookmark[];
@@ -25,7 +24,14 @@ export default function BookmarkListView({
       {bookmarks.map((bookmark) => (
         <div
           key={bookmark.id}
-          className="has-[[data-sheet-trigger]:focus-visible]:bg-card has-[[data-sheet-trigger]:hover]:bg-card has-[[data-sheet-trigger]:focus-visible]:ring-primary/20 has-[[data-sheet-trigger]:hover]:ring-primary/20 and rounded-md p-2 has-[[data-sheet-trigger]:focus-visible]:ring-1 has-[[data-sheet-trigger]:focus-visible]:ring-inset has-[[data-sheet-trigger]:hover]:ring-1 has-[[data-sheet-trigger]:hover]:ring-inset has-[[data-tag-links]:focus-visible]:bg-transparent has-[[data-tag-links]:focus-visible]:ring-0 has-[[data-tag-links]:hover]:bg-transparent has-[[data-tag-links]:hover]:ring-0">
+          className={cn(
+            "relative rounded-md p-2 transition-colors",
+            "has-[[data-sheet-trigger]:focus-visible]:bg-card has-[[data-sheet-trigger]:hover]:bg-card has-[[data-sheet-trigger]:focus-visible]:ring-primary/20 has-[[data-sheet-trigger]:hover]:ring-primary/20 has-[[data-sheet-trigger]:focus-visible]:ring-1 has-[[data-sheet-trigger]:focus-visible]:ring-inset has-[[data-sheet-trigger]:hover]:ring-1 has-[[data-sheet-trigger]:hover]:ring-inset has-[[data-tag-links]:focus-visible]:bg-transparent has-[[data-tag-links]:focus-visible]:ring-0 has-[[data-tag-links]:hover]:bg-transparent has-[[data-tag-links]:hover]:ring-0",
+            bookmark.unread && "bg-primary/15"
+          )}>
+          {bookmark.unread && (
+            <div className="bg-primary absolute top-1/2 right-5 size-2 -translate-y-1/2 rounded-full" />
+          )}
           <section className="mb-1 flex items-center justify-between gap-2">
             <a
               className="decoration-primary hover:decoration-primary/70 focus-visible:decoration-primary/70 hover:text-primary/70 focus-visible:text-primary/70 flex items-center gap-2 truncate underline underline-offset-4 transition-colors outline-none"
@@ -52,10 +58,21 @@ export default function BookmarkListView({
                 handleOpenSheet(bookmark);
               }
             }}
-            onClick={() => handleOpenSheet(bookmark)}>
-            <section className="mb-2 space-y-1">
+            onClick={(e) => {
+              if ((e.target as HTMLElement).tagName !== "SPAN") {
+                handleOpenSheet(bookmark);
+              }
+              e.stopPropagation();
+            }}>
+            <section className="mb-2 space-y-1 pr-8">
               {bookmark?.description && (
-                <p className="text-muted-foreground line-clamp-2 text-xs">{bookmark.description}</p>
+                <p
+                  className={cn(
+                    "line-clamp-2 text-xs",
+                    bookmark.unread ? "text-foreground/80" : "text-muted-foreground"
+                  )}>
+                  {bookmark.description}
+                </p>
               )}
               {bookmark?.date_added && (
                 <p className={cn("text-xs", !bookmark?.description && "mt-2")}>
@@ -63,33 +80,25 @@ export default function BookmarkListView({
                 </p>
               )}
             </section>
-            <section className="mb-2 flex items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Badge size="icon" variant="outline">
-                      {bookmark.shared ? (
-                        <GlobeIcon className="text-primary" />
-                      ) : (
-                        <ShieldIcon className="text-primary" />
-                      )}
-                    </Badge>
-                  }></TooltipTrigger>
-                <TooltipContent>
-                  <p>{bookmark.shared ? "Public" : "Private"}</p>
-                </TooltipContent>
-              </Tooltip>
+            <section className="mb-2 flex items-center gap-1" data-tag-links>
+              <SharedButton
+                title={bookmark.title}
+                text={bookmark.description}
+                url={bookmark.url}
+                isShared={bookmark.shared}
+              />
 
-              <Badge variant="secondary">{bookmark.is_archived ? "Archived" : "Active"}</Badge>
+              {bookmark.is_archived && <Badge variant="secondary">Archived</Badge>}
 
               {bookmark?.tag_names && (
-                <div className="flex items-center gap-1" data-tag-links>
+                <div className="flex items-center gap-1">
                   {bookmark.tag_names.map((tag) => (
                     <Badge
                       key={tag}
+                      variant="invert"
                       render={
                         <Link
-                          className="hover:bg-muted! hover:text-primary/80 focus-visible:bg-muted! focus-visible:text-primary/80 transition-colors outline-none"
+                          className="transition-colors outline-none"
                           to="/dashboard/tags/$tagName"
                           params={{ tagName: tag }}
                           onClick={(e) => e.stopPropagation()}>
