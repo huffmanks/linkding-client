@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 
+import { logout } from "@/lib/auth";
 import { useSettingsStore } from "@/lib/store";
 import { cleanUrl } from "@/lib/utils";
 
@@ -28,6 +29,9 @@ export async function linkdingFetch<T>(
       ...options?.headers,
     },
   });
+  if (response.status === 401) {
+    logout();
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));

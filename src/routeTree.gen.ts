@@ -93,16 +93,16 @@ const protectedDashboardBookmarksIdEditRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard': typeof protectedDashboardIndexRoute
+  '/dashboard/': typeof protectedDashboardIndexRoute
   '/dashboard/add/bookmark': typeof protectedDashboardAddBookmarkRoute
   '/dashboard/add/folder': typeof protectedDashboardAddFolderRoute
   '/dashboard/tags/$tagName': typeof protectedDashboardTagsTagNameRoute
-  '/dashboard/folders': typeof protectedDashboardFoldersIndexRoute
-  '/dashboard/settings': typeof protectedDashboardSettingsIndexRoute
-  '/dashboard/tags': typeof protectedDashboardTagsIndexRoute
+  '/dashboard/folders/': typeof protectedDashboardFoldersIndexRoute
+  '/dashboard/settings/': typeof protectedDashboardSettingsIndexRoute
+  '/dashboard/tags/': typeof protectedDashboardTagsIndexRoute
   '/dashboard/bookmarks/$id/edit': typeof protectedDashboardBookmarksIdEditRoute
   '/dashboard/folders/$id/edit': typeof protectedDashboardFoldersIdEditRoute
-  '/dashboard/folders/$id': typeof protectedDashboardFoldersIdIndexRoute
+  '/dashboard/folders/$id/': typeof protectedDashboardFoldersIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -136,16 +136,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/dashboard'
+    | '/dashboard/'
     | '/dashboard/add/bookmark'
     | '/dashboard/add/folder'
     | '/dashboard/tags/$tagName'
-    | '/dashboard/folders'
-    | '/dashboard/settings'
-    | '/dashboard/tags'
+    | '/dashboard/folders/'
+    | '/dashboard/settings/'
+    | '/dashboard/tags/'
     | '/dashboard/bookmarks/$id/edit'
     | '/dashboard/folders/$id/edit'
-    | '/dashboard/folders/$id'
+    | '/dashboard/folders/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,28 +199,28 @@ declare module '@tanstack/react-router' {
     '/(protected)/dashboard/': {
       id: '/(protected)/dashboard/'
       path: '/dashboard'
-      fullPath: '/dashboard'
+      fullPath: '/dashboard/'
       preLoaderRoute: typeof protectedDashboardIndexRouteImport
       parentRoute: typeof protectedRouteRoute
     }
     '/(protected)/dashboard/tags/': {
       id: '/(protected)/dashboard/tags/'
       path: '/dashboard/tags'
-      fullPath: '/dashboard/tags'
+      fullPath: '/dashboard/tags/'
       preLoaderRoute: typeof protectedDashboardTagsIndexRouteImport
       parentRoute: typeof protectedRouteRoute
     }
     '/(protected)/dashboard/settings/': {
       id: '/(protected)/dashboard/settings/'
       path: '/dashboard/settings'
-      fullPath: '/dashboard/settings'
+      fullPath: '/dashboard/settings/'
       preLoaderRoute: typeof protectedDashboardSettingsIndexRouteImport
       parentRoute: typeof protectedRouteRoute
     }
     '/(protected)/dashboard/folders/': {
       id: '/(protected)/dashboard/folders/'
       path: '/dashboard/folders'
-      fullPath: '/dashboard/folders'
+      fullPath: '/dashboard/folders/'
       preLoaderRoute: typeof protectedDashboardFoldersIndexRouteImport
       parentRoute: typeof protectedRouteRoute
     }
@@ -248,7 +248,7 @@ declare module '@tanstack/react-router' {
     '/(protected)/dashboard/folders/$id/': {
       id: '/(protected)/dashboard/folders/$id/'
       path: '/dashboard/folders/$id'
-      fullPath: '/dashboard/folders/$id'
+      fullPath: '/dashboard/folders/$id/'
       preLoaderRoute: typeof protectedDashboardFoldersIdIndexRouteImport
       parentRoute: typeof protectedRouteRoute
     }

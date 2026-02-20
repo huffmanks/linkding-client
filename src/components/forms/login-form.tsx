@@ -36,7 +36,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
     defaultValues: {
       username,
       linkdingUrl,
-      token: "",
+      token: import.meta.env.VITE_LD_API_KEY ?? "",
     },
     onSubmit: async ({ value }) => {
       try {
@@ -118,6 +118,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                     <Input
                       id="linkdingUrl"
                       type="text"
+                      autoComplete="off"
                       value={field.state.value}
                       aria-invalid={!field.state.meta.isValid}
                       placeholder="http://localhost:9090"

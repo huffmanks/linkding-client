@@ -1,8 +1,12 @@
+import { useMemo } from "react";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { BookmarkIcon } from "lucide-react";
 
+import { useBookmarkParams } from "@/hooks/use-bookmark-params";
 import { safeEnsure } from "@/lib/api";
+import { applySortAndFilter } from "@/lib/bookmark-utils";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
 import type { BookmarkSearch } from "@/types";
@@ -24,12 +28,52 @@ export const Route = createFileRoute("/(protected)/dashboard/")({
     return {
       q: typeof search.q === "string" && search.q !== "" ? search.q : undefined,
       offset: typeof search.offset === "number" && search.offset !== 0 ? search.offset : undefined,
+      sort: typeof search.sort === "string" && search.sort !== "" ? search.sort : undefined,
+      order: typeof search.order === "string" && search.order !== "" ? search.order : undefined,
+      all:
+        typeof search.all === "string" || typeof search.all === "boolean"
+          ? (search.all as string | boolean)
+          : undefined,
+      archived:
+        typeof search.archived === "string" || typeof search.archived === "boolean"
+          ? (search.archived as string | boolean)
+          : undefined,
+      unread:
+        typeof search.unread === "string" || typeof search.unread === "boolean"
+          ? (search.unread as string | boolean)
+          : undefined,
+      shared:
+        typeof search.shared === "string" || typeof search.shared === "boolean"
+          ? (search.shared as string | boolean)
+          : undefined,
     };
   },
-  loaderDeps: ({ search: { q, offset } }) => ({ q: q ?? "", offset: offset ?? 0 }),
-  loader: async ({ context: { queryClient }, deps: { q, offset } }) => {
+  loaderDeps: ({ search: { q, offset, sort, order, all, archived, unread, shared } }) => ({
+    q: q ?? "",
+    offset: offset ?? 0,
+    sort: sort ?? undefined,
+    order: order ?? undefined,
+    all: all ?? undefined,
+    archived: archived ?? undefined,
+    unread: unread ?? undefined,
+    shared: shared ?? undefined,
+  }),
+  loader: async ({
+    context: { queryClient },
+    deps: { q, offset, sort, order, all, archived, unread, shared },
+  }) => {
     const { limit } = useSettingsStore.getState();
-    await safeEnsure(queryClient, getAllQueryOptions.bookmarkList(q, offset, limit));
+    await safeEnsure(
+      queryClient,
+      getAllQueryOptions.bookmarkList(q, offset, limit, {
+        sort,
+        order,
+        all,
+        archived,
+        unread,
+        shared,
+      })
+    );
   },
 });
 
@@ -46,11 +90,25 @@ function RouteComponent() {
     });
   }
 
+  const { filters, sort, setSort, setFilter } = useBookmarkParams(Route);
+
+  const bookmarkData = useMemo(() => {
+    if (!data) return data;
+    return {
+      ...data,
+      results: applySortAndFilter(data.results, { filters, sort }),
+    };
+  }, [data, filters, sort]);
+
   return (
     <BookmarkWrapper
       heading="Bookmarks"
-      bookmarkData={data}
+      bookmarkData={bookmarkData}
       offset={offset}
+      filters={filters}
+      sort={sort}
+      setSort={setSort}
+      setFilter={setFilter}
       onOffsetChange={onOffsetChange}
       emptyComponent={<EmptyBookmarks />}
     />

@@ -31,6 +31,12 @@ export type BookmarkSearch = {
   q?: string;
   offset?: number;
   bundle?: string;
+  sort?: string;
+  order?: string;
+  all?: string | boolean;
+  archived?: string | boolean;
+  unread?: string | boolean;
+  shared?: string | boolean;
 };
 
 export type TableList = {
