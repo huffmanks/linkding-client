@@ -11,33 +11,15 @@ export const getAllQueryOptions = {
         params: { limit: String(1000) },
       }),
   }),
-  bookmarkList: (
-    q: string = "",
-    offset: number = 0,
-    limit: number = 10,
-    opts?: {
-      sort?: string;
-      order?: string;
-      all?: string | boolean;
-      archived?: string | boolean;
-      unread?: string | boolean;
-      shared?: string | boolean;
-    }
-  ) =>
+  bookmarkList: (q: string = "", offset: number = 0, limit: number = 10) =>
     queryOptions({
-      queryKey: ["bookmarks", { q, offset, limit, ...opts }],
+      queryKey: ["bookmarks", { q, offset, limit }],
       queryFn: () =>
         linkdingFetch<PaginatedResponse<Bookmark>>("bookmarks", {
           params: {
             q: String(q),
             offset: String(offset),
             limit: String(limit),
-            ...(opts?.sort ? { sort: String(opts.sort) } : {}),
-            ...(opts?.order ? { order: String(opts.order) } : {}),
-            ...(opts?.all != null ? { all: String(opts.all) } : {}),
-            ...(opts?.archived != null ? { archived: String(opts.archived) } : {}),
-            ...(opts?.unread != null ? { unread: String(opts.unread) } : {}),
-            ...(opts?.shared != null ? { shared: String(opts.shared) } : {}),
           },
         }),
     }),

@@ -28,10 +28,13 @@ import {
   ComboboxChip,
   ComboboxChips,
   ComboboxChipsInput,
+  ComboboxCollection,
   ComboboxContent,
   ComboboxEmpty,
+  ComboboxGroup,
   ComboboxItem,
   ComboboxList,
+  ComboboxSeparator,
   ComboboxValue,
   useComboboxAnchor,
 } from "@/components/ui/combobox";
@@ -143,7 +146,56 @@ export default function BookmarkWrapper({
     return emptyComponent;
   }
 
-  const filterOptions = ["all", "unread", "read", "shared", "private", "archived", "active"];
+  const filterOptions = [
+    {
+      value: "0",
+      items: [
+        {
+          label: "All",
+          value: "all",
+        },
+      ],
+    },
+    {
+      value: "A",
+      items: [
+        {
+          label: "Read",
+          value: "read",
+        },
+        {
+          label: "Unread",
+          value: "unread",
+        },
+      ],
+    },
+    {
+      value: "B",
+      items: [
+        {
+          label: "Private",
+          value: "private",
+        },
+        {
+          label: "Shared",
+          value: "shared",
+        },
+      ],
+    },
+    {
+      value: "C",
+      items: [
+        {
+          label: "Active",
+          value: "active",
+        },
+        {
+          label: "Archived",
+          value: "archived",
+        },
+      ],
+    },
+  ] as const;
 
   useEffect(() => {
     const f = filters ?? {};
@@ -245,13 +297,68 @@ export default function BookmarkWrapper({
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between gap-4 sm:px-2">
+      <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:px-2 lg:flex-row">
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-medium">{heading}</h1>
           {children}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-center gap-2 sm:flex-row">
+          <div className="flex items-center gap-2">
+            <ToggleGroup
+              variant="outline"
+              multiple={false}
+              defaultValue={[""]}
+              onValueChange={(val) => handleSortChange(val as SortField[])}>
+              <ToggleGroupItem value="title" aria-label="title sort">
+                {sort?.field === "title" && sort.order === "asc" ? (
+                  <ArrowUpAzIcon />
+                ) : sort?.field === "title" && sort.order === "desc" ? (
+                  <ArrowDownAzIcon />
+                ) : (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round">
+                    <path d="M14.5 5.75h7l-7 10h7" />
+                    <path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16" />
+                    <path d="M3.304 13h6.392" />
+                  </svg>
+                )}
+              </ToggleGroupItem>
+
+              <ToggleGroupItem value="date_modified" aria-label="date modified sort">
+                {sort?.field === "date_modified" && sort.order === "asc" ? (
+                  <CalendarArrowUpIcon />
+                ) : sort?.field === "date_modified" && sort.order === "desc" ? (
+                  <CalendarArrowDownIcon />
+                ) : (
+                  <CalendarIcon />
+                )}
+              </ToggleGroupItem>
+            </ToggleGroup>
+            <ToggleGroup
+              variant="outline"
+              multiple={false}
+              value={[view]}
+              onValueChange={handleValueChange}>
+              <ToggleGroupItem value="grid" aria-label="Grid view">
+                <LayoutGridIcon />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="list" aria-label="List view">
+                <ListIcon />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="table" aria-label="Table view">
+                <Table2Icon />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
           <Combobox
             multiple
             autoHighlight
@@ -265,7 +372,7 @@ export default function BookmarkWrapper({
                     {values.map((value: string) => (
                       <ComboboxChip key={value}>{value}</ComboboxChip>
                     ))}
-                    <ComboboxChipsInput />
+                    <ComboboxChipsInput placeholder="Select filters" />
                   </>
                 )}
               </ComboboxValue>
@@ -273,68 +380,21 @@ export default function BookmarkWrapper({
             <ComboboxContent anchor={anchor}>
               <ComboboxEmpty>No items found.</ComboboxEmpty>
               <ComboboxList>
-                {(item) => (
-                  <ComboboxItem key={item} value={item}>
-                    {item}
-                  </ComboboxItem>
+                {(group, index) => (
+                  <ComboboxGroup key={group.value} items={group.items}>
+                    <ComboboxCollection>
+                      {(item) => (
+                        <ComboboxItem key={item.label} value={item.value}>
+                          {item.label}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxCollection>
+                    {index < filterOptions.length - 1 && <ComboboxSeparator />}
+                  </ComboboxGroup>
                 )}
               </ComboboxList>
             </ComboboxContent>
           </Combobox>
-
-          <ToggleGroup
-            variant="outline"
-            multiple={false}
-            defaultValue={[""]}
-            onValueChange={(val) => handleSortChange(val as SortField[])}>
-            <ToggleGroupItem value="title" aria-label="title sort">
-              {sort?.field === "title" && sort.order === "asc" ? (
-                <ArrowUpAzIcon />
-              ) : sort?.field === "title" && sort.order === "desc" ? (
-                <ArrowDownAzIcon />
-              ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round">
-                  <path d="M14.5 5.75h7l-7 10h7" />
-                  <path d="m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16" />
-                  <path d="M3.304 13h6.392" />
-                </svg>
-              )}
-            </ToggleGroupItem>
-
-            <ToggleGroupItem value="date_modified" aria-label="date modified sort">
-              {sort?.field === "date_modified" && sort.order === "asc" ? (
-                <CalendarArrowUpIcon />
-              ) : sort?.field === "date_modified" && sort.order === "desc" ? (
-                <CalendarArrowDownIcon />
-              ) : (
-                <CalendarIcon />
-              )}
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <ToggleGroup
-            variant="outline"
-            multiple={false}
-            value={[view]}
-            onValueChange={handleValueChange}>
-            <ToggleGroupItem value="grid" aria-label="Grid view">
-              <LayoutGridIcon />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="list" aria-label="List view">
-              <ListIcon />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="table" aria-label="Table view">
-              <Table2Icon />
-            </ToggleGroupItem>
-          </ToggleGroup>
         </div>
       </div>
 

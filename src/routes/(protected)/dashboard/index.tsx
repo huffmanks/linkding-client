@@ -48,32 +48,13 @@ export const Route = createFileRoute("/(protected)/dashboard/")({
           : undefined,
     };
   },
-  loaderDeps: ({ search: { q, offset, sort, order, all, archived, unread, shared } }) => ({
+  loaderDeps: ({ search: { q, offset } }) => ({
     q: q ?? "",
     offset: offset ?? 0,
-    sort: sort ?? undefined,
-    order: order ?? undefined,
-    all: all ?? undefined,
-    archived: archived ?? undefined,
-    unread: unread ?? undefined,
-    shared: shared ?? undefined,
   }),
-  loader: async ({
-    context: { queryClient },
-    deps: { q, offset, sort, order, all, archived, unread, shared },
-  }) => {
+  loader: async ({ context: { queryClient }, deps: { q, offset } }) => {
     const { limit } = useSettingsStore.getState();
-    await safeEnsure(
-      queryClient,
-      getAllQueryOptions.bookmarkList(q, offset, limit, {
-        sort,
-        order,
-        all,
-        archived,
-        unread,
-        shared,
-      })
-    );
+    await safeEnsure(queryClient, getAllQueryOptions.bookmarkList(q, offset, limit));
   },
 });
 
