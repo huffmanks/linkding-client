@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ExternalLinkIcon, FileCodeIcon, LandmarkIcon, Link2Icon } from "lucide-react";
 import Markdown from "markdown-to-jsx";
+import { useShallow } from "zustand/react/shallow";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { linkdingFetch } from "@/lib/api";
@@ -96,7 +97,12 @@ function Content({
     queryFn: () => linkdingFetch<{ results: Asset[] }>(`bookmarks/${bookmark.id}/assets`),
   });
 
-  const linkdingUrl = useSettingsStore((state) => state.linkdingUrl);
+  const { linkdingUrl, autoMarkRead } = useSettingsStore(
+    useShallow((state) => ({
+      linkdingUrl: state.linkdingUrl,
+      autoMarkRead: state.autoMarkRead,
+    }))
+  );
   const { mutate: toggleReadBookmark } = useToggleReadBookmark();
 
   const { mutate } = useDeleteBookmark();
@@ -138,7 +144,7 @@ function Content({
   }, [data?.results, isLoading]);
 
   useEffect(() => {
-    if (bookmark.unread) {
+    if (bookmark.unread && autoMarkRead) {
       toggleReadBookmark({ id: bookmark.id, unread: false });
     }
   }, []);

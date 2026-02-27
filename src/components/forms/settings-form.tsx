@@ -44,12 +44,20 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
     theme,
     sidebarAddOpen,
     limit,
+    archivedDefault,
+    unreadDefault,
+    sharedDefault,
+    autoMarkRead,
     setUsername,
     setLinkdingUrl,
     setView,
     setTheme,
     setSidebarAddOpen,
     setLimit,
+    setArchivedDefault,
+    setUnreadDefault,
+    setSharedDefault,
+    setAutoMarkRead,
   } = useSettingsStore(
     useShallow((state) => ({
       username: state.username,
@@ -58,12 +66,20 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
       theme: state.theme,
       sidebarAddOpen: state.sidebarAddOpen,
       limit: state.limit,
+      archivedDefault: state.archivedDefault,
+      unreadDefault: state.unreadDefault,
+      sharedDefault: state.sharedDefault,
+      autoMarkRead: state.autoMarkRead,
       setUsername: state.setUsername,
       setLinkdingUrl: state.setLinkdingUrl,
       setView: state.setView,
       setTheme: state.setTheme,
       setSidebarAddOpen: state.setSidebarAddOpen,
       setLimit: state.setLimit,
+      setArchivedDefault: state.setArchivedDefault,
+      setUnreadDefault: state.setUnreadDefault,
+      setSharedDefault: state.setSharedDefault,
+      setAutoMarkRead: state.setAutoMarkRead,
     }))
   );
 
@@ -78,6 +94,10 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
       theme,
       sidebarAddOpen,
       limit,
+      unreadDefault,
+      archivedDefault,
+      sharedDefault,
+      autoMarkRead,
       appCache: false,
       linkdingCache: false,
     },
@@ -89,6 +109,10 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
         setTheme(value.theme);
         setSidebarAddOpen(value.sidebarAddOpen);
         setLimit(Number(value.limit));
+        setUnreadDefault(value.unreadDefault);
+        setArchivedDefault(value.archivedDefault);
+        setSharedDefault(value.sharedDefault);
+        setAutoMarkRead(value.autoMarkRead);
 
         toast.success("Settings updated!");
       } catch (error: unknown) {
@@ -285,7 +309,7 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
                 children={(field) => (
                   <Field orientation="horizontal">
                     <FieldContent>
-                      <FieldLabel htmlFor="sidebarAddOpen">Sidebar “Add” default open</FieldLabel>
+                      <FieldLabel htmlFor="sidebarAddOpen">Sidebar add collapsible</FieldLabel>
                       <FieldDescription>
                         Choose whether the “Add” item in the sidebar is open or collapsed by
                         default.
@@ -330,7 +354,94 @@ export function SettingsForm({ className, ...props }: SettingsFormProps) {
 
         <FieldSeparator className="my-4" />
 
-        <FieldGroup>
+        <FieldSet>
+          <FieldLegend className="text-muted-foreground">Bookmark settings</FieldLegend>
+          <FieldGroup>
+            <form.Field
+              name="archivedDefault"
+              children={(field) => (
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldLabel htmlFor="archivedDefault">Archived</FieldLabel>
+                    <FieldDescription>
+                      Sets the default state to “Archived” when creating a new bookmark.
+                    </FieldDescription>
+                  </FieldContent>
+                  <Switch
+                    id="archivedDefault"
+                    checked={field.state.value}
+                    onBlur={field.handleBlur}
+                    onCheckedChange={(checked) => field.handleChange(checked)}
+                  />
+                </Field>
+              )}
+            />
+
+            <form.Field
+              name="unreadDefault"
+              children={(field) => (
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldLabel htmlFor="unreadDefault">Unread</FieldLabel>
+                    <FieldDescription>
+                      Sets the default state to “Unread” when creating a new bookmark.
+                    </FieldDescription>
+                  </FieldContent>
+                  <Switch
+                    id="unreadDefault"
+                    checked={field.state.value}
+                    onBlur={field.handleBlur}
+                    onCheckedChange={(checked) => field.handleChange(checked)}
+                  />
+                </Field>
+              )}
+            />
+
+            <form.Field
+              name="sharedDefault"
+              children={(field) => (
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldLabel htmlFor="sharedDefault">Shared</FieldLabel>
+                    <FieldDescription>
+                      Sets the default state to “Shared” when creating a new bookmark.
+                    </FieldDescription>
+                  </FieldContent>
+                  <Switch
+                    id="sharedDefault"
+                    checked={field.state.value}
+                    onBlur={field.handleBlur}
+                    onCheckedChange={(checked) => field.handleChange(checked)}
+                  />
+                </Field>
+              )}
+            />
+
+            <FieldSeparator />
+
+            <form.Field
+              name="autoMarkRead"
+              children={(field) => (
+                <Field orientation="horizontal">
+                  <FieldContent>
+                    <FieldLabel htmlFor="autoMarkRead">Auto-mark as read</FieldLabel>
+                    <FieldDescription>
+                      Automatically mark a bookmark as read after you have viewed it.
+                    </FieldDescription>
+                  </FieldContent>
+                  <Switch
+                    id="autoMarkRead"
+                    checked={field.state.value}
+                    onBlur={field.handleBlur}
+                    onCheckedChange={(checked) => field.handleChange(checked)}
+                  />
+                </Field>
+              )}
+            />
+          </FieldGroup>
+        </FieldSet>
+
+        <FieldGroup className="mt-8">
           <Button className="text-foreground cursor-pointer" type="submit">
             Update
           </Button>

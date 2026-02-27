@@ -10,8 +10,6 @@
 - [ ] Display LD preferences as disabled in the Settings page (user profile data from: `GET /api/user/profile/`).
 - [ ] Add batch deletion to folders, bookmarks.
 - [ ] Show stats page (like karakeep).
-- [ ] Disable mark as read when bookmark sheet is open.
-- [ ] When creating bookmark, unread/archived/shared as default.
 
 ## Background Sync
 
@@ -22,3 +20,4 @@
 
 - [ ] Grid/list view add url below/above title.
 - [ ] Bug when submitting tag ghost focus from either drawer or modal.
+- [ ] Swap out vaul drawer for Base UI drawer.

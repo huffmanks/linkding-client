@@ -23,6 +23,10 @@ type SettingsStoreState = {
   theme: Theme;
   sidebarAddOpen: boolean;
   limit: number;
+  archivedDefault: boolean;
+  unreadDefault: boolean;
+  sharedDefault: boolean;
+  autoMarkRead: boolean;
   isAuthenticated: boolean;
 };
 
@@ -34,6 +38,10 @@ type SettingsStoreActions = {
   setTheme: (theme: Theme) => void;
   setSidebarAddOpen: (sidebarAddOpen: boolean) => void;
   setLimit: (limit: number) => void;
+  setArchivedDefault: (archivedDefault: boolean) => void;
+  setUnreadDefault: (unreadDefault: boolean) => void;
+  setSharedDefault: (sharedDefault: boolean) => void;
+  setAutoMarkRead: (autoMarkRead: boolean) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   reset: () => void;
 };
@@ -46,6 +54,10 @@ const initialSettingsStoreState: SettingsStoreState = {
   theme: "system",
   sidebarAddOpen: true,
   limit: 10,
+  archivedDefault: false,
+  unreadDefault: false,
+  sharedDefault: false,
+  autoMarkRead: true,
   isAuthenticated: false,
 };
 
@@ -60,6 +72,10 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
       setTheme: (theme) => set({ theme }),
       setSidebarAddOpen: (sidebarAddOpen) => set({ sidebarAddOpen }),
       setLimit: (limit) => set({ limit }),
+      setArchivedDefault: (archivedDefault) => set({ archivedDefault }),
+      setUnreadDefault: (unreadDefault) => set({ unreadDefault }),
+      setSharedDefault: (sharedDefault) => set({ sharedDefault }),
+      setAutoMarkRead: (autoMarkRead) => set({ autoMarkRead }),
       setIsAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
       reset: () => set(initialSettingsStoreState),
     }),

@@ -3,9 +3,11 @@ import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useCanGoBack, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useShallow } from "zustand/react/shallow";
 
 import { useCreateBookmark, useEditBookmark } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
+import { useSettingsStore } from "@/lib/store";
 import { cn, getErrorMessage } from "@/lib/utils";
 import { useBackgroundSync } from "@/providers/background-sync";
 import type { Bookmark } from "@/types";
@@ -40,14 +42,22 @@ export function BookmarkForm({ bookmark, className, ...props }: BookmarkFormProp
   const { data } = useSuspenseQuery(getAllQueryOptions.tags);
   const { data: bookmarks } = useSuspenseQuery(getAllQueryOptions.bookmarks);
 
+  const { unreadDefault, archivedDefault, sharedDefault } = useSettingsStore(
+    useShallow((state) => ({
+      unreadDefault: state.unreadDefault,
+      archivedDefault: state.archivedDefault,
+      sharedDefault: state.sharedDefault,
+    }))
+  );
+
   const defaultValues = {
     url: bookmark?.url ?? "",
     title: bookmark?.title ?? "",
     description: bookmark?.description ?? "",
     notes: bookmark?.notes ?? "",
-    is_archived: bookmark?.is_archived ?? false,
-    unread: bookmark?.unread ?? false,
-    shared: bookmark?.shared ?? false,
+    is_archived: bookmark?.is_archived ?? archivedDefault,
+    unread: bookmark?.unread ?? unreadDefault,
+    shared: bookmark?.shared ?? sharedDefault,
     tag_names: bookmark?.tag_names ?? [],
   };
 
