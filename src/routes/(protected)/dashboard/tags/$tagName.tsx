@@ -1,6 +1,9 @@
+import { useMemo } from "react";
+
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 
+import { useBookmarkParams } from "@/hooks/use-bookmark-params";
 import { safeEnsure } from "@/lib/api";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
@@ -8,12 +11,31 @@ import { EmptyTag } from "@/routes/(protected)/dashboard/tags/-components/empty-
 import type { BookmarkSearch, PaginatedResponse, Tag } from "@/types";
 
 import BookmarkWrapper from "@/components/blocks/bookmark";
+import { applySortAndFilter } from "@/components/blocks/bookmark/bookmark-utils";
 
 export const Route = createFileRoute("/(protected)/dashboard/tags/$tagName")({
   component: RouteComponent,
   validateSearch: (search: Record<string, unknown>): BookmarkSearch => {
     return {
       offset: typeof search.offset === "number" && search.offset !== 0 ? search.offset : undefined,
+      sort: typeof search.sort === "string" && search.sort !== "" ? search.sort : undefined,
+      order: typeof search.order === "string" && search.order !== "" ? search.order : undefined,
+      all:
+        typeof search.all === "string" || typeof search.all === "boolean"
+          ? (search.all as string | boolean)
+          : undefined,
+      archived:
+        typeof search.archived === "string" || typeof search.archived === "boolean"
+          ? (search.archived as string | boolean)
+          : undefined,
+      unread:
+        typeof search.unread === "string" || typeof search.unread === "boolean"
+          ? (search.unread as string | boolean)
+          : undefined,
+      shared:
+        typeof search.shared === "string" || typeof search.shared === "boolean"
+          ? (search.shared as string | boolean)
+          : undefined,
     };
   },
   loaderDeps: ({ search: { offset } }) => ({ offset: offset ?? 0 }),
@@ -55,11 +77,25 @@ function RouteComponent() {
     });
   }
 
+  const { filters, sort, setSort, setFilter } = useBookmarkParams(Route);
+
+  const bookmarkData = useMemo(() => {
+    if (!data) return data;
+    return {
+      ...data,
+      results: applySortAndFilter(data.results, { filters, sort }),
+    };
+  }, [data, filters, sort]);
+
   return (
     <BookmarkWrapper
       heading={`#${tagName}`}
-      bookmarkData={data}
+      bookmarkData={bookmarkData}
       offset={offset}
+      filters={filters}
+      sort={sort}
+      setSort={setSort}
+      setFilter={setFilter}
       onOffsetChange={onOffsetChange}
       emptyComponent={<EmptyTag name={tagName} />}
     />

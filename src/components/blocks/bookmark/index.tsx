@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
@@ -102,6 +102,7 @@ export default function BookmarkWrapper({
   const [selectedBookmark, setSelectedBookmark] = useState<Bookmark | null>(null);
   const [selectedFilters, setSelectedFilters] = useState(["all"]);
 
+  const search = useSearch({ strict: false });
   const navigate = useNavigate();
   const anchor = useComboboxAnchor();
   const { isOnline } = useBackgroundSync();
@@ -284,11 +285,12 @@ export default function BookmarkWrapper({
     return <EmptyCache />;
   }
 
-  if (bookmarkData.count === 0) {
+  if (bookmarkData.count === 0 && !search.q) {
     return emptyComponent;
   }
 
-  const isFilterEmpty = bookmarkData.count > 0 && bookmarkData.results.length === 0;
+  const isFilterEmpty =
+    (bookmarkData.count > 0 && bookmarkData.results.length === 0) || (search?.q && search.q !== "");
 
   return (
     <div>

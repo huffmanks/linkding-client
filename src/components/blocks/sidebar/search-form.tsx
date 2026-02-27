@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { SearchIcon, XIcon } from "lucide-react";
@@ -41,12 +41,18 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   function clearSearch() {
     setSearchInput("");
     navigate({
-      search: undefined,
+      to: "/dashboard",
+      search: (prev) => {
+        return {
+          ...prev,
+          q: undefined,
+        };
+      },
       replace: true,
     });
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!inputRef.current) return;
@@ -55,11 +61,18 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
 
     navigate({
       to: "/dashboard",
-      search: {
-        q: searchValue || undefined,
+      search: (prev) => {
+        return {
+          ...prev,
+          q: searchValue || undefined,
+        };
       },
     });
   }
+
+  useEffect(() => {
+    setSearchInput(search?.q ?? "");
+  }, [search?.q]);
 
   return (
     <form {...props} autoComplete="off" onSubmit={handleSubmit}>

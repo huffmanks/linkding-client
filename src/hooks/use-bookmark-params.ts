@@ -2,7 +2,9 @@ import { useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
-import type { Route } from "@/routes/(protected)/dashboard";
+import type { Route as DashboardRoute } from "@/routes/(protected)/dashboard";
+import type { Route as FolderRoute } from "@/routes/(protected)/dashboard/folders/$id";
+import type { Route as TagRoute } from "@/routes/(protected)/dashboard/tags/$tagName";
 
 import {
   type FilterKey,
@@ -11,7 +13,9 @@ import {
   parseBoolParam,
 } from "@/components/blocks/bookmark/bookmark-utils";
 
-export function useBookmarkParams(route: typeof Route) {
+type Route = typeof DashboardRoute | typeof FolderRoute | typeof TagRoute;
+
+export function useBookmarkParams(route: Route) {
   const search = route.useSearch();
   const navigate = useNavigate({ from: route.fullPath });
 
