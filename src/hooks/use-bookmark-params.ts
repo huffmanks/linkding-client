@@ -2,13 +2,14 @@ import { useCallback, useMemo } from "react";
 
 import { useNavigate } from "@tanstack/react-router";
 
+import type { Route } from "@/routes/(protected)/dashboard";
+
 import {
   type FilterKey,
   type SortField,
   type SortOrder,
   parseBoolParam,
-} from "@/lib/bookmark-utils";
-import type { Route } from "@/routes/(protected)/dashboard";
+} from "@/components/blocks/bookmark/bookmark-utils";
 
 export function useBookmarkParams(route: typeof Route) {
   const search = route.useSearch();
@@ -24,20 +25,33 @@ export function useBookmarkParams(route: typeof Route) {
     [search.all, search.archived, search.unread, search.shared]
   );
 
+  function parseSortOrder(order?: string): SortOrder {
+    return order === "desc" ? "desc" : "asc";
+  }
+
   const sort = useMemo(() => {
     if (!search.sort) return undefined;
-    return { field: search.sort as SortField, order: (search.order as SortOrder) ?? "asc" };
+    return { field: search.sort as SortField, order: parseSortOrder(search.order) };
   }, [search.sort, search.order]);
 
   const setSort = useCallback(
-    (field?: SortField, order?: SortOrder) => {
+    (field?: SortField) => {
+      if (!field) return;
+
       navigate({
-        search: (prev: Record<string, unknown>) => ({
-          ...prev,
-          sort: field ?? undefined,
-          order: order ?? undefined,
-          offset: 0,
-        }),
+        search: (prev) => {
+          const isSameField = prev.sort === field;
+          const currentOrder = parseSortOrder(prev.order);
+
+          const nextOrder = isSameField ? (currentOrder === "asc" ? "desc" : "asc") : "asc";
+
+          return {
+            ...prev,
+            sort: field,
+            order: nextOrder,
+            offset: 0,
+          };
+        },
       });
     },
     [navigate]

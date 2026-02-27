@@ -47,10 +47,15 @@ export function sortBookmarks(
   });
 }
 
-export function filterBookmarks(items: Bookmark[], filters: BookmarkFilters): Bookmark[] {
-  if (filters.all) return items;
+export function filterBookmarks(
+  items: Bookmark[] | null | undefined,
+  filters: BookmarkFilters
+): Bookmark[] {
+  const list = items ?? [];
 
-  return items.filter((b) => {
+  if (filters.all === true) return list;
+
+  return list.filter((b) => {
     if (filters.is_archived !== undefined && b.is_archived !== filters.is_archived) return false;
     if (filters.unread !== undefined && b.unread !== filters.unread) return false;
     if (filters.shared !== undefined && b.shared !== filters.shared) return false;
@@ -59,13 +64,13 @@ export function filterBookmarks(items: Bookmark[], filters: BookmarkFilters): Bo
 }
 
 export function applySortAndFilter(
-  items: Bookmark[],
+  items: Bookmark[] | null | undefined,
   options?: {
     filters?: BookmarkFilters;
     sort?: { field: SortField; order?: SortOrder } | null;
   }
 ): Bookmark[] {
-  let result = items;
+  let result = items ?? [];
   if (options?.filters) result = filterBookmarks(result, options.filters);
   if (options?.sort)
     result = sortBookmarks(result, options.sort.field, options.sort.order ?? "asc");

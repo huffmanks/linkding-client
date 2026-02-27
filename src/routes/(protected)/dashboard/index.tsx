@@ -6,12 +6,12 @@ import { BookmarkIcon } from "lucide-react";
 
 import { useBookmarkParams } from "@/hooks/use-bookmark-params";
 import { safeEnsure } from "@/lib/api";
-import { applySortAndFilter } from "@/lib/bookmark-utils";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
 import type { BookmarkSearch } from "@/types";
 
 import BookmarkWrapper from "@/components/blocks/bookmark";
+import { applySortAndFilter } from "@/components/blocks/bookmark/bookmark-utils";
 import { Button } from "@/components/ui/button";
 import {
   Empty,

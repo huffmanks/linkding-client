@@ -107,3 +107,54 @@ export const DRAWER_MOBILE_NAV = [
     icon: SettingsIcon,
   },
 ] as SidebarNavItem[];
+
+export const FILTER_OPTIONS = [
+  {
+    value: "0",
+    items: [
+      {
+        label: "All",
+        value: "all",
+      },
+    ],
+  },
+  {
+    value: "A",
+    items: [
+      {
+        label: "Read",
+        value: "read",
+      },
+      {
+        label: "Unread",
+        value: "unread",
+      },
+    ],
+  },
+  {
+    value: "B",
+    items: [
+      {
+        label: "Private",
+        value: "private",
+      },
+      {
+        label: "Shared",
+        value: "shared",
+      },
+    ],
+  },
+  {
+    value: "C",
+    items: [
+      {
+        label: "Active",
+        value: "active",
+      },
+      {
+        label: "Archived",
+        value: "archived",
+      },
+    ],
+  },
+] as const;

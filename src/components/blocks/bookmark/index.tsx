@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { useNavigate } from "@tanstack/react-router";
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
@@ -8,21 +9,30 @@ import {
   CalendarIcon,
   LayoutGridIcon,
   ListIcon,
+  SearchXIcon,
   Table2Icon,
 } from "lucide-react";
 import { flushSync } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
 
 import { usePagination } from "@/hooks/use-pagination";
-import type { BookmarkFilters, FilterKey, SortField, SortOrder } from "@/lib/bookmark-utils";
+import { FILTER_OPTIONS } from "@/lib/constants";
 import { useSettingsStore } from "@/lib/store";
+import { useBackgroundSync } from "@/providers/background-sync";
 import type { Bookmark, PaginatedResponse, View } from "@/types";
 
+import type {
+  BookmarkFilters,
+  FilterKey,
+  SortField,
+  SortOrder,
+} from "@/components/blocks/bookmark/bookmark-utils";
 import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
 import BookmarkTableView from "@/components/blocks/bookmark/views/table";
 import { EmptyCache } from "@/components/default-error-component";
+import { Button } from "@/components/ui/button";
 import {
   Combobox,
   ComboboxChip,
@@ -38,6 +48,14 @@ import {
   ComboboxValue,
   useComboboxAnchor,
 } from "@/components/ui/combobox";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   Pagination,
   PaginationContent,
@@ -84,6 +102,10 @@ export default function BookmarkWrapper({
   const [selectedBookmark, setSelectedBookmark] = useState<Bookmark | null>(null);
   const [selectedFilters, setSelectedFilters] = useState(["all"]);
 
+  const navigate = useNavigate();
+  const anchor = useComboboxAnchor();
+  const { isOnline } = useBackgroundSync();
+
   const { limit, view, setView } = useSettingsStore(
     useShallow((state) => ({
       limit: state.limit,
@@ -91,6 +113,23 @@ export default function BookmarkWrapper({
       setView: state.setView,
     }))
   );
+
+  const {
+    currentPage,
+    pageNumbers,
+    handleNext,
+    handlePrevious,
+    handlePageClick,
+    hasNext,
+    hasPrevious,
+  } = usePagination({
+    offset,
+    limit,
+    totalCount: bookmarkData.count,
+    hasNext: !!bookmarkData.next,
+    hasPrevious: !!bookmarkData.previous,
+    onOffsetChange,
+  });
 
   function handleOpenSheet(bookmark: Bookmark) {
     setSelectedBookmark(bookmark);
@@ -121,179 +160,135 @@ export default function BookmarkWrapper({
     });
   }
 
-  const {
-    currentPage,
-    pageNumbers,
-    handleNext,
-    handlePrevious,
-    handlePageClick,
-    hasNext,
-    hasPrevious,
-  } = usePagination({
-    offset,
-    limit,
-    totalCount: bookmarkData.count,
-    hasNext: !!bookmarkData.next,
-    hasPrevious: !!bookmarkData.previous,
-    onOffsetChange,
-  });
-
-  if (!bookmarkData?.results) {
-    return <EmptyCache />;
-  }
-
-  if (!bookmarkData.results.length || bookmarkData.count === 0) {
-    return emptyComponent;
-  }
-
-  const filterOptions = [
-    {
-      value: "0",
-      items: [
-        {
-          label: "All",
-          value: "all",
-        },
-      ],
-    },
-    {
-      value: "A",
-      items: [
-        {
-          label: "Read",
-          value: "read",
-        },
-        {
-          label: "Unread",
-          value: "unread",
-        },
-      ],
-    },
-    {
-      value: "B",
-      items: [
-        {
-          label: "Private",
-          value: "private",
-        },
-        {
-          label: "Shared",
-          value: "shared",
-        },
-      ],
-    },
-    {
-      value: "C",
-      items: [
-        {
-          label: "Active",
-          value: "active",
-        },
-        {
-          label: "Archived",
-          value: "archived",
-        },
-      ],
-    },
+  const FILTER_GROUPS = [
+    { param: "unread", trueKey: "unread", falseKey: "read" },
+    { param: "shared", trueKey: "shared", falseKey: "private" },
+    { param: "archived", trueKey: "archived", falseKey: "active" },
   ] as const;
 
-  useEffect(() => {
-    const f = filters ?? {};
-    if (f.all) {
-      setSelectedFilters(["all"]);
-      return;
-    }
-    const next: string[] = [];
-    if (f.unread === true) next.push("unread");
-    else if (f.unread === false) next.push("read");
-
-    if (f.shared === true) next.push("shared");
-    else if (f.shared === false) next.push("private");
-
-    if (f.is_archived === true) next.push("archived");
-    else if (f.is_archived === false) next.push("active");
-
-    setSelectedFilters(next);
-  }, [filters]);
+  function resolveGroupValue(
+    selected: Set<string>,
+    trueKey: string,
+    falseKey: string
+  ): boolean | undefined {
+    if (selected.has(trueKey) && !selected.has(falseKey)) return true;
+    if (selected.has(falseKey) && !selected.has(trueKey)) return false;
+    return undefined;
+  }
 
   function handleFilterChange(keys: FilterKey[] | Set<string>) {
     const selected = new Set(Array.isArray(keys) ? keys : [...keys]);
 
-    const updates: Record<string, boolean | undefined> = {};
-
     if (selected.has("all")) {
-      updates.all = true;
-      updates.unread = undefined;
-      updates.shared = undefined;
-      updates.archived = undefined;
       setSelectedFilters(["all"]);
-      setFilter?.(updates as Record<string, boolean | undefined>);
+      setFilter?.({
+        all: true,
+        unread: undefined,
+        shared: undefined,
+        archived: undefined,
+      });
       return;
     }
 
-    updates.all = undefined;
-
-    if (selected.has("unread") && !selected.has("read")) updates.unread = true;
-    else if (selected.has("read") && !selected.has("unread")) updates.unread = false;
-    else updates.unread = undefined;
-
-    if (selected.has("shared") && !selected.has("private")) updates.shared = true;
-    else if (selected.has("private") && !selected.has("shared")) updates.shared = false;
-    else updates.shared = undefined;
-
-    if (selected.has("archived") && !selected.has("active")) updates.archived = true;
-    else if (selected.has("active") && !selected.has("archived")) updates.archived = false;
-    else updates.archived = undefined;
-
+    const updates: Record<string, boolean | undefined> = { all: undefined };
     const ui: string[] = [];
-    if (updates.unread === true) ui.push("unread");
-    else if (updates.unread === false) ui.push("read");
-    if (updates.shared === true) ui.push("shared");
-    else if (updates.shared === false) ui.push("private");
-    if (updates.archived === true) ui.push("archived");
-    else if (updates.archived === false) ui.push("active");
 
-    setSelectedFilters(ui);
-    setFilter?.(updates as Record<string, boolean | undefined>);
+    for (const g of FILTER_GROUPS) {
+      const val = resolveGroupValue(selected, g.trueKey, g.falseKey);
+      updates[g.param] = val;
+      if (val === true) ui.push(g.trueKey);
+      else if (val === false) ui.push(g.falseKey);
+    }
+
+    setSelectedFilters(ui.length ? ui : []);
+    setFilter?.(updates);
   }
 
   function handleComboboxChange(values: string[]) {
-    const valuesArr = values ?? [];
+    const arr = values ?? [];
 
-    const hasAll = valuesArr.includes("all");
-    if (hasAll && valuesArr.length > 1) valuesArr.splice(valuesArr.indexOf("all"), 1);
+    const hadAll = selectedFilters.includes("all");
+    const hasAllNow = arr.includes("all");
 
-    function pickLast(a: string, b: string) {
-      const iA = valuesArr.indexOf(a);
-      const iB = valuesArr.indexOf(b);
-      if (iA === -1 && iB === -1) return null;
-      if (iA === -1) return b;
-      if (iB === -1) return a;
-      return iA > iB ? a : b;
+    if (!hadAll && hasAllNow) {
+      handleFilterChange(["all"]);
+      return;
     }
 
-    const chosen: Set<string> = new Set();
+    const working = hasAllNow ? arr.filter((v) => v !== "all") : arr;
 
-    const r = pickLast("unread", "read");
-    if (r) chosen.add(r);
-    const s = pickLast("shared", "private");
-    if (s) chosen.add(s);
-    const a = pickLast("archived", "active");
-    if (a) chosen.add(a);
+    const selected = new Set<string>();
 
-    if (hasAll && chosen.size === 0) chosen.add("all");
+    for (const g of FILTER_GROUPS) {
+      const iTrue = working.lastIndexOf(g.trueKey);
+      const iFalse = working.lastIndexOf(g.falseKey);
+      if (iTrue === -1 && iFalse === -1) continue;
+      selected.add(iTrue > iFalse ? g.trueKey : g.falseKey);
+    }
 
-    const normalized = [...chosen];
-    setSelectedFilters(normalized);
-    handleFilterChange(normalized as FilterKey[]);
+    handleFilterChange([...selected] as FilterKey[]);
   }
 
-  function handleSortChange(field?: SortField[]) {
-    const updatedField = sort?.field === field ? undefined : field?.[0];
-    const updatedOrder = sort?.order === "asc" ? "desc" : "asc";
-    setSort?.(updatedField, updatedOrder);
+  function handleSortChange(field: SortField[]) {
+    const newField = field[0] as SortField;
+
+    if (newField) {
+      setSort?.(newField);
+    } else if (sort?.field) {
+      setSort?.(sort.field);
+    }
   }
-  const anchor = useComboboxAnchor();
+
+  function clearAllFilters() {
+    navigate({
+      to: ".",
+      search: (prev) => ({
+        ...prev,
+        q: undefined,
+        offset: undefined,
+        all: undefined,
+        archived: undefined,
+        unread: undefined,
+        shared: undefined,
+      }),
+    });
+
+    setFilter?.({
+      all: undefined,
+      archived: undefined,
+      unread: undefined,
+      shared: undefined,
+    });
+  }
+
+  useEffect(() => {
+    const f = filters ?? {};
+
+    if (f.all) {
+      setSelectedFilters(["all"]);
+      return;
+    }
+
+    const next: string[] = [];
+
+    for (const g of FILTER_GROUPS) {
+      const val = g.param === "archived" ? f.is_archived : f[g.param];
+      if (val === true) next.push(g.trueKey);
+      else if (val === false) next.push(g.falseKey);
+    }
+
+    setSelectedFilters(next);
+  }, [filters]);
+
+  if (!isOnline && !bookmarkData?.results) {
+    return <EmptyCache />;
+  }
+
+  if (bookmarkData.count === 0) {
+    return emptyComponent;
+  }
+
+  const isFilterEmpty = bookmarkData.count > 0 && bookmarkData.results.length === 0;
 
   return (
     <div>
@@ -308,7 +303,7 @@ export default function BookmarkWrapper({
             <ToggleGroup
               variant="outline"
               multiple={false}
-              defaultValue={[""]}
+              value={sort?.field ? [sort.field] : []}
               onValueChange={(val) => handleSortChange(val as SortField[])}>
               <ToggleGroupItem value="title" aria-label="title sort">
                 {sort?.field === "title" && sort.order === "asc" ? (
@@ -362,7 +357,7 @@ export default function BookmarkWrapper({
           <Combobox
             multiple
             autoHighlight
-            items={filterOptions}
+            items={FILTER_OPTIONS}
             value={selectedFilters}
             onValueChange={(val) => handleComboboxChange(val as string[])}>
             <ComboboxChips ref={anchor} className="w-full max-w-xs">
@@ -389,7 +384,7 @@ export default function BookmarkWrapper({
                         </ComboboxItem>
                       )}
                     </ComboboxCollection>
-                    {index < filterOptions.length - 1 && <ComboboxSeparator />}
+                    {index < FILTER_OPTIONS.length - 1 && <ComboboxSeparator />}
                   </ComboboxGroup>
                 )}
               </ComboboxList>
@@ -398,78 +393,107 @@ export default function BookmarkWrapper({
         </div>
       </div>
 
-      <div className="view-content overflow-hidden">
-        {view === "grid" && (
-          <BookmarkGridView
-            bookmarks={bookmarkData.results}
-            handleOpenSheet={handleOpenSheet}
-            handleOpenChange={handleOpenChange}
-          />
-        )}
-
-        {view === "list" && (
-          <BookmarkListView
-            bookmarks={bookmarkData.results}
-            handleOpenSheet={handleOpenSheet}
-            handleOpenChange={handleOpenChange}
-          />
-        )}
-
-        {view === "table" && (
-          <BookmarkTableView
-            bookmarks={bookmarkData.results}
-            count={bookmarkData.count}
-            handleOpenSheet={handleOpenSheet}
-            handleOpenChange={handleOpenChange}
-          />
-        )}
-      </div>
-
-      {selectedBookmark && (
-        <BookmarkSheet
-          isOpen={isOpen}
-          bookmark={selectedBookmark}
-          handleOpenChange={handleOpenChange}
-        />
-      )}
-
-      {bookmarkData.count > limit && (
-        <Pagination className="mb-10">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={handlePrevious}
-                className={!hasPrevious ? "pointer-events-none opacity-50" : "cursor-pointer"}
+      {isFilterEmpty ? (
+        <EmptyFilterResults clearAllFilters={clearAllFilters} />
+      ) : (
+        <>
+          <div className="view-content overflow-hidden">
+            {view === "grid" && (
+              <BookmarkGridView
+                bookmarks={bookmarkData.results}
+                handleOpenSheet={handleOpenSheet}
+                handleOpenChange={handleOpenChange}
               />
-            </PaginationItem>
+            )}
 
-            {pageNumbers.map((page, i) => (
-              <PaginationItem key={typeof page === "string" ? `el-${i}` : page}>
-                {page === "ellipsis-start" || page === "ellipsis-end" ? (
-                  <PaginationEllipsis />
-                ) : (
-                  <PaginationLink
-                    href="#"
-                    isActive={currentPage === page}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handlePageClick(page as number);
-                    }}>
-                    {page}
-                  </PaginationLink>
-                )}
-              </PaginationItem>
-            ))}
-
-            <PaginationItem>
-              <PaginationNext
-                onClick={handleNext}
-                className={!hasNext ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            {view === "list" && (
+              <BookmarkListView
+                bookmarks={bookmarkData.results}
+                handleOpenSheet={handleOpenSheet}
+                handleOpenChange={handleOpenChange}
               />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+            )}
+
+            {view === "table" && (
+              <BookmarkTableView
+                bookmarks={bookmarkData.results}
+                count={bookmarkData.count}
+                handleOpenSheet={handleOpenSheet}
+                handleOpenChange={handleOpenChange}
+              />
+            )}
+          </div>
+
+          {selectedBookmark && (
+            <BookmarkSheet
+              isOpen={isOpen}
+              bookmark={selectedBookmark}
+              handleOpenChange={handleOpenChange}
+            />
+          )}
+
+          {bookmarkData.count > limit && (
+            <Pagination className="mb-10">
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={handlePrevious}
+                    className={!hasPrevious ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+
+                {pageNumbers.map((page, i) => (
+                  <PaginationItem key={typeof page === "string" ? `el-${i}` : page}>
+                    {page === "ellipsis-start" || page === "ellipsis-end" ? (
+                      <PaginationEllipsis />
+                    ) : (
+                      <PaginationLink
+                        href="#"
+                        isActive={currentPage === page}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handlePageClick(page as number);
+                        }}>
+                        {page}
+                      </PaginationLink>
+                    )}
+                  </PaginationItem>
+                ))}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={handleNext}
+                    className={!hasNext ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          )}
+        </>
       )}
     </div>
+  );
+}
+
+function EmptyFilterResults({ clearAllFilters }: { clearAllFilters: () => void }) {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <SearchXIcon />
+        </EmptyMedia>
+        <EmptyTitle>No matches found</EmptyTitle>
+        <EmptyDescription>
+          No bookmarks match those filters. Try resetting the filters below.
+        </EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <div className="flex gap-2">
+          <Button className="cursor-pointer" onClick={clearAllFilters}>
+            Reset filters
+          </Button>
+        </div>
+      </EmptyContent>
+    </Empty>
   );
 }
