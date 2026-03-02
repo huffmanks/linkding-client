@@ -110,15 +110,6 @@ export const DRAWER_MOBILE_NAV = [
 
 export const FILTER_OPTIONS = [
   {
-    value: "0",
-    items: [
-      {
-        label: "All",
-        value: "all",
-      },
-    ],
-  },
-  {
     value: "A",
     items: [
       {

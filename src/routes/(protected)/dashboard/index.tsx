@@ -1,17 +1,14 @@
 import { useMemo } from "react";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { BookmarkIcon } from "lucide-react";
 
-import { useBookmarkParams } from "@/hooks/use-bookmark-params";
 import { safeEnsure } from "@/lib/api";
 import { getAllQueryOptions } from "@/lib/queries";
-import { useSettingsStore } from "@/lib/store";
-import type { BookmarkSearch } from "@/types";
+import { SearchSchema, transformData } from "@/lib/search";
 
 import BookmarkWrapper from "@/components/blocks/bookmark";
-import { applySortAndFilter } from "@/components/blocks/bookmark/bookmark-utils";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -24,73 +21,32 @@ import {
 
 export const Route = createFileRoute("/(protected)/dashboard/")({
   component: RouteComponent,
-  validateSearch: (search: Record<string, unknown>): BookmarkSearch => {
-    return {
-      q: typeof search.q === "string" && search.q !== "" ? search.q : undefined,
-      offset: typeof search.offset === "number" && search.offset !== 0 ? search.offset : undefined,
-      sort: typeof search.sort === "string" && search.sort !== "" ? search.sort : undefined,
-      order: typeof search.order === "string" && search.order !== "" ? search.order : undefined,
-      all:
-        typeof search.all === "string" || typeof search.all === "boolean"
-          ? (search.all as string | boolean)
-          : undefined,
-      archived:
-        typeof search.archived === "string" || typeof search.archived === "boolean"
-          ? (search.archived as string | boolean)
-          : undefined,
-      unread:
-        typeof search.unread === "string" || typeof search.unread === "boolean"
-          ? (search.unread as string | boolean)
-          : undefined,
-      shared:
-        typeof search.shared === "string" || typeof search.shared === "boolean"
-          ? (search.shared as string | boolean)
-          : undefined,
-    };
-  },
-  loaderDeps: ({ search: { q, offset } }) => ({
+  validateSearch: (search) => SearchSchema.parse(search),
+  loaderDeps: ({ search: { q } }) => ({
     q: q ?? "",
-    offset: offset ?? 0,
   }),
-  loader: async ({ context: { queryClient }, deps: { q, offset } }) => {
-    const { limit } = useSettingsStore.getState();
-    await safeEnsure(queryClient, getAllQueryOptions.bookmarkList(q, offset, limit));
-  },
+  loader: async ({ context: { queryClient }, deps: { q } }) =>
+    await safeEnsure(queryClient, getAllQueryOptions.bookmarkList(q)),
 });
 
 function RouteComponent() {
-  const { q, offset } = Route.useSearch();
-  const limit = useSettingsStore((state) => state.limit);
-  const navigate = useNavigate({ from: Route.fullPath });
+  const search = Route.useSearch();
 
-  const { data } = useSuspenseQuery(getAllQueryOptions.bookmarkList(q, offset, limit));
+  const { data: rawData } = useSuspenseQuery(getAllQueryOptions.bookmarkList(search.q));
 
-  function onOffsetChange(newOffset: number) {
-    navigate({
-      search: (prev): BookmarkSearch => ({ ...prev, offset: newOffset }),
-    });
-  }
-
-  const { filters, sort, setSort, setFilter } = useBookmarkParams(Route);
-
-  const bookmarkData = useMemo(() => {
-    if (!data) return data;
-    return {
-      ...data,
-      results: applySortAndFilter(data.results, { filters, sort }),
-    };
-  }, [data, filters, sort]);
+  const { items, totalCount, totalPages, hasNextCurrent, hasPreviousCurrent } = useMemo(() => {
+    return transformData(rawData, search);
+  }, [rawData, search]);
 
   return (
     <BookmarkWrapper
+      appRouteId="/(protected)/dashboard/"
       heading="Bookmarks"
-      bookmarkData={bookmarkData}
-      offset={offset}
-      filters={filters}
-      sort={sort}
-      setSort={setSort}
-      setFilter={setFilter}
-      onOffsetChange={onOffsetChange}
+      bookmarkItems={items}
+      totalCount={totalCount}
+      totalPages={totalPages}
+      hasNextCurrent={hasNextCurrent}
+      hasPreviousCurrent={hasPreviousCurrent}
       emptyComponent={<EmptyBookmarks />}
     />
   );

@@ -1,35 +1,34 @@
 import { useMemo } from "react";
 
+import { type AppRouteId, useSearchState } from "@/hooks/use-search-state";
+
 interface UsePaginationProps {
-  offset: number;
-  limit: number;
-  totalCount: number;
+  appRouteId: AppRouteId;
+  totalPages: number;
   hasNext: boolean;
   hasPrevious: boolean;
-  onOffsetChange: (newOffset: number) => void;
 }
 
 export function usePagination({
-  offset,
-  limit,
-  totalCount,
+  appRouteId,
+  totalPages,
   hasNext,
   hasPrevious,
-  onOffsetChange,
 }: UsePaginationProps) {
-  const totalPages = Math.ceil(totalCount / limit);
-  const currentPage = Math.floor(offset / limit) + 1;
+  const { search, setParams } = useSearchState(appRouteId);
+
+  const currentPage = search?.page ?? 1;
 
   function handleNext() {
-    if (hasNext) onOffsetChange(offset + limit);
+    if (hasNext) setParams((prev) => ({ ...prev, page: currentPage + 1 }));
   }
 
   function handlePrevious() {
-    if (hasPrevious) onOffsetChange(Math.max(0, offset - limit));
+    if (hasPrevious) setParams((prev) => ({ ...prev, page: Math.max(0, currentPage - 1) }));
   }
 
   function handlePageClick(pageNumber: number) {
-    onOffsetChange((pageNumber - 1) * limit);
+    setParams((prev) => ({ ...prev, page: pageNumber }));
   }
 
   const pageNumbers = useMemo(() => {
@@ -50,7 +49,6 @@ export function usePagination({
 
   return {
     currentPage,
-    totalPages,
     pageNumbers,
     handleNext,
     handlePrevious,

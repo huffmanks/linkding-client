@@ -8,18 +8,16 @@ export const getAllQueryOptions = {
     queryKey: ["bookmarks"],
     queryFn: () =>
       linkdingFetch<PaginatedResponse<Bookmark>>("bookmarks", {
-        params: { limit: String(1000) },
+        params: { limit: String(10000) },
       }),
   }),
-  bookmarkList: (q: string = "", offset: number = 0, limit: number = 10) =>
+  bookmarkList: (q: string = "") =>
     queryOptions({
-      queryKey: ["bookmarks", { q, offset, limit }],
+      queryKey: ["bookmarks", { q }],
       queryFn: () =>
         linkdingFetch<PaginatedResponse<Bookmark>>("bookmarks", {
           params: {
             q: String(q),
-            offset: String(offset),
-            limit: String(limit),
           },
         }),
     }),
@@ -40,45 +38,29 @@ export const getAllQueryOptions = {
     queryKey: ["bundles"],
     queryFn: () => linkdingFetch<PaginatedResponse<Folder>>("bundles"),
   }),
-  folderList: (offset: number = 0, limit: number = 10) =>
-    queryOptions({
-      queryKey: ["bundles", { offset, limit }],
-      queryFn: () =>
-        linkdingFetch<PaginatedResponse<Folder>>("bundles", {
-          params: { offset: String(offset), limit: String(limit) },
-        }),
-    }),
   folderById: (id: string) =>
     queryOptions({
       queryKey: ["bundles", id],
       queryFn: () => linkdingFetch<Folder>(`bundles/${id}`),
     }),
-  bookmarksByFolderId: (id: string, offset: number = 0, limit: number = 10) =>
+  bookmarksByFolderId: (id: string) =>
     queryOptions({
-      queryKey: ["bookmarks", { bundle: id, offset, limit }],
+      queryKey: ["bookmarks", { bundle: id }],
       queryFn: () =>
         linkdingFetch<PaginatedResponse<Bookmark>>("bookmarks", {
-          params: { bundle: id, offset: String(offset), limit: String(limit) },
+          params: { bundle: id },
         }),
     }),
   tags: queryOptions({
     queryKey: ["tags"],
     queryFn: () => linkdingFetch<PaginatedResponse<Tag>>("tags"),
   }),
-  tagList: (offset: number = 0, limit: number = 10) =>
+  bookmarksByTagName: (tagName: string) =>
     queryOptions({
-      queryKey: ["tags", { offset, limit }],
-      queryFn: () =>
-        linkdingFetch<PaginatedResponse<Tag>>("tags", {
-          params: { offset: String(offset), limit: String(limit) },
-        }),
-    }),
-  bookmarksByTagName: (tagName: string, offset: number = 0, limit: number = 10) =>
-    queryOptions({
-      queryKey: ["bookmarks", { q: `#${tagName}`, offset, limit }],
+      queryKey: ["bookmarks", { q: `#${tagName}` }],
       queryFn: () =>
         linkdingFetch<PaginatedResponse<Bookmark>>("bookmarks", {
-          params: { q: `#${tagName}`, offset: String(offset), limit: String(limit) },
+          params: { q: `#${tagName}` },
         }),
     }),
 };
