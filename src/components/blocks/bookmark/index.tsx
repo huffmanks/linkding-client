@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
-import { useNavigate, useSearch } from "@tanstack/react-router";
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
@@ -16,17 +15,13 @@ import { flushSync } from "react-dom";
 import { useShallow } from "zustand/react/shallow";
 
 import { usePagination } from "@/hooks/use-pagination";
+import { type AppRouteId, useSearchState } from "@/hooks/use-search-state";
 import { FILTER_OPTIONS } from "@/lib/constants";
+import type { SortField } from "@/lib/search";
 import { useSettingsStore } from "@/lib/store";
 import { useBackgroundSync } from "@/providers/background-sync";
-import type { Bookmark, PaginatedResponse, View } from "@/types";
+import type { Bookmark, View } from "@/types";
 
-import type {
-  BookmarkFilters,
-  FilterKey,
-  SortField,
-  SortOrder,
-} from "@/components/blocks/bookmark/bookmark-utils";
 import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
@@ -68,44 +63,35 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface BookmarkWrapperProps {
+  appRouteId: AppRouteId;
   heading: string;
-  bookmarkData: PaginatedResponse<Bookmark>;
-  offset?: number;
-  filters?: BookmarkFilters;
-  sort?: {
-    field: SortField;
-    order: SortOrder;
-  };
-  onOffsetChange: (offset: number) => void;
-  setFilter?: (
-    key: FilterKey | Record<string, boolean | undefined>,
-    value?: boolean | undefined
-  ) => void;
-  setSort?: (field?: SortField | undefined, order?: SortOrder) => void;
+  bookmarkItems: Bookmark[];
+  totalCount: number;
+  totalPages: number;
+  hasNextCurrent: boolean;
+  hasPreviousCurrent: boolean;
   emptyComponent: React.ReactNode;
   children?: React.ReactNode;
 }
 
 export default function BookmarkWrapper({
+  appRouteId,
   heading,
   emptyComponent,
-  bookmarkData,
-  offset = 0,
-  filters,
-  sort,
-  onOffsetChange,
-  setFilter,
-  setSort,
+  bookmarkItems,
+  totalCount,
+  totalPages,
+  hasNextCurrent,
+  hasPreviousCurrent,
   children,
 }: BookmarkWrapperProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedBookmark, setSelectedBookmark] = useState<Bookmark | null>(null);
-  const [selectedFilters, setSelectedFilters] = useState(["all"]);
 
-  const search = useSearch({ strict: false });
-  const navigate = useNavigate();
   const anchor = useComboboxAnchor();
   const { isOnline } = useBackgroundSync();
+
+  const { search, setParams } = useSearchState(appRouteId);
 
   const { limit, view, setView } = useSettingsStore(
     useShallow((state) => ({
@@ -124,12 +110,10 @@ export default function BookmarkWrapper({
     hasNext,
     hasPrevious,
   } = usePagination({
-    offset,
-    limit,
-    totalCount: bookmarkData.count,
-    hasNext: !!bookmarkData.next,
-    hasPrevious: !!bookmarkData.previous,
-    onOffsetChange,
+    appRouteId,
+    totalPages,
+    hasNext: hasNextCurrent,
+    hasPrevious: hasPreviousCurrent,
   });
 
   function handleOpenSheet(bookmark: Bookmark) {
@@ -161,136 +145,80 @@ export default function BookmarkWrapper({
     });
   }
 
-  const FILTER_GROUPS = [
-    { param: "unread", trueKey: "unread", falseKey: "read" },
-    { param: "shared", trueKey: "shared", falseKey: "private" },
-    { param: "archived", trueKey: "archived", falseKey: "active" },
-  ] as const;
-
-  function resolveGroupValue(
-    selected: Set<string>,
-    trueKey: string,
-    falseKey: string
-  ): boolean | undefined {
-    if (selected.has(trueKey) && !selected.has(falseKey)) return true;
-    if (selected.has(falseKey) && !selected.has(trueKey)) return false;
-    return undefined;
-  }
-
-  function handleFilterChange(keys: FilterKey[] | Set<string>) {
-    const selected = new Set(Array.isArray(keys) ? keys : [...keys]);
-
-    if (selected.has("all")) {
-      setSelectedFilters(["all"]);
-      setFilter?.({
-        all: true,
-        unread: undefined,
-        shared: undefined,
-        archived: undefined,
-      });
-      return;
-    }
-
-    const updates: Record<string, boolean | undefined> = { all: undefined };
-    const ui: string[] = [];
-
-    for (const g of FILTER_GROUPS) {
-      const val = resolveGroupValue(selected, g.trueKey, g.falseKey);
-      updates[g.param] = val;
-      if (val === true) ui.push(g.trueKey);
-      else if (val === false) ui.push(g.falseKey);
-    }
-
-    setSelectedFilters(ui.length ? ui : []);
-    setFilter?.(updates);
-  }
+  const activeFilters = useMemo(() => {
+    const active: string[] = [];
+    if (search.read === true) active.push("read");
+    if (search.unread === true) active.push("unread");
+    if (search.shared === true) active.push("shared");
+    if (search.private === true) active.push("private");
+    if (search.archived === true) active.push("archived");
+    if (search.active === true) active.push("active");
+    return active;
+  }, [search]);
 
   function handleComboboxChange(values: string[]) {
-    const arr = values ?? [];
+    setParams((prev) => {
+      const newAddition = values.find((v) => !activeFilters.includes(v));
 
-    const hadAll = selectedFilters.includes("all");
-    const hasAllNow = arr.includes("all");
+      return {
+        ...prev,
 
-    if (!hadAll && hasAllNow) {
-      handleFilterChange(["all"]);
-      return;
-    }
+        read: values.includes("read") && newAddition !== "unread" ? true : undefined,
+        unread: values.includes("unread") && newAddition !== "read" ? true : undefined,
 
-    const working = hasAllNow ? arr.filter((v) => v !== "all") : arr;
+        private: values.includes("private") && newAddition !== "shared" ? true : undefined,
+        shared: values.includes("shared") && newAddition !== "private" ? true : undefined,
 
-    const selected = new Set<string>();
-
-    for (const g of FILTER_GROUPS) {
-      const iTrue = working.lastIndexOf(g.trueKey);
-      const iFalse = working.lastIndexOf(g.falseKey);
-      if (iTrue === -1 && iFalse === -1) continue;
-      selected.add(iTrue > iFalse ? g.trueKey : g.falseKey);
-    }
-
-    handleFilterChange([...selected] as FilterKey[]);
+        active: values.includes("active") && newAddition !== "archived" ? true : undefined,
+        archived: values.includes("archived") && newAddition !== "active" ? true : undefined,
+      };
+    });
   }
 
   function handleSortChange(field: SortField[]) {
-    const newField = field[0] as SortField;
+    const clickedField = field[0];
 
-    if (newField) {
-      setSort?.(newField);
-    } else if (sort?.field) {
-      setSort?.(sort.field);
-    }
+    setParams((prev) => {
+      if (!clickedField) {
+        return {
+          ...prev,
+          order: prev.order === "asc" ? "desc" : "asc",
+        };
+      }
+
+      if (clickedField !== prev.sort) {
+        return {
+          ...prev,
+          sort: clickedField,
+          order: "asc",
+        };
+      }
+
+      return prev;
+    });
   }
 
   function clearAllFilters() {
-    navigate({
-      to: ".",
-      search: (prev) => ({
-        ...prev,
-        q: undefined,
-        offset: undefined,
-        all: undefined,
-        archived: undefined,
-        unread: undefined,
-        shared: undefined,
-      }),
-    });
+    setParams((prev) => ({
+      ...prev,
 
-    setFilter?.({
-      all: undefined,
+      q: undefined,
       archived: undefined,
       unread: undefined,
       shared: undefined,
-    });
+    }));
   }
 
-  useEffect(() => {
-    const f = filters ?? {};
-
-    if (f.all) {
-      setSelectedFilters(["all"]);
-      return;
-    }
-
-    const next: string[] = [];
-
-    for (const g of FILTER_GROUPS) {
-      const val = g.param === "archived" ? f.is_archived : f[g.param];
-      if (val === true) next.push(g.trueKey);
-      else if (val === false) next.push(g.falseKey);
-    }
-
-    setSelectedFilters(next);
-  }, [filters]);
-
-  if (!isOnline && !bookmarkData?.results) {
+  if (!isOnline && !bookmarkItems.length) {
     return <EmptyCache />;
   }
 
-  if (bookmarkData.count === 0 && !search.q) {
+  if (totalCount === 0 && !search.q) {
     return emptyComponent;
   }
 
   const isFilterEmpty =
-    (bookmarkData.count > 0 && bookmarkData.results.length === 0) || (search?.q && search.q !== "");
+    (totalCount > 0 && bookmarkItems.length === 0) || (search?.q && search.q !== "");
 
   return (
     <div>
@@ -305,13 +233,15 @@ export default function BookmarkWrapper({
             <ToggleGroup
               variant="outline"
               multiple={false}
-              value={sort?.field ? [sort.field] : []}
+              value={search.sort ? [search.sort] : []}
               onValueChange={(val) => handleSortChange(val as SortField[])}>
-              <ToggleGroupItem value="title" aria-label="title sort">
-                {sort?.field === "title" && sort.order === "asc" ? (
-                  <ArrowUpAzIcon />
-                ) : sort?.field === "title" && sort.order === "desc" ? (
-                  <ArrowDownAzIcon />
+              <ToggleGroupItem value="title" aria-label="Sort by title">
+                {search.sort === "title" ? (
+                  search.order === "asc" ? (
+                    <ArrowUpAzIcon />
+                  ) : (
+                    <ArrowDownAzIcon />
+                  )
                 ) : (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -330,11 +260,13 @@ export default function BookmarkWrapper({
                 )}
               </ToggleGroupItem>
 
-              <ToggleGroupItem value="date_modified" aria-label="date modified sort">
-                {sort?.field === "date_modified" && sort.order === "asc" ? (
-                  <CalendarArrowUpIcon />
-                ) : sort?.field === "date_modified" && sort.order === "desc" ? (
-                  <CalendarArrowDownIcon />
+              <ToggleGroupItem value="date_modified" aria-label="Sort by date">
+                {search.sort === "date_modified" ? (
+                  search.order === "asc" ? (
+                    <CalendarArrowUpIcon />
+                  ) : (
+                    <CalendarArrowDownIcon />
+                  )
                 ) : (
                   <CalendarIcon />
                 )}
@@ -360,7 +292,7 @@ export default function BookmarkWrapper({
             multiple
             autoHighlight
             items={FILTER_OPTIONS}
-            value={selectedFilters}
+            value={activeFilters}
             onValueChange={(val) => handleComboboxChange(val as string[])}>
             <ComboboxChips ref={anchor} className="w-full max-w-xs">
               <ComboboxValue>
@@ -402,7 +334,7 @@ export default function BookmarkWrapper({
           <div className="view-content overflow-hidden">
             {view === "grid" && (
               <BookmarkGridView
-                bookmarks={bookmarkData.results}
+                bookmarks={bookmarkItems}
                 handleOpenSheet={handleOpenSheet}
                 handleOpenChange={handleOpenChange}
               />
@@ -410,7 +342,7 @@ export default function BookmarkWrapper({
 
             {view === "list" && (
               <BookmarkListView
-                bookmarks={bookmarkData.results}
+                bookmarks={bookmarkItems}
                 handleOpenSheet={handleOpenSheet}
                 handleOpenChange={handleOpenChange}
               />
@@ -418,8 +350,8 @@ export default function BookmarkWrapper({
 
             {view === "table" && (
               <BookmarkTableView
-                bookmarks={bookmarkData.results}
-                count={bookmarkData.count}
+                bookmarks={bookmarkItems}
+                count={totalCount}
                 handleOpenSheet={handleOpenSheet}
                 handleOpenChange={handleOpenChange}
               />
@@ -434,7 +366,7 @@ export default function BookmarkWrapper({
             />
           )}
 
-          {bookmarkData.count > limit && (
+          {totalCount > limit && (
             <Pagination className="mb-10">
               <PaginationContent>
                 <PaginationItem>

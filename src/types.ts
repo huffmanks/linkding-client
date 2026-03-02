@@ -20,28 +20,14 @@ export interface SidebarSubNavItem {
 export type View = "table" | "list" | "grid";
 export type Theme = "light" | "dark" | "system";
 
+export type CacheName = "linkding-assets" | "linkding-api-cache" | "app-assets" | "app-navigations";
+
 export interface PaginatedResponse<T> {
   count: number;
   next: string | null;
   previous: string | null;
   results: T[];
 }
-
-export type BookmarkSearch = {
-  q?: string;
-  offset?: number;
-  bundle?: string;
-  sort?: string;
-  order?: string;
-  all?: string | boolean;
-  archived?: string | boolean;
-  unread?: string | boolean;
-  shared?: string | boolean;
-};
-
-export type TableList = {
-  offset?: number;
-};
 
 export type Bookmark = BookmarkInsert & {
   id: number;
@@ -103,5 +89,3 @@ export type FolderInsert = {
   all_tags: string;
   excluded_tags: string;
 };
-
-export type CacheName = "linkding-assets" | "linkding-api-cache" | "app-assets" | "app-navigations";
