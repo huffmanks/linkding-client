@@ -2,9 +2,7 @@
 
 ## Bookmark filters
 
-- [ ] Under select filters combobox, add `${count} results` e.g. *10 results*
-- [ ] Make filters combobox a button instead of an input. Use filter icon and show filter count not chips.
-- [ ] If a filter is selected, e.g. `unread` and marking a bookmark as read the UI glitches. Probably a recursive loop from useMemo, useCallback or useEffect.
+- [ ] Check empty states for: EmptyCache (offline), EmptyResults (No results from filter), EmptyBookmarks (No items exist yet.)
 
 ## Search
 

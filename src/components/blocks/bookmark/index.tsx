@@ -6,6 +6,7 @@ import {
   CalendarArrowDownIcon,
   CalendarArrowUpIcon,
   CalendarIcon,
+  FunnelIcon,
   LayoutGridIcon,
   ListIcon,
   SearchXIcon,
@@ -27,12 +28,10 @@ import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
 import BookmarkTableView from "@/components/blocks/bookmark/views/table";
 import { EmptyCache } from "@/components/default-error-component";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
   ComboboxCollection,
   ComboboxContent,
   ComboboxEmpty,
@@ -40,7 +39,7 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxSeparator,
-  ComboboxValue,
+  ComboboxTrigger,
   useComboboxAnchor,
 } from "@/components/ui/combobox";
 import {
@@ -220,6 +219,8 @@ export default function BookmarkWrapper({
   const isFilterEmpty =
     (totalCount > 0 && bookmarkItems.length === 0) || (search?.q && search.q !== "");
 
+  const hasFilters = activeFilters.length > 0;
+
   return (
     <div>
       <div className="mb-6 flex flex-col items-center justify-between gap-4 sm:px-2 lg:flex-row">
@@ -228,7 +229,7 @@ export default function BookmarkWrapper({
           {children}
         </div>
 
-        <div className="flex flex-col items-center gap-2 sm:flex-row">
+        <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             <ToggleGroup
               variant="outline"
@@ -294,19 +295,24 @@ export default function BookmarkWrapper({
             items={FILTER_OPTIONS}
             value={activeFilters}
             onValueChange={(val) => handleComboboxChange(val as string[])}>
-            <ComboboxChips ref={anchor} className="w-full max-w-xs">
-              <ComboboxValue>
-                {(values) => (
-                  <>
-                    {values.map((value: string) => (
-                      <ComboboxChip key={value}>{value}</ComboboxChip>
-                    ))}
-                    <ComboboxChipsInput placeholder="Select filters" />
-                  </>
-                )}
-              </ComboboxValue>
-            </ComboboxChips>
-            <ComboboxContent anchor={anchor}>
+            <div className="relative">
+              <ComboboxTrigger
+                render={
+                  <Button variant="outline" className="cursor-pointer">
+                    <FunnelIcon className="size-4" />
+                    <span className="hidden sm:inline-block">Filters</span>
+                  </Button>
+                }></ComboboxTrigger>
+              {hasFilters && (
+                <div className="absolute -top-2 -right-2">
+                  <Badge className="flex size-5 items-center justify-center rounded-full p-1 text-xs">
+                    {activeFilters.length}
+                  </Badge>
+                </div>
+              )}
+            </div>
+
+            <ComboboxContent anchor={anchor} className="w-32" align="end">
               <ComboboxEmpty>No items found.</ComboboxEmpty>
               <ComboboxList>
                 {(group, index) => (
@@ -331,6 +337,11 @@ export default function BookmarkWrapper({
         <EmptyFilterResults clearAllFilters={clearAllFilters} />
       ) : (
         <>
+          {view !== "table" && (
+            <p className="text-muted-foreground mb-4 pl-2 text-sm">
+              {totalCount} result{totalCount > 1 ? "s" : ""}
+            </p>
+          )}
           <div className="view-content overflow-hidden">
             {view === "grid" && (
               <BookmarkGridView
