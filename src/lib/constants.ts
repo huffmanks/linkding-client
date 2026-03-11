@@ -149,3 +149,54 @@ export const FILTER_OPTIONS = [
     ],
   },
 ] as const;
+
+export const READ_BULK_SELECT_OPTIONS = [
+  {
+    label: "Mark as read",
+    value: "read",
+  },
+  {
+    label: "Mark as unread",
+    value: "unread",
+  },
+];
+
+export const SHARE_BULK_SELECT_OPTIONS = [
+  {
+    label: "Share",
+    value: "share",
+  },
+  {
+    label: "Unshare",
+    value: "unshare",
+  },
+];
+
+export const ARCHIVE_BULK_SELECT_OPTIONS = [
+  {
+    label: "Archive",
+    value: "archive",
+  },
+  {
+    label: "Unarchive",
+    value: "unarchive",
+  },
+];
+
+export const DELETE_BULK_SELECT_OPTIONS = [
+  {
+    label: "Delete",
+    value: "delete",
+  },
+];
+
+export const ALL_BULK_SELECT_OPTIONS = [
+  {
+    label: "Select action",
+    value: null,
+  },
+  ...READ_BULK_SELECT_OPTIONS,
+  ...SHARE_BULK_SELECT_OPTIONS,
+  ...ARCHIVE_BULK_SELECT_OPTIONS,
+  ...DELETE_BULK_SELECT_OPTIONS,
+];

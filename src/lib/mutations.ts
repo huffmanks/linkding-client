@@ -18,6 +18,21 @@ export function useEditBookmark() {
   });
 }
 
+export type BulkUpdatePayload =
+  | { delete: null }
+  | { unread: boolean }
+  | { is_archived: boolean }
+  | { shared: boolean };
+
+export function useBulkEditBookmarks() {
+  return useOfflineMutation<BulkUpdatePayload & { id: number }, Bookmark>({
+    queryKey: ["bookmarks"],
+    url: "bookmarks",
+    method: "PATCH",
+    idField: "id",
+  });
+}
+
 export function useToggleReadBookmark() {
   return useOfflineMutation<Pick<BookmarkInsert, "unread"> & { id: number }, Bookmark>({
     queryKey: ["bookmarks"],

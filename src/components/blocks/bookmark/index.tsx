@@ -6,23 +6,30 @@ import {
   CalendarArrowDownIcon,
   CalendarArrowUpIcon,
   CalendarIcon,
+  ChevronsUpDownIcon,
   FunnelIcon,
   LayoutGridIcon,
   ListIcon,
   SearchXIcon,
+  SquareDashedMousePointerIcon,
   Table2Icon,
 } from "lucide-react";
 import { flushSync } from "react-dom";
+import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 
 import { usePagination } from "@/hooks/use-pagination";
 import { type AppRouteId, useSearchState } from "@/hooks/use-search-state";
-import { FILTER_OPTIONS } from "@/lib/constants";
+import { ALL_BULK_SELECT_OPTIONS, FILTER_OPTIONS } from "@/lib/constants";
+import { type BulkUpdatePayload, useBulkEditBookmarks, useDeleteBookmark } from "@/lib/mutations";
 import type { SortField } from "@/lib/search";
 import { useSettingsStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import { useBackgroundSync } from "@/providers/background-sync";
+import { type BulkAction, useBulkSelection } from "@/providers/bulk-selection";
 import type { Bookmark, View } from "@/types";
 
+import SelectGroups from "@/components/blocks/bookmark/select-groups";
 import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
@@ -30,6 +37,7 @@ import BookmarkTableView from "@/components/blocks/bookmark/views/table";
 import { EmptyCache } from "@/components/default-error-component";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Combobox,
   ComboboxCollection,
@@ -42,6 +50,16 @@ import {
   ComboboxTrigger,
   useComboboxAnchor,
 } from "@/components/ui/combobox";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   Empty,
   EmptyContent,
@@ -59,6 +77,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface BookmarkWrapperProps {
@@ -89,8 +108,18 @@ export default function BookmarkWrapper({
 
   const anchor = useComboboxAnchor();
   const { isOnline } = useBackgroundSync();
+  const { mutate: editBookmark } = useBulkEditBookmarks();
+  const { mutate: deleteBookmark } = useDeleteBookmark();
 
   const { search, setParams } = useSearchState(appRouteId);
+  const {
+    isBulkSelecting,
+    selectedIds,
+    bulkAction,
+    toggleBulkSelection,
+    setCurrentBulkAction,
+    stopBulkSelection,
+  } = useBulkSelection();
 
   const { limit, view, setView } = useSettingsStore(
     useShallow((state) => ({
@@ -210,6 +239,44 @@ export default function BookmarkWrapper({
     }));
   }
 
+  async function handleBulkEdit() {
+    if (!bulkAction || selectedIds.size === 0) return;
+
+    const actionMap: Record<BulkAction, BulkUpdatePayload> = {
+      delete: { delete: null },
+      read: { unread: false },
+      unread: { unread: true },
+      archive: { is_archived: true },
+      unarchive: { is_archived: false },
+      share: { shared: true },
+      unshare: { shared: false },
+    };
+
+    try {
+      const promises = Array.from(selectedIds).map((id) => {
+        if (bulkAction === "delete") {
+          return deleteBookmark(id);
+        } else {
+          const payload = actionMap[bulkAction as keyof typeof actionMap];
+          return editBookmark({ ...payload, id });
+        }
+      });
+
+      const batchPromise = Promise.all(promises);
+
+      toast.promise(batchPromise, {
+        loading: `Executing ${bulkAction} on ${selectedIds.size} items...`,
+        success: () => {
+          stopBulkSelection();
+          return "Bulk actions completed!";
+        },
+        error: "Error, something went wrong!",
+      });
+
+      stopBulkSelection();
+    } catch (error) {}
+  }
+
   const isSearchingOrFiltering = activeFilters.length > 0 || (!!search.q && search.q !== "");
   const hasResults = bookmarkItems.length > 0;
 
@@ -291,47 +358,123 @@ export default function BookmarkWrapper({
               </ToggleGroupItem>
             </ToggleGroup>
           </div>
-          <Combobox
-            multiple
-            autoHighlight
-            items={FILTER_OPTIONS}
-            value={activeFilters}
-            onValueChange={(val) => handleComboboxChange(val as string[])}>
-            <div className="relative">
-              <ComboboxTrigger
-                render={
-                  <Button variant="outline" className="cursor-pointer">
-                    <FunnelIcon className="size-4" />
-                    <span className="hidden sm:inline-block">Filters</span>
-                  </Button>
-                }></ComboboxTrigger>
-              {hasFilters && (
-                <div className="absolute -top-2 -right-2">
-                  <Badge className="flex size-5 items-center justify-center rounded-full p-1 text-xs">
-                    {activeFilters.length}
-                  </Badge>
-                </div>
-              )}
-            </div>
-
-            <ComboboxContent anchor={anchor} className="w-32" align="end">
-              <ComboboxEmpty>No items found.</ComboboxEmpty>
-              <ComboboxList>
-                {(group, index) => (
-                  <ComboboxGroup key={group.value} items={group.items}>
-                    <ComboboxCollection>
-                      {(item) => (
-                        <ComboboxItem key={item.label} value={item.value}>
-                          {item.label}
-                        </ComboboxItem>
-                      )}
-                    </ComboboxCollection>
-                    {index < FILTER_OPTIONS.length - 1 && <ComboboxSeparator />}
-                  </ComboboxGroup>
+          <div className="flex items-center gap-2">
+            <Combobox
+              multiple
+              autoHighlight
+              items={FILTER_OPTIONS}
+              value={activeFilters}
+              onValueChange={(val) => handleComboboxChange(val as string[])}>
+              <div className="relative">
+                <ComboboxTrigger
+                  render={
+                    <Button variant="outline" className="cursor-pointer">
+                      <FunnelIcon className="size-4" />
+                      <span className="hidden sm:inline-block">Filters</span>
+                    </Button>
+                  }></ComboboxTrigger>
+                {hasFilters && (
+                  <div className="absolute -top-2 -right-2">
+                    <Badge className="flex size-5 items-center justify-center rounded-full p-1 text-xs">
+                      {activeFilters.length}
+                    </Badge>
+                  </div>
                 )}
-              </ComboboxList>
-            </ComboboxContent>
-          </Combobox>
+              </div>
+
+              <ComboboxContent anchor={anchor} className="w-32" align="end">
+                <ComboboxEmpty>No items found.</ComboboxEmpty>
+                <ComboboxList>
+                  {(group, index) => (
+                    <ComboboxGroup key={group.value} items={group.items}>
+                      <ComboboxCollection>
+                        {(item) => (
+                          <ComboboxItem key={item.label} value={item.value}>
+                            {item.label}
+                          </ComboboxItem>
+                        )}
+                      </ComboboxCollection>
+                      {index < FILTER_OPTIONS.length - 1 && <ComboboxSeparator />}
+                    </ComboboxGroup>
+                  )}
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+
+            <Dialog
+              modal={false}
+              disablePointerDismissal
+              open={isBulkSelecting}
+              onOpenChange={(open) => {
+                if (!open) stopBulkSelection();
+              }}>
+              <DialogTrigger
+                render={
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer"
+                    onClick={toggleBulkSelection}>
+                    <SquareDashedMousePointerIcon className="size-4" />
+                    <span className="hidden sm:inline-block">Bulk edit</span>
+                  </Button>
+                }></DialogTrigger>
+              <DialogContent
+                className="bg-card top-auto! right-4! bottom-12! left-auto! translate-x-0! translate-y-0! p-0 sm:max-w-sm"
+                showCloseButton={false}
+                showDialogOverlay={false}>
+                <Collapsible defaultOpen>
+                  <DialogHeader className="flex-row items-center justify-between p-4">
+                    <div>
+                      <DialogTitle>Bulk edit</DialogTitle>
+                      <DialogDescription>Select an action below.</DialogDescription>
+                    </div>
+                    <CollapsibleTrigger
+                      render={
+                        <Button variant="secondary" size="icon-sm" className="cursor-pointer">
+                          <ChevronsUpDownIcon />
+                        </Button>
+                      }></CollapsibleTrigger>
+                  </DialogHeader>
+                  <CollapsibleContent>
+                    <div className="px-4 pb-4">
+                      <Select
+                        items={ALL_BULK_SELECT_OPTIONS}
+                        value={bulkAction}
+                        onValueChange={(value) => setCurrentBulkAction(value as BulkAction)}>
+                        <SelectTrigger className="w-full cursor-pointer">
+                          <SelectValue
+                            placeholder="Select Action"
+                            className={cn(bulkAction === "delete" && "text-destructive")}
+                          />
+                        </SelectTrigger>
+                        <SelectContent alignItemWithTrigger={false} align="end" sideOffset={6}>
+                          <SelectGroups />
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <DialogFooter className="px-4 py-3">
+                      <DialogClose
+                        render={
+                          <Button
+                            variant="secondary"
+                            className="cursor-pointer"
+                            onClick={stopBulkSelection}>
+                            Cancel
+                          </Button>
+                        }
+                      />
+                      <Button
+                        className="cursor-pointer"
+                        disabled={selectedIds.size === 0 || !bulkAction}
+                        onClick={handleBulkEdit}>
+                        Execute
+                      </Button>
+                    </DialogFooter>
+                  </CollapsibleContent>
+                </Collapsible>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </div>
 
@@ -341,7 +484,9 @@ export default function BookmarkWrapper({
         <>
           {hasResults && view !== "table" && (
             <p className="text-muted-foreground mb-4 pl-2 text-sm">
-              {totalCount} result{totalCount > 1 ? "s" : ""}
+              {isBulkSelecting
+                ? `${selectedIds.size} selected`
+                : `${totalCount} result${totalCount > 1 ? "s" : ""}`}
             </p>
           )}
           <div className="view-content overflow-hidden">

@@ -3,6 +3,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { safeEnsure } from "@/lib/api";
 import { checkAuth } from "@/lib/auth";
 import { getAllQueryOptions } from "@/lib/queries";
+import { BulkSelectionProvider } from "@/providers/bulk-selection";
 
 import Sidebar from "@/components/blocks/sidebar";
 
@@ -27,7 +28,9 @@ export const Route = createFileRoute("/(protected)")({
 function RouteComponent() {
   return (
     <>
-      <Sidebar />
+      <BulkSelectionProvider>
+        <Sidebar />
+      </BulkSelectionProvider>
     </>
   );
 }

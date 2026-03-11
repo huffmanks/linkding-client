@@ -28,7 +28,7 @@ export function GlobalModalProvider({ children }: { children: React.ReactNode })
 export function useGlobalModal() {
   const context = useContext(GlobalModalContext);
   if (context === undefined) {
-    throw new Error("useModal must be used within a ModalProvider");
+    throw new Error("useGlobalModal must be used within a GlobalModalProvider");
   }
   return context;
 }

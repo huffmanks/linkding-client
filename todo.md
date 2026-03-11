@@ -3,17 +3,20 @@
 ## Search
 
 - [ ] When typing `#` in search, show a dropdown of existing tags.
-- [ ] Make search work offline. If offline try query cache.
 
 ## Settings & preferences
 
 - [ ] Add batch deletion to folders, bookmarks.
+  - [ ] Add alert dialog confirmation.
+  - [x] Table view.
+  - [ ] Grid view.
+  - [ ] List view.
 - [ ] Show stats page (like karakeep).
 
 ## Background sync
 
 - [ ] If offline, hard refresh crashes.
-- [ ] If offline, optimisitic updates dont work for PUT/PATCH.
+- [ ] If offline, make search query the cache.
 
 ## UI
 
