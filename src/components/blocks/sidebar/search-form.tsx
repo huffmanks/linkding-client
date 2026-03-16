@@ -1,22 +1,45 @@
 import { useEffect, useRef, useState } from "react";
 
+import { Autocomplete as AutocompletePrimitive } from "@base-ui/react/autocomplete";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { SearchIcon, XIcon } from "lucide-react";
 
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
+import { getAllQueryOptions } from "@/lib/queries";
 import { cn } from "@/lib/utils";
+import type { Tag } from "@/types";
 
-import { Button } from "@/components/ui/button";
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+import {
+  Autocomplete,
+  AutocompleteEmpty,
+  AutocompleteInput,
+  AutocompleteItem,
+  AutocompleteList,
+  AutocompletePopup,
+  AutocompletePositioner,
+} from "@/components/ui/autocomplete";
+import { InputGroup, InputGroupAddon, InputGroupButton } from "@/components/ui/input-group";
 import { Kbd } from "@/components/ui/kbd";
 import { Label } from "@/components/ui/label";
+
+interface TagAutocompleteItem {
+  id: number;
+  value: string;
+}
 
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   const navigate = useNavigate();
   const search = useSearch({ strict: false });
+  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [searchInput, setSearchInput] = useState(search?.q ?? "");
+  const [searchValue, setSearchValue] = useState(search?.q ?? "");
+  const [searchResults, setSearchResults] = useState<TagAutocompleteItem[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { data: allTags } = useSuspenseQuery(getAllQueryOptions.tags);
+  const { contains } = AutocompletePrimitive.useFilter({ sensitivity: "base" });
 
   useKeyboardShortcut("k", toggleFocus, { mod: true });
 
@@ -25,21 +48,32 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
     inputRef.current?.select();
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    if (e.target.value === "") {
+  function handleInputChange(value: string) {
+    if (value === "") {
       clearSearch();
       return;
     }
 
-    if (e.target.value.split(" ").some((item) => item.startsWith("#"))) {
-      console.log("word starts with hash");
-    }
+    setSearchValue(value);
 
-    setSearchInput(e.target.value);
+    if (value.startsWith("#")) {
+      const cleanQuery = value.slice(1);
+
+      const tags = allTags.results
+        .filter((tag) => contains(tag.name, cleanQuery))
+        .map((tag: Tag) => ({
+          id: tag.id,
+          value: tag.name,
+        }));
+      setSearchResults(tags);
+      setIsOpen(value.length > 0);
+    } else {
+      setIsOpen(false);
+    }
   }
 
   function clearSearch() {
-    setSearchInput("");
+    setSearchValue("");
     navigate({
       to: "/dashboard",
       search: (prev) => {
@@ -57,51 +91,77 @@ export function SearchForm({ ...props }: React.ComponentProps<"form">) {
 
     if (!inputRef.current) return;
 
-    const searchValue = inputRef.current.value;
+    const newSearchValue = inputRef.current.value;
 
     navigate({
       to: "/dashboard",
       search: (prev) => {
         return {
           ...prev,
-          q: searchValue || undefined,
+          q: newSearchValue || undefined,
         };
       },
     });
   }
 
   useEffect(() => {
-    setSearchInput(search?.q ?? "");
+    setSearchValue(search?.q ?? "");
   }, [search?.q]);
 
   return (
     <form {...props} autoComplete="off" onSubmit={handleSubmit}>
-      <Label htmlFor="search" className="sr-only">
-        Search
-      </Label>
-
-      <InputGroup className="max-w-sm">
-        <InputGroupInput
-          ref={inputRef}
-          id="search"
-          value={searchInput}
-          placeholder="Search..."
-          autoComplete="off"
-          className="bg-background h-8 w-full shadow-none"
-          onChange={handleChange}
-          onFocus={() => inputRef.current?.select()}
-        />
+      <InputGroup
+        ref={containerRef}
+        className="focus-within:border-ring focus-within:ring-ring/50 max-w-sm focus-within:ring-[3px]">
         <InputGroupAddon>
-          <SearchIcon className="text-muted-foreground" />
+          <InputGroupButton type="submit" size="icon-xs" disabled={!searchValue}>
+            <SearchIcon className="text-muted-foreground" />
+          </InputGroupButton>
         </InputGroupAddon>
+
+        <Autocomplete
+          autoHighlight
+          mode="both"
+          open={isOpen && searchValue.startsWith("#")}
+          onOpenChange={setIsOpen}
+          items={searchResults}
+          value={searchValue}
+          itemToStringValue={(item: TagAutocompleteItem) => (item ? `#${item.value}` : searchValue)}
+          onValueChange={handleInputChange}>
+          <Label htmlFor="search" className="sr-only">
+            Search
+          </Label>
+          <AutocompleteInput
+            ref={inputRef}
+            id="search"
+            autoComplete="off"
+            placeholder="Search..."
+            className="h-8 w-full border-none bg-transparent! p-0! ring-0!"
+            onFocus={() => inputRef.current?.select()}
+          />
+
+          <AutocompletePositioner sideOffset={6} anchor={containerRef}>
+            <AutocompletePopup>
+              <AutocompleteEmpty>No tags found.</AutocompleteEmpty>
+              <AutocompleteList>
+                {(tag) => (
+                  <AutocompleteItem key={tag.id} value={tag}>
+                    {tag.value}
+                  </AutocompleteItem>
+                )}
+              </AutocompleteList>
+            </AutocompletePopup>
+          </AutocompletePositioner>
+        </Autocomplete>
+
         <InputGroupAddon align="inline-end">
-          <Button
-            className={cn(searchInput === "" ? "invisible opacity-0" : "visible opacity-100")}
+          <InputGroupButton
+            type="button"
             size="icon-xs"
-            variant="ghost"
+            className={cn(searchValue === "" ? "invisible opacity-0" : "visible opacity-100")}
             onClick={clearSearch}>
             <XIcon />
-          </Button>
+          </InputGroupButton>
         </InputGroupAddon>
         <InputGroupAddon align="inline-end">
           <Kbd>⌘K</Kbd>
