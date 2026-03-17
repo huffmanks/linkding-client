@@ -32,9 +32,6 @@ services:
       LD_USE_X_FORWARDED_HOST: "true"
     restart: unless-stopped
   echo-link:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: huffmanks/echo-link:latest
     container_name: echo-link
     ports:
