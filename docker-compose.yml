@@ -16,7 +16,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # image: huffmanks/echo-link@latest
+    image: huffmanks/echo-link:latest
     container_name: echo-link
     ports:
       - "${APP_PORT}:${APP_PORT}"

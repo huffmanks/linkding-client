@@ -1,4 +1,6 @@
-base_compose := "docker compose -f docker-compose.yml"
+BASE_COMPOSE := "docker compose -f docker-compose.yml"
+BUILDER      := "echolink-builder"
+IMAGE        := "huffmanks/echo-link:latest"
 
 # --- Public Recipes ---
 
@@ -17,7 +19,7 @@ down profile="development":
     @just -E .env.{{profile}} _down-{{profile}}
 
 # Setup pre-reqs
-init domain:
+init domain="":
     @for env in development staging production; do \
         if [ ! -f .env.$env ]; then \
             cp .env.example .env.$env; \
@@ -26,23 +28,41 @@ init domain:
             echo ".env.$env already exists, skipping..."; \
         fi; \
     done
-    mkcert -install {{domain}}
+    @{{ if domain != "" { \
+        "mkcert -install " + domain \
+    } else { \
+        "echo 'No domain provided, skipping mkcert.'" \
+    } }}
+
+# Build the docker image
+build push="false":
+    @echo "Building docker image..."
+    @docker buildx ls | grep -q {{BUILDER}} || docker buildx create --name {{BUILDER}} --driver docker-container
+    docker buildx inspect --bootstrap
+    docker buildx use {{BUILDER}}
+    {{ if push == "true" { \
+        "docker buildx build --platform linux/amd64,linux/arm64 -t " + IMAGE + " --push ." \
+    } else { \
+        "docker buildx build -t " + IMAGE + " --load ." \
+    } }}
+    @docker buildx rm {{BUILDER}} || true
+    @echo "Build complete."
 
 # --- Internal Helpers ---
 _up-development:
-    {{base_compose}} up -d linkding
+    {{BASE_COMPOSE}} up -d linkding
     pnpm dev
 
 _up-staging:
-    {{base_compose}} up -d linkding
+    {{BASE_COMPOSE}} up -d linkding
     pnpm staging
 
 _up-production:
     sudo caddy start
-    {{base_compose}} up -d
+    {{BASE_COMPOSE}} up -d
 
 _down-base:
-    {{base_compose}} down
+    {{BASE_COMPOSE}} down
 
 _down-development: _down-base
 
@@ -50,4 +70,4 @@ _down-staging: _down-base
 
 _down-production:
     -sudo caddy stop
-    {{base_compose}} down
+    {{BASE_COMPOSE}} down
