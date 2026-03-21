@@ -13,7 +13,7 @@
 
 ## Folders
 
-- [ ] Sort by order in sidebar.
+- [x] Sort by order in sidebar.
 
 ## Table view
 
@@ -30,5 +30,5 @@
 
 ## Issues
 
-- [ ] When creating a tag or folder, sidebar is not optimistically updated.
+- [x] When creating a tag or folder, sidebar is not optimistically updated.
 - [ ] [Folder form](src/components/forms/folder-form.tsx) keyword/tag selection, has a ghost checked item.

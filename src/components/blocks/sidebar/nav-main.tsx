@@ -35,25 +35,33 @@ export function NavMain() {
   const { pathname } = useLocation();
 
   const folderItems =
-    folders?.results?.map((item) => {
-      const url = `/dashboard/folders/${item.id}`;
+    folders?.results
+      .sort((a, b) => {
+        const orderA = a.order ?? Infinity;
+        const orderB = b.order ?? Infinity;
+        return orderA - orderB;
+      })
+      .map((item) => {
+        const url = `/dashboard/folders/${item.id}`;
 
-      return {
-        name: item.name,
-        url,
-        isActive: checkActive({ pathname, url }),
-      };
-    }) || [];
+        return {
+          name: item.name,
+          url,
+          isActive: checkActive({ pathname, url }),
+        };
+      }) || [];
 
   const tagItems =
-    tags?.results?.map((item) => {
-      const url = `/dashboard/tags/${item.name}`;
-      return {
-        name: item.name,
-        url,
-        isActive: checkActive({ pathname, url }),
-      };
-    }) || [];
+    tags?.results
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((item) => {
+        const url = `/dashboard/tags/${item.name}`;
+        return {
+          name: item.name,
+          url,
+          isActive: checkActive({ pathname, url }),
+        };
+      }) || [];
 
   const folderHasItems = folderItems.length > 0;
   const tagHasItems = tagItems.length > 0;

@@ -42,7 +42,11 @@ export default function AppMobileNav() {
             entityType: "folders" as const,
             params: { id: String(f.id) } as const,
           }))
-          .sort((a, b) => a.name.localeCompare(b.name));
+          .sort((a, b) => {
+            const orderA = a.order ?? Infinity;
+            const orderB = b.order ?? Infinity;
+            return orderA - orderB;
+          });
       } else if (newItem.name === "Tags" && tags?.results) {
         subItems = tags.results
           .map((t) => ({
@@ -216,7 +220,7 @@ function NavDrawer({
             )}
           </div>
 
-          <div className="mb-4 px-4">
+          <div className="mx-auto mb-4 max-w-lg px-4">
             <DrawerClose
               className={cn(
                 "w-full cursor-pointer rounded-xl!",

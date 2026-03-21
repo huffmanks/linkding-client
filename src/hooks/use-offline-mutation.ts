@@ -110,7 +110,7 @@ export function useOfflineMutation<
         }
 
         if (options.method === "POST") {
-          if (options.url === "bookmarks" || isOnline) {
+          if (options.url === "bookmarks") {
             return old;
           }
 
