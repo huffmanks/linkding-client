@@ -1,6 +1,7 @@
 BASE_COMPOSE := "docker compose -f docker-compose.yml"
-BUILDER      := "echolink-builder"
-IMAGE        := "huffmanks/echo-link:latest"
+BUILDER := "echolink-builder"
+IMAGE_NAME := "huffmanks/echo-link"
+VERSION := "1.0.0"
 
 # --- Public Recipes ---
 
@@ -36,14 +37,16 @@ init domain="":
 
 # Build the docker image
 build push="false":
-    @echo "Building docker image..."
+    @echo "Building docker image version {{VERSION}}..."
     @docker buildx ls | grep -q {{BUILDER}} || docker buildx create --name {{BUILDER}} --driver docker-container
     docker buildx inspect --bootstrap
     docker buildx use {{BUILDER}}
     {{ if push == "true" { \
-        "docker buildx build --platform linux/amd64,linux/arm64 -t " + IMAGE + " --push ." \
+        "docker buildx build --platform linux/amd64,linux/arm64 " + \
+        "-t " + IMAGE_NAME + ":" + VERSION + " " + \
+        "-t " + IMAGE_NAME + ":latest --push ." \
     } else { \
-        "docker buildx build -t " + IMAGE + " --load ." \
+        "docker buildx build -t " + IMAGE_NAME + ":" + VERSION + " --load ." \
     } }}
     @docker buildx rm {{BUILDER}} || true
     @echo "Build complete."
