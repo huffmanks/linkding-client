@@ -72,6 +72,7 @@ export default function SharedButton({ title, text, url, isShared }: SharedButto
         <Tooltip>
           <TooltipTrigger
             className="size-5.5"
+            disabled={isBulkSelecting}
             tabIndex={isBulkSelecting ? -1 : 0}
             render={
               <Badge size="icon" variant="outline">

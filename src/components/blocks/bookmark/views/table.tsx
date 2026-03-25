@@ -1,10 +1,12 @@
-import { cn, getCleanDomain } from "@/lib/utils";
+import { useSettingsStore } from "@/lib/store";
+import { cn, formatToLocalTime, getCleanDomain, getPaginationLabel } from "@/lib/utils";
 import { useBulkSelection } from "@/providers/bulk-selection";
 import type { Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
 import BookmarkFavicon from "@/components/blocks/bookmark/bookmark-favicon";
 import { AllCheckbox, ItemCheckbox } from "@/components/blocks/bookmark/checkboxes";
+import TagCell from "@/components/blocks/bookmark/tag-cell";
 import {
   Table,
   TableBody,
@@ -18,6 +20,7 @@ import {
 interface BookmarkTableViewProps {
   bookmarks: Array<Bookmark>;
   count: number;
+  currentPage: number;
   handleOpenSheet: (bookmark: Bookmark) => void;
   handleOpenChange: (open: boolean) => void;
 }
@@ -25,10 +28,15 @@ interface BookmarkTableViewProps {
 export default function BookmarkTableView({
   bookmarks,
   count,
+  currentPage,
   handleOpenSheet,
   handleOpenChange,
 }: BookmarkTableViewProps) {
   const { isBulkSelecting, selectedIds, toggleIdSelection } = useBulkSelection();
+
+  const limit = useSettingsStore((state) => state.limit);
+
+  const paginationLabel = getPaginationLabel({ count, limit, currentPage });
 
   const allBookmarkIds = bookmarks.map((bookmark) => bookmark.id);
 
@@ -41,9 +49,10 @@ export default function BookmarkTableView({
               <AllCheckbox allIds={allBookmarkIds} />
             </TableHead>
             <TableHead className="w-8.5"></TableHead>
-            <TableHead className="w-80">Title</TableHead>
-            <TableHead className="w-56">Link</TableHead>
-            <TableHead className="w-80">Description</TableHead>
+            <TableHead className="w-64">Title</TableHead>
+            <TableHead className="w-64">Link</TableHead>
+            <TableHead className="w-64">Tags</TableHead>
+            <TableHead className="w-48">Created at</TableHead>
             <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
@@ -54,9 +63,8 @@ export default function BookmarkTableView({
               tabIndex={isBulkSelecting ? -1 : 0}
               role="button"
               className={cn(
-                "border-muted outline-none",
+                "border-muted relative transition-all outline-none",
                 bookmark.unread && "bg-primary/10",
-
                 isBulkSelecting
                   ? "hover:ring-primary/50 cursor-pointer hover:ring-2"
                   : "hover:bg-muted/50 focus:bg-muted"
@@ -112,19 +120,18 @@ export default function BookmarkTableView({
                   {getCleanDomain(bookmark.url)}
                 </a>
               </TableCell>
+              <TableCell className="min-w-0">
+                <TagCell tags={bookmark.tag_names} handleOpenChange={handleOpenChange} />
+              </TableCell>
               <TableCell
                 role="button"
-                className="min-w-0 cursor-pointer truncate"
+                className="cursor-pointer truncate"
                 onClick={() => {
                   if (!isBulkSelecting) {
                     handleOpenSheet(bookmark);
                   }
                 }}>
-                {bookmark?.description ? (
-                  bookmark.description
-                ) : (
-                  <span className="text-muted-foreground">No description</span>
-                )}
+                <span>{formatToLocalTime(bookmark.date_added)}</span>
               </TableCell>
               <TableCell className="flex items-center justify-end">
                 <ActionDropdown
@@ -138,8 +145,8 @@ export default function BookmarkTableView({
         </TableBody>
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={5}>
-              {isBulkSelecting ? `Selected: ${selectedIds.size}` : `Total: ${count}`}
+            <TableCell colSpan={7} className="px-2 py-2.5">
+              {isBulkSelecting ? `Selected: ${selectedIds.size}` : paginationLabel}
             </TableCell>
           </TableRow>
         </TableFooter>

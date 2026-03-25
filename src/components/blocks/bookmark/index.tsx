@@ -423,7 +423,11 @@ export default function BookmarkWrapper({
                 render={
                   <Button
                     variant="outline"
-                    className="cursor-pointer"
+                    className={cn(
+                      "cursor-pointer",
+                      isBulkSelecting &&
+                        "bg-primary dark:bg-primary text-primary-foreground dark:text-primary-foreground dark:hover:text-foreground hover:text-foreground"
+                    )}
                     onClick={toggleBulkSelection}>
                     <SquareDashedMousePointerIcon className="size-4" />
                     <span className="hidden sm:inline-block">Bulk edit</span>
@@ -545,6 +549,7 @@ export default function BookmarkWrapper({
               <BookmarkTableView
                 bookmarks={bookmarkItems}
                 count={totalCount}
+                currentPage={currentPage}
                 handleOpenSheet={handleOpenSheet}
                 handleOpenChange={handleOpenChange}
               />

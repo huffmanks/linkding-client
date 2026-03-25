@@ -58,7 +58,9 @@ export function EmptyTags() {
       </EmptyHeader>
       <EmptyContent>
         <div className="flex gap-2">
-          <Button onClick={() => setActiveGlobalDialog("tag-form")}>Create tag</Button>
+          <Button className="cursor-pointer" onClick={() => setActiveGlobalDialog("tag-form")}>
+            Create tag
+          </Button>
         </div>
       </EmptyContent>
     </Empty>

@@ -82,17 +82,19 @@ export function NavMain() {
     }),
     {
       name: "Folders",
+      url: "/dashboard/folders",
       icon: FolderIcon,
       isActive: folderItems.some((folder) => folder.isActive),
       isCollapsible: true,
-      items: folderHasItems ? folderItems : undefined,
+      items: folderHasItems ? folderItems : [],
     },
     {
       name: "Tags",
+      url: "/dashboard/tags",
       icon: HashIcon,
       isActive: tagItems.some((tag) => tag.isActive),
       isCollapsible: true,
-      items: tagHasItems ? tagItems : undefined,
+      items: tagHasItems ? tagItems : [],
     },
   ] as Array<SidebarNavItem>;
 
@@ -103,14 +105,14 @@ export function NavMain() {
   }
 
   function renderSidebarItem(item: SidebarNavItem) {
-    if (item.url) {
-      return <NavLinkItem key={item.name} item={item} handleCloseSidebar={handleCloseSidebar} />;
-    }
-
-    if (item.isCollapsible) {
+    if (item.isCollapsible && item?.items?.length) {
       return (
         <NavCollapsibleItem key={item.name} item={item} handleCloseSidebar={handleCloseSidebar} />
       );
+    }
+
+    if (item.url) {
+      return <NavLinkItem key={item.name} item={item} handleCloseSidebar={handleCloseSidebar} />;
     }
 
     return null;

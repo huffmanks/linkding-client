@@ -76,7 +76,7 @@ export default function AppMobileNav() {
       <div className="h-18 px-3 pt-4">
         <div className="flex w-full items-center gap-4">
           {items.map((item) => {
-            if (!!item.isCollapsible) {
+            if (item?.subItems?.length || item.name === "Add") {
               return (
                 <NavDrawer
                   key={item.name}

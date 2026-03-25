@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { ImageIcon } from "lucide-react";
 
 import { linkdingFetch } from "@/lib/api";
@@ -14,6 +13,7 @@ import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
 import BookmarkFavicon from "@/components/blocks/bookmark/bookmark-favicon";
 import { AllCheckbox, ItemCheckbox } from "@/components/blocks/bookmark/checkboxes";
 import SharedButton from "@/components/blocks/bookmark/shared-button";
+import TagCell from "@/components/blocks/bookmark/tag-cell";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -125,26 +125,11 @@ export default function BookmarkGridView({
 
                 {bookmark.is_archived && <Badge variant="secondary">Archived</Badge>}
 
-                {bookmark?.tag_names &&
-                  bookmark.tag_names.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="invert"
-                      render={
-                        <Link
-                          tabIndex={isBulkSelecting ? -1 : 0}
-                          className={cn(
-                            "transition-colors outline-none",
-                            isBulkSelecting && "pointer-events-none"
-                          )}
-                          to="/dashboard/tags/$tagName"
-                          params={{ tagName: tag }}
-                          onClick={(e) => e.stopPropagation()}>
-                          #{tag}
-                        </Link>
-                      }
-                    />
-                  ))}
+                <TagCell
+                  tags={bookmark.tag_names}
+                  handleOpenChange={handleOpenChange}
+                  variant="invert"
+                />
               </section>
             </CardContent>
           </Card>

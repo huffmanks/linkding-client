@@ -14,14 +14,9 @@
 - [ ] If offline, hard refresh crashes.
 - [ ] If offline, make search query the cache.
 
-## Table view
-
-- [ ] Add more fields, (tags, date created, etc.)
-
 ## Bulk edit
 
 - [ ] Add ability to remove/add tags to bookmarks.
-- [ ] When bulk editing, highlight or change color of bulk edit button/icon.
 
 ## Upload assets
 
@@ -35,10 +30,6 @@
 ## API token
 
 - [ ] Switch to using on go server instead.
-
-## Mobile nav
-
-- [ ] When no folders or tags drawer opens the create drawer. Should disable button.
 
 ## Tags and folder manager pages
 

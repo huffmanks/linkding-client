@@ -209,3 +209,22 @@ export function getErrorMessage(error: unknown) {
       return error.message || "An unexpected error occurred.";
   }
 }
+
+export function getPaginationLabel({
+  count,
+  limit,
+  currentPage,
+}: {
+  count: number;
+  limit: number;
+  currentPage: number;
+}) {
+  if (count <= limit) {
+    return `Total: ${count}`;
+  }
+
+  const start = (currentPage - 1) * limit + 1;
+  const end = Math.min(currentPage * limit, count);
+
+  return `Showing ${start}–${end} of ${count} items`;
+}
