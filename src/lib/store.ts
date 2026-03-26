@@ -24,7 +24,8 @@ type SettingsStoreState = {
   sidebarAddCollapsed: boolean;
   defaultSortDate: DefaultSortDate;
   limit: number;
-  exitBulkEditOnAction: boolean;
+  continueBulkEdit: boolean;
+  keepBulkSelection: boolean;
   archivedDefault: boolean;
   unreadDefault: boolean;
   sharedDefault: boolean;
@@ -41,7 +42,8 @@ type SettingsStoreActions = {
   setSidebarAddCollapsed: (sidebarAddCollapsed: boolean) => void;
   setDefaultSortDate: (defaultSortDate: DefaultSortDate) => void;
   setLimit: (limit: number) => void;
-  setExitBulkEditOnAction: (exitBulkEditOnAction: boolean) => void;
+  setContinueBulkEdit: (continueBulkEdit: boolean) => void;
+  setKeepBulkSelection: (keepBulkSelection: boolean) => void;
   setArchivedDefault: (archivedDefault: boolean) => void;
   setUnreadDefault: (unreadDefault: boolean) => void;
   setSharedDefault: (sharedDefault: boolean) => void;
@@ -59,7 +61,8 @@ const initialSettingsStoreState: SettingsStoreState = {
   sidebarAddCollapsed: false,
   defaultSortDate: "date_modified",
   limit: 10,
-  exitBulkEditOnAction: true,
+  continueBulkEdit: false,
+  keepBulkSelection: false,
   archivedDefault: false,
   unreadDefault: false,
   sharedDefault: false,
@@ -79,7 +82,8 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
       setSidebarAddCollapsed: (sidebarAddCollapsed) => set({ sidebarAddCollapsed }),
       setDefaultSortDate: (defaultSortDate) => set({ defaultSortDate }),
       setLimit: (limit) => set({ limit }),
-      setExitBulkEditOnAction: (exitBulkEditOnAction) => set({ exitBulkEditOnAction }),
+      setContinueBulkEdit: (continueBulkEdit) => set({ continueBulkEdit }),
+      setKeepBulkSelection: (keepBulkSelection) => set({ keepBulkSelection }),
       setArchivedDefault: (archivedDefault) => set({ archivedDefault }),
       setUnreadDefault: (unreadDefault) => set({ unreadDefault }),
       setSharedDefault: (sharedDefault) => set({ sharedDefault }),

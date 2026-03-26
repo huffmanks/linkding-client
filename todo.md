@@ -24,7 +24,6 @@
 ### Bulk edit
 
 - [ ] Add ability to remove/add tags for selected bookmarks.
-- [ ] If `exitBulkEditOnAction` is true, allow option to keep current selection. [form](src/components/forms/settings/bookmark-settings-form.tsx#L166)
 
 ### Upload assets
 

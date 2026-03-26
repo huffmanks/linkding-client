@@ -135,15 +135,17 @@ export default function BookmarkWrapper({
     stopBulkSelection,
   } = useBulkSelection();
 
-  const { limit, view, defaultSortDate, exitBulkEditOnAction, setView } = useSettingsStore(
-    useShallow((state) => ({
-      limit: state.limit,
-      view: state.view,
-      defaultSortDate: state.defaultSortDate,
-      exitBulkEditOnAction: state.exitBulkEditOnAction,
-      setView: state.setView,
-    }))
-  );
+  const { limit, view, defaultSortDate, continueBulkEdit, keepBulkSelection, setView } =
+    useSettingsStore(
+      useShallow((state) => ({
+        limit: state.limit,
+        view: state.view,
+        defaultSortDate: state.defaultSortDate,
+        continueBulkEdit: state.continueBulkEdit,
+        keepBulkSelection: state.keepBulkSelection,
+        setView: state.setView,
+      }))
+    );
 
   const {
     currentPage,
@@ -292,10 +294,12 @@ export default function BookmarkWrapper({
   }
 
   function handlePostBulkAction() {
-    if (exitBulkEditOnAction) {
+    if (!continueBulkEdit) {
       stopBulkSelection();
-    } else {
+    } else if (!keepBulkSelection) {
       clearSelection();
+    } else {
+      setCurrentBulkAction(null);
     }
 
     setIsAlertOpen(false);

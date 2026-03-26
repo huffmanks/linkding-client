@@ -26,24 +26,28 @@ export function BookmarkSettingsForm({ className, ...props }: BookmarkSettingsFo
     unreadDefault,
     sharedDefault,
     autoMarkRead,
-    exitBulkEditOnAction,
+    continueBulkEdit,
+    keepBulkSelection,
     setArchivedDefault,
     setUnreadDefault,
     setSharedDefault,
     setAutoMarkRead,
-    setExitBulkEditOnAction,
+    setContinueBulkEdit,
+    setKeepBulkSelection,
   } = useSettingsStore(
     useShallow((state) => ({
       archivedDefault: state.archivedDefault,
       unreadDefault: state.unreadDefault,
       sharedDefault: state.sharedDefault,
       autoMarkRead: state.autoMarkRead,
-      exitBulkEditOnAction: state.exitBulkEditOnAction,
+      continueBulkEdit: state.continueBulkEdit,
+      keepBulkSelection: state.keepBulkSelection,
       setArchivedDefault: state.setArchivedDefault,
       setUnreadDefault: state.setUnreadDefault,
       setSharedDefault: state.setSharedDefault,
       setAutoMarkRead: state.setAutoMarkRead,
-      setExitBulkEditOnAction: state.setExitBulkEditOnAction,
+      setContinueBulkEdit: state.setContinueBulkEdit,
+      setKeepBulkSelection: state.setKeepBulkSelection,
     }))
   );
 
@@ -53,7 +57,8 @@ export function BookmarkSettingsForm({ className, ...props }: BookmarkSettingsFo
       archivedDefault,
       sharedDefault,
       autoMarkRead,
-      exitBulkEditOnAction,
+      continueBulkEdit,
+      keepBulkSelection,
     },
     onSubmit: ({ value }) => {
       try {
@@ -61,7 +66,9 @@ export function BookmarkSettingsForm({ className, ...props }: BookmarkSettingsFo
         setArchivedDefault(value.archivedDefault);
         setSharedDefault(value.sharedDefault);
         setAutoMarkRead(value.autoMarkRead);
-        setExitBulkEditOnAction(value.exitBulkEditOnAction);
+        setContinueBulkEdit(value.continueBulkEdit);
+
+        setKeepBulkSelection(value.continueBulkEdit ? value.keepBulkSelection : false);
 
         toast.success("Settings updated!");
       } catch (error: unknown) {
@@ -164,17 +171,17 @@ export function BookmarkSettingsForm({ className, ...props }: BookmarkSettingsFo
             />
 
             <form.Field
-              name="exitBulkEditOnAction"
+              name="continueBulkEdit"
               children={(field) => (
                 <Field orientation="horizontal">
                   <FieldContent>
-                    <FieldLabel htmlFor="exitBulkEditOnAction">Exit bulk edit on action</FieldLabel>
+                    <FieldLabel htmlFor="continueBulkEdit">Continue bulk edit</FieldLabel>
                     <FieldDescription>
-                      Automatically exit bulk editing after running an action.
+                      Remain in bulk edit mode after performing an action.
                     </FieldDescription>
                   </FieldContent>
                   <Switch
-                    id="exitBulkEditOnAction"
+                    id="continueBulkEdit"
                     checked={field.state.value}
                     onBlur={field.handleBlur}
                     onCheckedChange={(checked) => field.handleChange(checked)}
@@ -182,6 +189,31 @@ export function BookmarkSettingsForm({ className, ...props }: BookmarkSettingsFo
                 </Field>
               )}
             />
+
+            <form.Subscribe selector={(state) => state.values.continueBulkEdit}>
+              {(continueBulkEditAfterAction) => (
+                <form.Field
+                  name="keepBulkSelection"
+                  children={(field) => (
+                    <Field orientation="horizontal" data-disabled={!continueBulkEditAfterAction}>
+                      <FieldContent>
+                        <FieldLabel htmlFor="keepBulkSelection">Keep bulk selection</FieldLabel>
+                        <FieldDescription>
+                          Retain selected items after performing a bulk edit action.
+                        </FieldDescription>
+                      </FieldContent>
+                      <Switch
+                        id="keepBulkSelection"
+                        checked={field.state.value}
+                        disabled={!continueBulkEditAfterAction}
+                        onBlur={field.handleBlur}
+                        onCheckedChange={(checked) => field.handleChange(checked)}
+                      />
+                    </Field>
+                  )}
+                />
+              )}
+            </form.Subscribe>
           </FieldGroup>
         </FieldSet>
 

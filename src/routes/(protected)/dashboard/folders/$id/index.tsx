@@ -15,7 +15,7 @@ import BookmarkWrapper from "@/components/blocks/bookmark";
 export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
   validateSearch: (search) => {
     const parsed = SearchSchema.parse(search);
-    const limit = useSettingsStore.getState().limit;
+    const { limit } = useSettingsStore.getState();
 
     return {
       ...parsed,
