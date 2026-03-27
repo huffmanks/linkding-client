@@ -1,10 +1,19 @@
 import { useRef, useState } from "react";
 
+import { XIcon } from "lucide-react";
 import { AnimatePresence, type PanInfo, motion, useMotionValue, useTransform } from "motion/react";
 
-export function DragWrapper({ children }: { children: React.ReactNode }) {
-  const [isVisible, setIsVisible] = useState(true);
+import { cn } from "@/lib/utils";
+
+interface DragWrapperProps {
+  onDismiss?: () => void;
+  children: React.ReactNode;
+}
+
+export function DragWrapper({ onDismiss, children }: DragWrapperProps) {
   const [isInZone, setIsInZone] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
   const constraintsRef = useRef(null);
 
   const x = useMotionValue(0);
@@ -12,50 +21,72 @@ export function DragWrapper({ children }: { children: React.ReactNode }) {
 
   const scale = useTransform(y, [400, 600], [1, 0.85]);
 
+  function handleDragStart() {
+    setIsDragging(true);
+  }
+
   function handleDrag(_event: PointerEvent | MouseEvent | TouchEvent, info: PanInfo) {
     const isOverTarget =
-      info.point.y > window.innerHeight - 120 &&
+      info.point.y > window.innerHeight - 215 &&
       Math.abs(info.point.x - window.innerWidth / 2) < 60;
 
     setIsInZone(isOverTarget);
   }
 
   function handleDragEnd(_event: PointerEvent | MouseEvent | TouchEvent, _info: PanInfo) {
-    if (isInZone) {
-      setIsVisible(false);
-    }
+    setIsDragging(false);
+    if (isInZone) onDismiss?.();
   }
 
-  return (
-    <div ref={constraintsRef} className="pointer-events-none fixed inset-0 z-50 h-screen w-screen">
-      <AnimatePresence>
-        {isVisible && (
-          <>
-            <motion.div
-              drag
-              dragConstraints={constraintsRef}
-              dragElastic={0.1}
-              dragMomentum={false}
-              onDrag={handleDrag}
-              onDragEnd={handleDragEnd}
-              style={{ x, y, scale }}
-              className="pointer-events-auto absolute bottom-20 left-1/2 -translate-x-1/2 cursor-grab active:cursor-grabbing">
-              {children}
-            </motion.div>
+  const zoneTransition = { type: "tween", ease: "easeOut", duration: 0.2 } as const;
 
+  return (
+    <div
+      ref={constraintsRef}
+      className="pointer-events-none fixed inset-0 z-50 h-dvh w-screen overflow-hidden">
+      <motion.div
+        drag
+        dragConstraints={constraintsRef}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragStart={handleDragStart}
+        onDrag={handleDrag}
+        onDragEnd={handleDragEnd}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 40 }}
+        style={{ x, y, scale }}
+        className="pointer-events-auto absolute right-4 bottom-6 w-full max-w-[calc(100%-2rem)] cursor-grab active:cursor-grabbing sm:bottom-12 sm:max-w-sm">
+        {children}
+      </motion.div>
+
+      <AnimatePresence>
+        {isDragging && (
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.6 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: isInZone ? 1.1 : 1,
+              backgroundColor: isInZone ? "rgba(239, 68, 68, 0.25)" : "rgba(255, 255, 255, 0.05)",
+              borderColor: isInZone ? "rgba(239, 68, 68, 0.6)" : "rgba(255, 255, 255, 0.1)",
+              boxShadow: isInZone ? "0 0 0 6px rgba(239, 68, 68, 0.2)" : "0 0 0 0px rgba(0,0,0,0)",
+            }}
+            exit={{ opacity: 0, y: 30, scale: 0.6 }}
+            transition={zoneTransition}
+            className={cn(
+              "border-border text-foreground fixed bottom-32 left-1/2 flex size-12 -translate-x-1/2 items-center justify-center rounded-full border border-dashed backdrop-blur-md transition-colors",
+              isInZone && "ring-destructive/20 ring-4"
+            )}>
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
               animate={{
-                opacity: 1,
-                y: 0,
-                scale: isInZone ? 1.4 : 1,
-                backgroundColor: isInZone ? "rgb(239, 68, 68)" : "var(--secondary)",
+                color: isInZone ? "rgb(239, 68, 68)" : "rgb(161, 161, 170)",
+                scale: isInZone ? 1.1 : 1,
               }}
-              exit={{ opacity: 0, y: 20 }}
-              className="border-border text-foreground fixed bottom-10 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-full border border-dashed backdrop-blur-lg transition-colors">
-              <span className={isInZone ? "scale-110" : ""}>✕</span>
+              transition={zoneTransition}>
+              <XIcon className="size-6" />
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

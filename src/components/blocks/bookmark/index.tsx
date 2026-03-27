@@ -6,12 +6,10 @@ import {
   CalendarArrowDownIcon,
   CalendarArrowUpIcon,
   CalendarIcon,
-  ChevronsUpDownIcon,
   FunnelIcon,
   LayoutGridIcon,
   ListIcon,
   SearchXIcon,
-  SquareDashedMousePointerIcon,
   Table2Icon,
 } from "lucide-react";
 import { flushSync } from "react-dom";
@@ -20,36 +18,24 @@ import { useShallow } from "zustand/react/shallow";
 
 import { usePagination } from "@/hooks/use-pagination";
 import { type AppRouteId, useSearchState } from "@/hooks/use-search-state";
-import { ALL_BULK_SELECT_OPTIONS, FILTER_OPTIONS } from "@/lib/constants";
+import { FILTER_OPTIONS } from "@/lib/constants";
 import { type BulkUpdatePayload, useBulkEditBookmarks, useDeleteBookmark } from "@/lib/mutations";
 import type { SortField } from "@/lib/search";
 import { useSettingsStore } from "@/lib/store";
-import { cn, getPaginationLabel } from "@/lib/utils";
+import { getPaginationLabel } from "@/lib/utils";
 import { useBackgroundSync } from "@/providers/background-sync";
 import { type BulkAction, useBulkSelection } from "@/providers/bulk-selection";
 import { useGlobalModal } from "@/providers/global-modal-context";
 import type { Bookmark, View } from "@/types";
 
-import SelectGroups from "@/components/blocks/bookmark/select-groups";
+import BulkActionBar from "@/components/blocks/bookmark/bulk-action-bar";
 import BookmarkSheet from "@/components/blocks/bookmark/sheet";
 import BookmarkGridView from "@/components/blocks/bookmark/views/grid";
 import BookmarkListView from "@/components/blocks/bookmark/views/list";
 import BookmarkTableView from "@/components/blocks/bookmark/views/table";
 import { EmptyCache } from "@/components/default-error-component";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Combobox,
   ComboboxCollection,
@@ -62,16 +48,6 @@ import {
   ComboboxTrigger,
   useComboboxAnchor,
 } from "@/components/ui/combobox";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   Empty,
   EmptyContent,
@@ -89,7 +65,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Select, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface BookmarkWrapperProps {
@@ -125,15 +100,8 @@ export default function BookmarkWrapper({
   const { mutate: deleteBookmark } = useDeleteBookmark();
 
   const { search, setParams } = useSearchState(appRouteId);
-  const {
-    isBulkSelecting,
-    selectedIds,
-    bulkAction,
-    clearSelection,
-    toggleBulkSelection,
-    setCurrentBulkAction,
-    stopBulkSelection,
-  } = useBulkSelection();
+  const { selectedIds, bulkAction, clearSelection, setCurrentBulkAction, stopBulkSelection } =
+    useBulkSelection();
 
   const { limit, view, defaultSortDate, continueBulkEdit, keepBulkSelection, setView } =
     useSettingsStore(
@@ -432,131 +400,12 @@ export default function BookmarkWrapper({
               </ComboboxContent>
             </Combobox>
 
-            <Dialog
-              modal={false}
-              disablePointerDismissal
-              open={isBulkSelecting}
-              onOpenChange={(open) => {
-                if (!open && !isAlertOpen) handlePostBulkAction();
-              }}>
-              <DialogTrigger
-                render={
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "cursor-pointer",
-                      isBulkSelecting &&
-                        "bg-primary dark:bg-primary text-primary-foreground dark:text-primary-foreground dark:hover:text-foreground hover:text-foreground"
-                    )}
-                    onClick={toggleBulkSelection}>
-                    <SquareDashedMousePointerIcon className="size-4" />
-                    <span className="hidden sm:inline-block">Bulk edit</span>
-                  </Button>
-                }></DialogTrigger>
-              <DialogContent
-                className="bg-card top-auto! right-4! bottom-6! left-auto! translate-x-0! translate-y-0! p-0 sm:bottom-12! sm:max-w-sm"
-                showCloseButton={false}
-                showDialogOverlay={false}>
-                <Collapsible defaultOpen>
-                  <DialogHeader className="flex-row items-center justify-between p-4">
-                    <div>
-                      <DialogTitle className="flex items-center gap-2">Bulk edit</DialogTitle>
-                      <DialogDescription>
-                        {selectedIds.size > 0 ? (
-                          <span>{selectedIds.size} selected</span>
-                        ) : (
-                          <span>No items selected</span>
-                        )}
-                      </DialogDescription>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {bulkAction ? (
-                        <Badge variant="outline" className="font-normal uppercase">
-                          {bulkAction}
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant="outline"
-                          className="text-muted-foreground font-normal uppercase">
-                          No action
-                        </Badge>
-                      )}
-                      <CollapsibleTrigger
-                        render={
-                          <Button
-                            disabled={isAlertOpen}
-                            variant="secondary"
-                            size="icon-sm"
-                            className="cursor-pointer">
-                            <ChevronsUpDownIcon />
-                          </Button>
-                        }></CollapsibleTrigger>
-                    </div>
-                  </DialogHeader>
-                  <CollapsibleContent>
-                    <div className="px-4 pb-4">
-                      <Select
-                        items={ALL_BULK_SELECT_OPTIONS}
-                        value={bulkAction}
-                        onValueChange={(value) => setCurrentBulkAction(value as BulkAction)}>
-                        <SelectTrigger className="w-full cursor-pointer">
-                          <SelectValue
-                            placeholder="Select Action"
-                            className={cn(bulkAction === "delete" && "text-destructive")}
-                          />
-                        </SelectTrigger>
-                        <SelectContent alignItemWithTrigger={false} align="end" sideOffset={6}>
-                          <SelectGroups />
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <DialogFooter className="px-4 py-3">
-                      <DialogClose
-                        render={
-                          <Button
-                            disabled={isAlertOpen}
-                            variant="secondary"
-                            className="cursor-pointer"
-                            onClick={stopBulkSelection}>
-                            Cancel
-                          </Button>
-                        }
-                      />
-
-                      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-                        <AlertDialogTrigger
-                          render={
-                            <Button
-                              className="cursor-pointer"
-                              disabled={selectedIds.size === 0 || !bulkAction || isAlertOpen}>
-                              Continue
-                            </Button>
-                          }></AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              <span>This action cannot be undone. This will permanently </span>
-                              <span>{bulkAction === "delete" ? "delete" : "modify"}</span>
-                              <span> the selected bookmarks.</span>
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              variant="destructive"
-                              className="cursor-pointer"
-                              onClick={handleBulkEdit}>
-                              Execute
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </DialogFooter>
-                  </CollapsibleContent>
-                </Collapsible>
-              </DialogContent>
-            </Dialog>
+            <BulkActionBar
+              isAlertOpen={isAlertOpen}
+              setIsAlertOpen={setIsAlertOpen}
+              handleBulkEdit={handleBulkEdit}
+              handlePostBulkAction={handlePostBulkAction}
+            />
           </div>
         </div>
       </div>
