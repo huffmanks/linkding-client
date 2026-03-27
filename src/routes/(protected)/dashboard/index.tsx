@@ -10,6 +10,7 @@ import { SearchSchema, transformData } from "@/lib/search";
 import { useSettingsStore } from "@/lib/store";
 
 import BookmarkWrapper from "@/components/blocks/bookmark";
+import { DragWrapper } from "@/components/blocks/bookmark/drag-wrapper";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -48,16 +49,21 @@ function RouteComponent() {
   }, [rawData, search]);
 
   return (
-    <BookmarkWrapper
-      appRouteId="/(protected)/dashboard/"
-      heading="Bookmarks"
-      bookmarkItems={items}
-      totalCount={totalCount}
-      totalPages={totalPages}
-      hasNextCurrent={hasNextCurrent}
-      hasPreviousCurrent={hasPreviousCurrent}
-      emptyComponent={<EmptyBookmarks />}
-    />
+    <>
+      <DragWrapper>
+        <div className="rounded-md bg-red-500 p-5 text-white">Drag me</div>
+      </DragWrapper>
+      <BookmarkWrapper
+        appRouteId="/(protected)/dashboard/"
+        heading="Bookmarks"
+        bookmarkItems={items}
+        totalCount={totalCount}
+        totalPages={totalPages}
+        hasNextCurrent={hasNextCurrent}
+        hasPreviousCurrent={hasPreviousCurrent}
+        emptyComponent={<EmptyBookmarks />}
+      />
+    </>
   );
 }
 
