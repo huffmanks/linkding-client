@@ -460,19 +460,38 @@ export default function BookmarkWrapper({
                 <Collapsible defaultOpen>
                   <DialogHeader className="flex-row items-center justify-between p-4">
                     <div>
-                      <DialogTitle>Bulk edit</DialogTitle>
-                      <DialogDescription>Select an action below.</DialogDescription>
+                      <DialogTitle className="flex items-center gap-2">Bulk edit</DialogTitle>
+                      <DialogDescription>
+                        {selectedIds.size > 0 ? (
+                          <span>{selectedIds.size} selected</span>
+                        ) : (
+                          <span>No items selected</span>
+                        )}
+                      </DialogDescription>
                     </div>
-                    <CollapsibleTrigger
-                      render={
-                        <Button
-                          disabled={isAlertOpen}
-                          variant="secondary"
-                          size="icon-sm"
-                          className="cursor-pointer">
-                          <ChevronsUpDownIcon />
-                        </Button>
-                      }></CollapsibleTrigger>
+                    <div className="flex items-center gap-2">
+                      {bulkAction ? (
+                        <Badge variant="outline" className="font-normal uppercase">
+                          {bulkAction}
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="text-muted-foreground font-normal uppercase">
+                          No action
+                        </Badge>
+                      )}
+                      <CollapsibleTrigger
+                        render={
+                          <Button
+                            disabled={isAlertOpen}
+                            variant="secondary"
+                            size="icon-sm"
+                            className="cursor-pointer">
+                            <ChevronsUpDownIcon />
+                          </Button>
+                        }></CollapsibleTrigger>
+                    </div>
                   </DialogHeader>
                   <CollapsibleContent>
                     <div className="px-4 pb-4">

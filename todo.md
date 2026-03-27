@@ -11,7 +11,7 @@
 ### Filters
 
 - [ ] Archived filter broken, API does not return archived from normal endpoint. Use `/api/bookmarks/archived/`.
-- [ ] Tag search should support multiple comma-separated tags with autocomplete.
+- [ ] Tag search should support multiple space-separated tags with autocomplete.
 
 ---
 
@@ -24,7 +24,6 @@
 ### Bulk edit
 
 - [ ] Add ability to remove/add tags for selected bookmarks.
-- [ ] Move selected count label to bulk edit dialog. Also, for table show selected count label next to select all, but if none selected says Select all.
 - [ ] Make floating action dialog moveable and closable if pulled down and dropped in x.
 
 ### Upload assets
