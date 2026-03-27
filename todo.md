@@ -24,6 +24,8 @@
 ### Bulk edit
 
 - [ ] Add ability to remove/add tags for selected bookmarks.
+- [ ] Move selected count label to bulk edit dialog. Also, for table show selected count label next to select all, but if none selected says Select all.
+- [ ] Make floating action dialog moveable and closable if pulled down and dropped in x.
 
 ### Upload assets
 
