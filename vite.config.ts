@@ -7,10 +7,15 @@ import viteReact from "@vitejs/plugin-react";
 import { URL, fileURLToPath } from "node:url";
 import { VitePWA } from "vite-plugin-pwa";
 
+import pkg from "./package.json";
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   return {
     base: "/",
+    define: {
+      __APP_VERSION__: JSON.stringify(pkg.version),
+    },
     build: {
       rollupOptions: {
         output: {

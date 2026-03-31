@@ -32,10 +32,12 @@ export function SetupForm({ className, ...props }: SetupFormProps) {
     }))
   );
 
+  const config = (window as any).RUNTIME_CONFIG;
+
   const form = useForm({
     defaultValues: {
-      username,
-      linkdingUrl,
+      username: config?.ECHOLINK_USER_NAME || username,
+      linkdingUrl: config?.LINKDING_EXTERNAL_URL || linkdingUrl,
     },
     onSubmit: ({ value }) => {
       if (!isValid && errorMessage) {
@@ -148,16 +150,17 @@ export function SetupForm({ className, ...props }: SetupFormProps) {
                       continue.
                     </span>
                     <span> </span>
-                    <a
-                      href={joinUrlPath(
-                        form.getFieldValue("linkdingUrl"),
-                        "/settings/integrations"
+                    <form.Subscribe selector={(state) => state.values.linkdingUrl}>
+                      {(linkdingUrlInput) => (
+                        <a
+                          href={joinUrlPath(linkdingUrlInput, "/settings/integrations")}
+                          className="text-primary text-sm underline-offset-4 outline-none focus-within:underline hover:underline"
+                          target="_blank"
+                          rel="noopener noreferrer">
+                          Need an API token?
+                        </a>
                       )}
-                      className="text-primary text-sm underline-offset-4 outline-none focus-within:underline hover:underline"
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      Need an API token?
-                    </a>
+                    </form.Subscribe>
                   </p>
                 </div>
               )}

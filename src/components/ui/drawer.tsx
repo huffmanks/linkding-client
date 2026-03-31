@@ -1,6 +1,6 @@
 import { type ComponentProps, createContext, use } from "react";
 
-import { DrawerPreview as DrawerPrimitive } from "@base-ui/react/drawer";
+import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 
 import { cn } from "@/lib/utils";
 

@@ -1,7 +1,7 @@
 BASE_COMPOSE := "docker compose -f docker-compose.yml"
 BUILDER := "echolink-builder"
 IMAGE_NAME := "huffmanks/echo-link"
-VERSION := "1.1.0"
+VERSION := `node -p "require('./package.json').version"`
 
 # --- Public Recipes ---
 

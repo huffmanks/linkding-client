@@ -59,7 +59,7 @@ export function Provider({
       persistOptions={{
         persister,
         maxAge: DEFAULT_TTL,
-        buster: "v1.0.0",
+        buster: __APP_VERSION__,
       }}>
       <LoadingGate>{children}</LoadingGate>
     </PersistQueryClientProvider>

@@ -1,5 +1,5 @@
 # --- STAGE 0: Build Frontend ---
-FROM node:22.18.0-alpine AS frontend-builder
+FROM node:22-alpine3.23 AS frontend-builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY . .
 RUN pnpm run build
 
 # --- STAGE 1: Build Go ---
-FROM golang:1.23-alpine AS go-builder
+FROM golang:1.25-alpine3.23 AS go-builder
 
 WORKDIR /app
 

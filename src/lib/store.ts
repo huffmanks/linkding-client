@@ -46,8 +46,8 @@ type SettingsStoreActions = {
 };
 
 const initialSettingsStoreState: SettingsStoreState = {
-  username: import.meta.env.VITE_USER_NAME ?? "User",
-  linkdingUrl: import.meta.env.VITE_LINKDING_EXTERNAL_URL ?? "http://localhost:9090",
+  username: "Default user",
+  linkdingUrl: "http://localhost:9090",
   view: "grid",
   theme: "system",
   sidebarAddCollapsed: false,

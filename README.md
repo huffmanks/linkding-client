@@ -41,6 +41,9 @@ services:
       APP_PORT: ${APP_PORT}
       LINKDING_CONTAINER_URL: ${LINKDING_CONTAINER_URL}
       LINKDING_API_TOKEN: ${LINKDING_API_TOKEN}
+      # optional
+      ECHOLINK_USER_NAME: ${ECHOLINK_USER_NAME}
+      LINKDING_EXTERNAL_URL: ${LINKDING_EXTERNAL_URL}
     depends_on:
       - linkding
     restart: unless-stopped
@@ -55,8 +58,8 @@ LINKDING_CONTAINER_URL=http://linkding:9090
 LINKDING_API_TOKEN=
 
 # Optional
-VITE_USER_NAME=
-VITE_LINKDING_EXTERNAL_URL=http://localhost:9090
+ECHOLINK_USER_NAME=
+LINKDING_EXTERNAL_URL=http://localhost:9090
 
 # --- LINKDING ---
 # see https://linkding.link/options/#ld_csrf_trusted_origins
