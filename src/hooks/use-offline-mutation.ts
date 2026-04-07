@@ -184,7 +184,7 @@ export function useOfflineMutation<
       });
     },
     onSettled: (_data, error) => {
-      if (error) {
+      if (isOnline || error) {
         queryClient.invalidateQueries({ queryKey: options.queryKey });
       }
     },
