@@ -37,7 +37,9 @@
 
 ### Folders
 
-- [ ] Table view only.
-- [ ] Show total count.
-- [ ] Show bookmark count per folder.
-- [ ] Support drag-and-drop reordering.
+- [x] Table view only.
+- [x] Show total count.
+- [x] Show bookmark count per folder.
+- [x] Support drag-and-drop reordering.
+- [ ] Global sidebar/mobile menu links to direct page.
+- [ ] Rework bulk edit so it doesn't affect bookmarks editing.

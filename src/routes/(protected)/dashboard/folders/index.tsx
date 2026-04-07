@@ -7,22 +7,12 @@ import { useShallow } from "zustand/react/shallow";
 import { safeEnsure } from "@/lib/api";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
-import { cn } from "@/lib/utils";
 import { useBulkSelection } from "@/providers/bulk-selection";
 import { EmptyFolders } from "@/routes/(protected)/dashboard/folders/-components/empty-folder";
-import FolderActionDropdown from "@/routes/(protected)/dashboard/folders/-components/folder-action-dropdown";
 
 import BulkActionBar from "@/components/blocks/bookmark/bulk-action-bar";
-import { AllCheckbox, ItemCheckbox } from "@/components/blocks/bookmark/checkboxes";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
+import FolderTable from "./-components/table";
 
 export const Route = createFileRoute("/(protected)/dashboard/folders/")({
   component: RouteComponent,
@@ -43,22 +33,12 @@ function RouteComponent() {
 
   const { data: folders } = useSuspenseQuery(getAllQueryOptions.folders);
 
-  const {
-    selectedIds,
-    bulkAction,
-    isBulkSelecting,
-    clearSelection,
-    setCurrentBulkAction,
-    stopBulkSelection,
-  } = useBulkSelection();
+  const { selectedIds, bulkAction, clearSelection, setCurrentBulkAction, stopBulkSelection } =
+    useBulkSelection();
   const { continueBulkEdit, keepBulkSelection } = useSettingsStore(
     useShallow((state) => ({
-      limit: state.limit,
-      view: state.view,
-      defaultSortDate: state.defaultSortDate,
       continueBulkEdit: state.continueBulkEdit,
       keepBulkSelection: state.keepBulkSelection,
-      setView: state.setView,
     }))
   );
 
@@ -68,7 +48,7 @@ function RouteComponent() {
 
   async function handleBulkEdit() {
     if (!bulkAction || selectedIds.size === 0) return;
-
+    // TODO
     try {
     } catch (error) {}
   }
@@ -84,12 +64,6 @@ function RouteComponent() {
 
     setIsAlertOpen(false);
   }
-
-  const filteredFolders = folders.results.filter(
-    (folder) => !folder.id.toString().startsWith("temp")
-  );
-
-  const allFolderIds = filteredFolders.map((folder) => folder.id);
 
   return (
     <>
@@ -107,51 +81,8 @@ function RouteComponent() {
         </div>
       </div>
       <div className="pb-6 sm:px-2">
-        <Table className="w-full table-fixed">
-          <TableHeader>
-            <TableRow>
-              <TableHead
-                className={cn("transition-all", isBulkSelecting ? "w-8.5 p-2" : "w-0 p-0")}>
-                <AllCheckbox allIds={allFolderIds} />
-              </TableHead>
-              <TableHead className="w-8.5">Id</TableHead>
-              <TableHead className="min-36 w-3/4 truncate">Name</TableHead>
-              <TableHead className="min-24 w-1/4">Bookmarks</TableHead>
-              <TableHead className="w-12"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredFolders.map((folder) => (
-              <TableRow key={folder.id}>
-                <TableCell>
-                  <ItemCheckbox id={folder.id} />
-                </TableCell>
-                <TableCell>{folder.id}</TableCell>
-                <TableCell>{folder.name}</TableCell>
-                <TableCell>
-                  <BookmarksCount id={folder.id} />
-                </TableCell>
-                <TableCell className="flex items-center justify-end">
-                  <FolderActionDropdown id={folder.id} name={folder.name} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={5} className="text-muted-foreground px-2 py-2.5">
-                Total: {folders.count}
-              </TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table>
+        <FolderTable initialFolders={folders} />
       </div>
     </>
   );
-}
-
-function BookmarksCount({ id }: { id: number }) {
-  const { data: bookmarks } = useSuspenseQuery(getAllQueryOptions.bookmarksByFolderId(String(id)));
-
-  return <span>{bookmarks.count}</span>;
 }

@@ -78,7 +78,7 @@ export function useCreateFolder() {
 }
 
 export function useEditFolder() {
-  return useOfflineMutation<FolderInsert & { id: number }, Folder>({
+  return useOfflineMutation<FolderInsert & { id: number; order?: number }, Folder>({
     queryKey: ["bundles"],
     url: "bundles",
     method: "PUT",
