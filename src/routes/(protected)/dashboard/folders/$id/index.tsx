@@ -4,7 +4,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
 import { safeEnsure } from "@/lib/api";
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
+import { stopBulkSelectionOnEnterRoute } from "@/lib/loaders";
 import { getAllQueryOptions } from "@/lib/queries";
 import { SearchSchema, transformData } from "@/lib/search";
 import { useSettingsStore } from "@/lib/store";
@@ -23,11 +23,7 @@ export const Route = createFileRoute("/(protected)/dashboard/folders/$id/")({
       limit: limit ?? parsed.limit,
     };
   },
-  beforeLoad: ({ preload }) => {
-    if (!preload) {
-      useBulkSelectionStore.getState().stopBulkSelection();
-    }
-  },
+  onEnter: stopBulkSelectionOnEnterRoute,
   loader: async ({ context: { queryClient }, params: { id } }) => {
     try {
       await safeEnsure(queryClient, getAllQueryOptions.folderById(id));

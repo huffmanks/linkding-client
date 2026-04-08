@@ -33,11 +33,12 @@ export function SetupForm({ className, ...props }: SetupFormProps) {
   );
 
   const config = (window as any).RUNTIME_CONFIG;
+  const isDev = import.meta.env.DEV;
 
   const form = useForm({
     defaultValues: {
-      username: config?.ECHOLINK_USER_NAME || username,
-      linkdingUrl: config?.LINKDING_EXTERNAL_URL || linkdingUrl,
+      username: isDev ? username : config?.ECHOLINK_USER_NAME || username,
+      linkdingUrl: isDev ? linkdingUrl : config?.LINKDING_EXTERNAL_URL || linkdingUrl,
     },
     onSubmit: ({ value }) => {
       if (!isValid && errorMessage) {

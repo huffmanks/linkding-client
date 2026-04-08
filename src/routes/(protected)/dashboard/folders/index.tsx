@@ -6,6 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 
 import { safeEnsure } from "@/lib/api";
 import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
+import { stopBulkSelectionOnEnterRoute } from "@/lib/loaders";
 import { getAllQueryOptions } from "@/lib/queries";
 import { useSettingsStore } from "@/lib/store";
 import { EmptyFolders } from "@/routes/(protected)/dashboard/folders/-components/empty-folder";
@@ -15,11 +16,7 @@ import BulkActionBar from "@/components/blocks/bookmark/bulk-action-bar";
 
 export const Route = createFileRoute("/(protected)/dashboard/folders/")({
   component: RouteComponent,
-  beforeLoad: ({ preload }) => {
-    if (!preload) {
-      useBulkSelectionStore.getState().stopBulkSelection();
-    }
-  },
+  onEnter: stopBulkSelectionOnEnterRoute,
   loader: async ({ context: { queryClient } }) => {
     try {
       await safeEnsure(queryClient, getAllQueryOptions.folders);

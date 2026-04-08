@@ -34,7 +34,3 @@
 - [ ] Show total count.
 - [ ] Show bookmark count per tag.
 - [ ] Editing/removing should cascade to bookmarks. Check Linkding UI/API for support.
-
-### Folders
-
-- [ ] Rework bulk edit so it doesn't affect bookmarks editing.
