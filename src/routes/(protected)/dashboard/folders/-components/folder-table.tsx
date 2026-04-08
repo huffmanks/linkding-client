@@ -3,12 +3,13 @@ import { useState } from "react";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { GripVerticalIcon } from "lucide-react";
 import { Reorder, useDragControls } from "motion/react";
+import { useShallow } from "zustand/react/shallow";
 
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
 import { useEditFolder } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { cn } from "@/lib/utils";
+import { cn, formatToLocalTime } from "@/lib/utils";
 import FolderActionDropdown from "@/routes/(protected)/dashboard/folders/-components/folder-action-dropdown";
 import type { Folder, PaginatedResponse } from "@/types";
 
@@ -33,6 +34,13 @@ export default function FolderTable({
       .sort((a, b) => a.order - b.order)
   );
   const [activeId, setActiveId] = useState<number | null>(null);
+
+  const { isBulkSelecting, selectedIds } = useBulkSelectionStore(
+    useShallow((state) => ({
+      isBulkSelecting: state.isBulkSelecting,
+      selectedIds: state.selectedIds,
+    }))
+  );
 
   const { mutate: editFolder } = useEditFolder();
 
@@ -70,9 +78,10 @@ export default function FolderTable({
               </div>
             </TableHead>
             <TableHead className="w-10">Id</TableHead>
-            <TableHead className="w-14">Order</TableHead>
             <TableHead className="min-36 w-3/4 truncate">Name</TableHead>
-            <TableHead className="min-24 w-1/4">Bookmarks</TableHead>
+            <TableHead className="w-48">Date added</TableHead>
+            <TableHead className="w-14">Order</TableHead>
+            <TableHead className="w-24">Bookmarks</TableHead>
             <TableHead className="w-12"></TableHead>
           </TableRow>
         </TableHeader>
@@ -96,8 +105,8 @@ export default function FolderTable({
         </Reorder.Group>
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={6} className="text-muted-foreground px-2 py-2.5">
-              Total: {items.length}
+            <TableCell colSpan={7} className="text-muted-foreground px-2 py-2.5">
+              {isBulkSelecting ? `Selected: ${selectedIds.size}` : `Total: ${items.length}`}
             </TableCell>
           </TableRow>
         </TableFooter>
@@ -147,8 +156,12 @@ function FolderRow({ folder, index, activeId, onDragStart, onDragEnd }: FolderRo
         </div>
       </TableCell>
       <TableCell>{folder.id}</TableCell>
-      <TableCell>{index}</TableCell>
+
       <TableCell>{folder.name}</TableCell>
+
+      <TableCell>{formatToLocalTime(folder.date_created)}</TableCell>
+
+      <TableCell>{index}</TableCell>
       <TableCell>
         <BookmarksCount id={folder.id} />
       </TableCell>

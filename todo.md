@@ -4,9 +4,8 @@
 
 ### Data/Background sync
 
-- [ ] [Refactor useEffect](src/providers/background-sync.tsx#L51). Works but needs to be cleaned up.
+- [ ] [Refactor useEffect](src/providers/background-sync.tsx#L60).
 - [ ] Use cached results for search when offline.
-- [ ] Uploaded assets from Linkding don't work unless signed in with a session cookie.
 
 ---
 
@@ -20,6 +19,13 @@
 
 - [ ] Support uploading bookmark assets.
 
+### Settings form
+
+- [ ] Hide Id/order column, (optional preference) use settingsStore from:
+  - [folder-table](<src/routes/(protected)/dashboard/folders/-components/folder-table.tsx>)
+  - [tag-table](<src/routes/(protected)/dashboard/tags/-components/tag-table.tsx>)
+  - [bookmark-table](src/components/blocks/bookmark/views/table.tsx)
+
 ---
 
 ## New pages
@@ -30,7 +36,9 @@
 
 ### Tags
 
-- [ ] Table view only.
-- [ ] Show total count.
-- [ ] Show bookmark count per tag.
-- [ ] Editing/removing should cascade to bookmarks. Check Linkding UI/API for support.
+- [ ] Editing/removing should cascade to bookmarks.
+- [ ] [handleBulkEdit](<src/routes/(protected)/dashboard/folders/index.tsx>)
+
+### Folders
+
+- [ ] [handleBulkEdit](<src/routes/(protected)/dashboard/folders/index.tsx>)
