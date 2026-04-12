@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useShallow } from "zustand/react/shallow";
 
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
 import { getAllQueryOptions } from "@/lib/queries";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
 import { cn, formatToLocalTime } from "@/lib/utils";
 import TagActionDropdown from "@/routes/(protected)/dashboard/tags/-components/tag-action-dropdown";
 import type { PaginatedResponse, Tag } from "@/types";

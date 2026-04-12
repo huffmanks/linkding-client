@@ -2,7 +2,7 @@ import z from "zod";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import type { DefaultSortDate, Theme, View } from "@/types";
+import type { DefaultSortDate, SettingsTab, Theme, View } from "@/types";
 
 export const UrlSchema = z
   .url({ error: "Url is not valid." })
@@ -25,6 +25,7 @@ type SettingsStoreState = {
   sharedDefault: boolean;
   autoMarkRead: boolean;
   isSetupComplete: boolean;
+  lastActiveTab: SettingsTab;
 };
 
 type SettingsStoreActions = {
@@ -42,6 +43,7 @@ type SettingsStoreActions = {
   setSharedDefault: (sharedDefault: boolean) => void;
   setAutoMarkRead: (autoMarkRead: boolean) => void;
   setIsSetupComplete: (isSetupComplete: boolean) => void;
+  setLastActiveTab: (lastActiveTab: SettingsTab) => void;
   reset: () => void;
 };
 
@@ -60,6 +62,7 @@ const initialSettingsStoreState: SettingsStoreState = {
   sharedDefault: false,
   autoMarkRead: true,
   isSetupComplete: false,
+  lastActiveTab: "user",
 };
 
 export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions>()(
@@ -80,6 +83,7 @@ export const useSettingsStore = create<SettingsStoreState & SettingsStoreActions
       setSharedDefault: (sharedDefault) => set({ sharedDefault }),
       setAutoMarkRead: (autoMarkRead) => set({ autoMarkRead }),
       setIsSetupComplete: (isSetupComplete) => set({ isSetupComplete }),
+      setLastActiveTab: (lastActiveTab) => set({ lastActiveTab }),
       reset: () => set(initialSettingsStoreState),
     }),
     {

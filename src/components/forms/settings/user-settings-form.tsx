@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
-import { UrlSchema, useSettingsStore } from "@/lib/store";
+import { UrlSchema, useSettingsStore } from "@/lib/store/settings";
 import { cn, getErrorMessage } from "@/lib/utils";
 
 import CustomFieldError from "@/components/forms/custom-field-error";

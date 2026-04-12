@@ -27,6 +27,8 @@ export type View = "table" | "list" | "grid";
 export type Theme = "light" | "dark" | "system";
 export type DefaultSortDate = "date_added" | "date_modified";
 
+export type SettingsTab = "user" | "ui" | "bookmark" | "cache";
+
 export type CacheName = "linkding-assets" | "linkding-api-cache" | "app-assets" | "app-navigations";
 
 export interface PaginatedResponse<T> {

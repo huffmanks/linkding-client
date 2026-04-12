@@ -6,7 +6,7 @@ import z from "zod";
 
 import { useCreateFolder, useEditFolder } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn, getErrorMessage, processValue, stringToStringArray } from "@/lib/utils";
 import type { Folder } from "@/types";
 

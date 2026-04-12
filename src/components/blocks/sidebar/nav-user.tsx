@@ -6,7 +6,7 @@ import { useShallow } from "zustand/react/shallow";
 
 import { logout } from "@/lib/auth";
 import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { joinUrlPath } from "@/lib/utils";
 
 import { OnlineStatus } from "@/components/online-status";

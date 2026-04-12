@@ -7,7 +7,7 @@ import { SearchIcon, XIcon } from "lucide-react";
 
 import { useKeyboardShortcut } from "@/hooks/use-keyboard-shortcut";
 import { getAllQueryOptions } from "@/lib/queries";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn, getActiveHashSegment } from "@/lib/utils";
 import type { Tag } from "@/types";
 

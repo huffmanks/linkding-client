@@ -1,7 +1,7 @@
 import { useShallow } from "zustand/react/shallow";
 
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
-import { useSettingsStore } from "@/lib/store";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn, formatToLocalTime, getCleanDomain } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 

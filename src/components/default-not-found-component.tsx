@@ -1,6 +1,6 @@
 import { Link, type NotFoundRouteProps, useCanGoBack, useRouter } from "@tanstack/react-router";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn } from "@/lib/utils";
 
 import FullScreenWrapper from "@/components/full-screen-wrapper";

@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { validate } from "@/lib/auth";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 
 import { SetupForm } from "@/components/forms/setup-form";
 import FullScreenWrapper from "@/components/full-screen-wrapper";

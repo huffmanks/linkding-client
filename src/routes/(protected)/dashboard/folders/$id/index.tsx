@@ -7,7 +7,7 @@ import { safeEnsure } from "@/lib/api";
 import { stopBulkSelectionOnEnterRoute } from "@/lib/loaders";
 import { getAllQueryOptions } from "@/lib/queries";
 import { SearchSchema, transformData } from "@/lib/search";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { EmptyFolder } from "@/routes/(protected)/dashboard/folders/-components/empty-folder";
 import FolderActionDropdown from "@/routes/(protected)/dashboard/folders/-components/folder-action-dropdown";
 

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import type { PaginatedResponse } from "@/types";
 
 const { limit } = useSettingsStore.getState();

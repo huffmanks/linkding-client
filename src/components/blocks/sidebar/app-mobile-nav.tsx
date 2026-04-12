@@ -4,9 +4,9 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link, useLocation } from "@tanstack/react-router";
 
 import { useKeyboardVisible } from "@/hooks/use-keyboard-visible";
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
 import { DRAWER_MOBILE_NAV } from "@/lib/constants";
 import { getAllQueryOptions } from "@/lib/queries";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
 import { checkActive, cn } from "@/lib/utils";
 import { useGlobalModal } from "@/providers/global-modal-context";
 import type { Folder, SidebarNavItem, Tag } from "@/types";

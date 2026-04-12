@@ -3,7 +3,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { safeEnsure } from "@/lib/api";
 import { validate } from "@/lib/auth";
 import { getAllQueryOptions } from "@/lib/queries";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 
 import Sidebar from "@/components/blocks/sidebar";
 

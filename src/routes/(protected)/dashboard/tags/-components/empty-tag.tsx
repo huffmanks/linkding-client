@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { BookmarkIcon } from "lucide-react";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { useGlobalModal } from "@/providers/global-modal-context";
 
 import CodeSpan from "@/components/code-span";

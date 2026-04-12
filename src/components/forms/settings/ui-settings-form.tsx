@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { useShallow } from "zustand/react/shallow";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn, getErrorMessage } from "@/lib/utils";
 import type { DefaultSortDate, Theme, View } from "@/types";
 

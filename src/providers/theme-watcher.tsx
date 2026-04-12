@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 
 export default function ThemeWatcher() {
   const theme = useSettingsStore((state) => state.theme);

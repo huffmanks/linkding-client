@@ -1,6 +1,6 @@
 import { useShallow } from "zustand/react/shallow";
 
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";

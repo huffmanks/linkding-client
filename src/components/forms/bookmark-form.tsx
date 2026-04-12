@@ -8,7 +8,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useBackgroundSync } from "@/hooks/use-background-sync";
 import { useCreateBookmark, useEditBookmark } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn, getErrorMessage } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 

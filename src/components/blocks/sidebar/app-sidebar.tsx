@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { Link } from "@tanstack/react-router";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 
 import { NavMain } from "@/components/blocks/sidebar/nav-main";
 import { NavSecondary } from "@/components/blocks/sidebar/nav-secondary";

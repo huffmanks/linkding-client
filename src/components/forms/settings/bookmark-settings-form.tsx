@@ -2,7 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn, getErrorMessage } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";

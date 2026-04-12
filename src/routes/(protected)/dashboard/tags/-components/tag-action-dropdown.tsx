@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { EllipsisVerticalIcon } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { joinUrlPath } from "@/lib/utils";
 import type { Tag } from "@/types";
 

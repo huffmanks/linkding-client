@@ -1,4 +1,4 @@
-import { type Url, useSettingsStore } from "@/lib/store";
+import { type Url, useSettingsStore } from "@/lib/store/settings";
 import { getErrorMessage } from "@/lib/utils";
 
 export function handleSetup({ username, linkdingUrl }: { username: string; linkdingUrl: Url }) {

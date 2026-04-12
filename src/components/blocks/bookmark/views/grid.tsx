@@ -5,8 +5,8 @@ import { ImageIcon } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
 import { linkdingFetch } from "@/lib/api";
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
-import { useSettingsStore } from "@/lib/store";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn, getCleanDomain, getRelativeTimeString, joinUrlPath } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 

@@ -9,7 +9,7 @@ import { useShallow } from "zustand/react/shallow";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { linkdingFetch } from "@/lib/api";
 import { useDeleteBookmark, useToggleReadBookmark } from "@/lib/mutations";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { formatToLocalTime, getRelativeTimeString, joinUrlPath } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 

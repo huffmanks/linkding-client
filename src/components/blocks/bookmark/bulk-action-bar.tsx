@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
-import { type BulkAction, useBulkSelectionStore } from "@/lib/bulk-selection-store";
+import { type BulkAction, useBulkSelectionStore } from "@/lib/store/bulk-selection";
 import { cn } from "@/lib/utils";
 import type { EntityName, SelectOption } from "@/types";
 

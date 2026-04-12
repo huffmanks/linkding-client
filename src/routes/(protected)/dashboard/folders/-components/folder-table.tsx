@@ -6,9 +6,9 @@ import { Reorder, useDragControls } from "motion/react";
 import { useShallow } from "zustand/react/shallow";
 
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
 import { useEditFolder } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
 import { cn, formatToLocalTime } from "@/lib/utils";
 import FolderActionDropdown from "@/routes/(protected)/dashboard/folders/-components/folder-action-dropdown";
 import type { Folder, PaginatedResponse } from "@/types";

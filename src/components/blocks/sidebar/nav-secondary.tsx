@@ -4,7 +4,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { ExternalLinkIcon } from "lucide-react";
 
 import { SIDEBAR_NAV_SECONDARY } from "@/lib/constants";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { checkActive, joinUrlPath } from "@/lib/utils";
 
 import {

@@ -6,12 +6,12 @@ import { toast } from "sonner";
 import { useShallow } from "zustand/react/shallow";
 
 import { safeEnsure } from "@/lib/api";
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
 import { FOLDER_BULK_SELECT_OPTIONS } from "@/lib/constants";
 import { stopBulkSelectionOnEnterRoute } from "@/lib/loaders";
 import { useDeleteFolder } from "@/lib/mutations";
 import { getAllQueryOptions } from "@/lib/queries";
-import { useSettingsStore } from "@/lib/store";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
+import { useSettingsStore } from "@/lib/store/settings";
 import { EmptyFolders } from "@/routes/(protected)/dashboard/folders/-components/empty-folder";
 import FolderTable from "@/routes/(protected)/dashboard/folders/-components/folder-table";
 import type { Folder, PaginatedResponse } from "@/types";

@@ -3,7 +3,7 @@
 import { Link } from "@tanstack/react-router";
 import { SidebarIcon } from "lucide-react";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 
 import { NavUser } from "@/components/blocks/sidebar/nav-user";
 import { SearchForm } from "@/components/blocks/sidebar/search-form";

@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 
 import { Badge } from "@/components/ui/badge";
 

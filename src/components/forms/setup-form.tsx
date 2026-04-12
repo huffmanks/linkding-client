@@ -7,7 +7,7 @@ import z from "zod";
 import { useShallow } from "zustand/react/shallow";
 
 import { handleSetup, validate } from "@/lib/auth";
-import { UrlSchema, useSettingsStore } from "@/lib/store";
+import { UrlSchema, useSettingsStore } from "@/lib/store/settings";
 import { cn, joinUrlPath } from "@/lib/utils";
 
 import CustomFieldError from "@/components/forms/custom-field-error";

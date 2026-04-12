@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { EllipsisVerticalIcon } from "lucide-react";
 
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
 import {
   useDeleteBookmark,
   useToggleArchiveBookmark,
   useToggleReadBookmark,
   useToggleShareBookmark,
 } from "@/lib/mutations";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
 import { cn } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 

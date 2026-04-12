@@ -8,7 +8,7 @@ import { ChevronRightIcon, FolderIcon, HashIcon } from "lucide-react";
 
 import { SIDEBAR_NAV_MAIN } from "@/lib/constants";
 import { getAllQueryOptions } from "@/lib/queries";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { checkActive } from "@/lib/utils";
 import { useGlobalModal } from "@/providers/global-modal-context";
 import type { SidebarNavItem, SidebarSubNavItem } from "@/types";

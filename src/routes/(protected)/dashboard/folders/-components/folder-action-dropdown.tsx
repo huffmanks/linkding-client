@@ -1,9 +1,9 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { EllipsisVerticalIcon } from "lucide-react";
 
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
 import { useDeleteFolder } from "@/lib/mutations";
-import { useSettingsStore } from "@/lib/store";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
+import { useSettingsStore } from "@/lib/store/settings";
 import { cn } from "@/lib/utils";
 
 import {

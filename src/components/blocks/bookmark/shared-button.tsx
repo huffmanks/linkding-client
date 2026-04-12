@@ -3,7 +3,7 @@ import { useState } from "react";
 import { LockIcon, Share2Icon } from "lucide-react";
 import { toast } from "sonner";
 
-import { useBulkSelectionStore } from "@/lib/bulk-selection-store";
+import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
 import { cn, getErrorMessage } from "@/lib/utils";
 
 import { Badge } from "@/components/ui/badge";

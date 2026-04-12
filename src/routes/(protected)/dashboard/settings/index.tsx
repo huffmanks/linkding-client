@@ -1,4 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+
+import { useSettingsStore } from "@/lib/store/settings";
+import type { SettingsTab } from "@/types";
 
 import { BookmarkSettingsForm } from "@/components/forms/settings/bookmark-settings-form";
 import { CacheSettingsForm } from "@/components/forms/settings/cache-settings-form";
@@ -8,14 +11,34 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const Route = createFileRoute("/(protected)/dashboard/settings/")({
   component: RouteComponent,
+  validateSearch: (search) => {
+    const { lastActiveTab } = useSettingsStore.getState();
+    return {
+      tab: search.tab || lastActiveTab,
+    };
+  },
 });
 
 function RouteComponent() {
+  const { tab } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+
+  const setLastActiveTab = useSettingsStore((state) => state.setLastActiveTab);
+
+  function handleTabChange(value: SettingsTab) {
+    setLastActiveTab(value);
+
+    navigate({
+      search: { tab: value },
+      replace: true,
+    });
+  }
+
   return (
     <div className="max-w-lg px-4 pt-4 pb-8 md:pt-0">
       <h1 className="mb-4 text-2xl font-medium">Settings</h1>
 
-      <Tabs defaultValue="user">
+      <Tabs value={tab} onValueChange={handleTabChange}>
         <TabsList className="w-full p-0">
           <TabsTrigger value="user" className="cursor-pointer">
             User

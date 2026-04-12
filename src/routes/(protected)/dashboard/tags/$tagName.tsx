@@ -7,7 +7,7 @@ import { safeEnsure } from "@/lib/api";
 import { stopBulkSelectionOnEnterRoute } from "@/lib/loaders";
 import { getAllQueryOptions } from "@/lib/queries";
 import { SearchSchema, transformData } from "@/lib/search";
-import { useSettingsStore } from "@/lib/store";
+import { useSettingsStore } from "@/lib/store/settings";
 import { EmptyTag } from "@/routes/(protected)/dashboard/tags/-components/empty-tag";
 import type { PaginatedResponse, Tag } from "@/types";
 
