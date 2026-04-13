@@ -2,12 +2,13 @@ import { useMemo, useState } from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { ImageIcon } from "lucide-react";
+import { getDomain } from "tldts";
 import { useShallow } from "zustand/react/shallow";
 
 import { linkdingFetch } from "@/lib/api";
 import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
 import { useSettingsStore } from "@/lib/store/settings";
-import { cn, getCleanDomain, getRelativeTimeString, joinUrlPath } from "@/lib/utils";
+import { cn, getRelativeTimeString, joinUrlPath } from "@/lib/utils";
 import type { Asset, Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
@@ -98,7 +99,7 @@ export default function BookmarkGridView({
                     target="_blank"
                     rel="noopener noreferrer"
                     tabIndex={isBulkSelecting ? -1 : 0}>
-                    {getCleanDomain(bookmark.url)}
+                    {getDomain(bookmark.url)}
                   </a>
                 </p>
                 {bookmark?.description && (

@@ -90,7 +90,7 @@ export function NavUser() {
           <DropdownMenuSeparator />
 
           <DropdownMenuGroup>
-            {items.slice(0, 1).map((item) => (
+            {items.slice(0, 2).map((item) => (
               <DropdownMenuItem
                 key={item.url}
                 className="cursor-pointer"
@@ -113,7 +113,7 @@ export function NavUser() {
             <DropdownMenuLabel className="text-xs font-normal tracking-wide uppercase">
               Linkding
             </DropdownMenuLabel>
-            {items.slice(1).map((item) => (
+            {items.slice(2).map((item) => (
               <DropdownMenuItem
                 key={item.url}
                 className="cursor-pointer"

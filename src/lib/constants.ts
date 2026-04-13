@@ -1,5 +1,6 @@
 import {
   BookmarkIcon,
+  ChartNoAxesCombinedIcon,
   FolderIcon,
   HashIcon,
   PlusIcon,
@@ -55,6 +56,13 @@ export const SIDEBAR_NAV_SECONDARY = [
     isActive: false,
     isExternal: false,
     icon: SettingsIcon,
+  },
+  {
+    name: "Stats",
+    url: "/dashboard/stats",
+    isActive: false,
+    isExternal: false,
+    icon: ChartNoAxesCombinedIcon,
   },
   {
     name: "Admin",

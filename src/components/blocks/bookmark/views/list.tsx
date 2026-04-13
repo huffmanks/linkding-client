@@ -1,8 +1,9 @@
+import { getDomain } from "tldts";
 import { useShallow } from "zustand/react/shallow";
 
 import { useBulkSelectionStore } from "@/lib/store/bulk-selection";
 import { useSettingsStore } from "@/lib/store/settings";
-import { cn, getCleanDomain, getRelativeTimeString } from "@/lib/utils";
+import { cn, getRelativeTimeString } from "@/lib/utils";
 import type { Bookmark } from "@/types";
 
 import ActionDropdown from "@/components/blocks/bookmark/action-dropdown";
@@ -111,7 +112,7 @@ export default function BookmarkListView({
                   target="_blank"
                   rel="noopener noreferrer"
                   tabIndex={isBulkSelecting ? -1 : 0}>
-                  {getCleanDomain(bookmark.url)}
+                  {getDomain(bookmark.url)}
                 </a>
               </p>
             </section>

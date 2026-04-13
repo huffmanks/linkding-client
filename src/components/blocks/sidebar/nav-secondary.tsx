@@ -54,7 +54,7 @@ export function NavSecondary({
     <SidebarGroup {...props}>
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.slice(0, 1).map((item) => (
+          {items.slice(0, 2).map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
                 size="sm"
@@ -83,7 +83,7 @@ export function NavSecondary({
           Linkding
         </SidebarGroupLabel>
         <SidebarMenu>
-          {items.slice(1).map((item) => (
+          {items.slice(2).map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
                 size="sm"

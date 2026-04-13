@@ -13,6 +13,10 @@ export const getAllQueryOptions = {
       queryKey: ["bookmarks", { q: String(q).trim() }],
       queryFn: () => fetchAllBookmarks({ q: String(q).trim() }),
     }),
+  archivedList: queryOptions({
+    queryKey: ["archived"],
+    queryFn: () => linkdingFetch<PaginatedResponse<Bookmark>>("bookmarks/archived"),
+  }),
   bookmarkById: (id: string) =>
     queryOptions({
       queryKey: ["bookmarks", id],

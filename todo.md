@@ -5,7 +5,7 @@
 ### Data/Background sync
 
 - [ ] Use cached results for search when offline.
-- [ ] Change isOnline to isConnected to Linkding API.
+- [ ] Change isOnline to include isConnected to Linkding API.
 
 ---
 
@@ -28,11 +28,3 @@
   - [ ] [folder-table](<src/routes/(protected)/dashboard/folders/-components/folder-table.tsx>)
   - [ ] [tag-table](<src/routes/(protected)/dashboard/tags/-components/tag-table.tsx>)
   - [ ] [bookmark-table](src/components/blocks/bookmark/views/table.tsx)
-
----
-
-## New pages
-
-### Stats
-
-- [ ] Stats page (like karakeep).

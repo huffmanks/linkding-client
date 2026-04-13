@@ -1,17 +1,11 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { getDomain } from "tldts";
+
+import type { Bookmark } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-}
-
-export function getCleanDomain(url: string): string {
-  try {
-    const parsedUrl = new URL(url);
-    return parsedUrl.hostname.replace(/^www\./, "");
-  } catch (e) {
-    return url;
-  }
 }
 
 interface Value {
@@ -236,4 +230,72 @@ export function getActiveHashSegment(value: string, cursorPos: number): [number,
   const start = before.lastIndexOf(match[2]);
   const end = cursorPos + (value.slice(cursorPos).match(/^\S*/) ?? [""])[0].length;
   return [start, end];
+}
+
+export function getUnreadCount(bookmarks: Bookmark[]) {
+  return bookmarks.reduce((count, bookmark) => {
+    return bookmark.unread ? count + 1 : count;
+  }, 0);
+}
+
+export function getSharedCount(bookmarks: Bookmark[]) {
+  return bookmarks.reduce((count, bookmark) => {
+    return bookmark.shared ? count + 1 : count;
+  }, 0);
+}
+
+export function getMonthlyCount(bookmarks: Bookmark[]) {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  return bookmarks.reduce((count, bookmark) => {
+    const date = new Date(bookmark.date_added);
+
+    const isThisMonth = date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+
+    return isThisMonth ? count + 1 : count;
+  }, 0);
+}
+
+export function getTopTenDomains(bookmarks: Bookmark[]) {
+  const domainCounts: Record<string, number> = {};
+
+  for (const bookmark of bookmarks) {
+    const domain = getDomain(bookmark.url);
+
+    if (domain) {
+      domainCounts[domain] = (domainCounts[domain] || 0) + 1;
+    }
+  }
+
+  return Object.entries(domainCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      return a.name.localeCompare(b.name);
+    })
+    .slice(0, 10);
+}
+
+export function getTopTenTags(bookmarks: Bookmark[]) {
+  const tagCounts: Record<string, number> = {};
+
+  for (const bookmark of bookmarks) {
+    for (const tag of bookmark.tag_names) {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    }
+  }
+
+  return Object.entries(tagCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => {
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
+      return a.name.localeCompare(b.name);
+    })
+    .slice(0, 10);
 }

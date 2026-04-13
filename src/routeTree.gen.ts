@@ -13,6 +13,7 @@ import { Route as protectedRouteRouteImport } from './routes/(protected)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as protectedDashboardIndexRouteImport } from './routes/(protected)/dashboard/index'
 import { Route as protectedDashboardTagsIndexRouteImport } from './routes/(protected)/dashboard/tags/index'
+import { Route as protectedDashboardStatsIndexRouteImport } from './routes/(protected)/dashboard/stats/index'
 import { Route as protectedDashboardSettingsIndexRouteImport } from './routes/(protected)/dashboard/settings/index'
 import { Route as protectedDashboardFoldersIndexRouteImport } from './routes/(protected)/dashboard/folders/index'
 import { Route as protectedDashboardTagsTagNameRouteImport } from './routes/(protected)/dashboard/tags/$tagName'
@@ -40,6 +41,12 @@ const protectedDashboardTagsIndexRoute =
   protectedDashboardTagsIndexRouteImport.update({
     id: '/dashboard/tags/',
     path: '/dashboard/tags/',
+    getParentRoute: () => protectedRouteRoute,
+  } as any)
+const protectedDashboardStatsIndexRoute =
+  protectedDashboardStatsIndexRouteImport.update({
+    id: '/dashboard/stats/',
+    path: '/dashboard/stats/',
     getParentRoute: () => protectedRouteRoute,
   } as any)
 const protectedDashboardSettingsIndexRoute =
@@ -99,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/tags/$tagName': typeof protectedDashboardTagsTagNameRoute
   '/dashboard/folders/': typeof protectedDashboardFoldersIndexRoute
   '/dashboard/settings/': typeof protectedDashboardSettingsIndexRoute
+  '/dashboard/stats/': typeof protectedDashboardStatsIndexRoute
   '/dashboard/tags/': typeof protectedDashboardTagsIndexRoute
   '/dashboard/bookmarks/$id/edit': typeof protectedDashboardBookmarksIdEditRoute
   '/dashboard/folders/$id/edit': typeof protectedDashboardFoldersIdEditRoute
@@ -112,6 +120,7 @@ export interface FileRoutesByTo {
   '/dashboard/tags/$tagName': typeof protectedDashboardTagsTagNameRoute
   '/dashboard/folders': typeof protectedDashboardFoldersIndexRoute
   '/dashboard/settings': typeof protectedDashboardSettingsIndexRoute
+  '/dashboard/stats': typeof protectedDashboardStatsIndexRoute
   '/dashboard/tags': typeof protectedDashboardTagsIndexRoute
   '/dashboard/bookmarks/$id/edit': typeof protectedDashboardBookmarksIdEditRoute
   '/dashboard/folders/$id/edit': typeof protectedDashboardFoldersIdEditRoute
@@ -127,6 +136,7 @@ export interface FileRoutesById {
   '/(protected)/dashboard/tags/$tagName': typeof protectedDashboardTagsTagNameRoute
   '/(protected)/dashboard/folders/': typeof protectedDashboardFoldersIndexRoute
   '/(protected)/dashboard/settings/': typeof protectedDashboardSettingsIndexRoute
+  '/(protected)/dashboard/stats/': typeof protectedDashboardStatsIndexRoute
   '/(protected)/dashboard/tags/': typeof protectedDashboardTagsIndexRoute
   '/(protected)/dashboard/bookmarks/$id/edit': typeof protectedDashboardBookmarksIdEditRoute
   '/(protected)/dashboard/folders/$id/edit': typeof protectedDashboardFoldersIdEditRoute
@@ -142,6 +152,7 @@ export interface FileRouteTypes {
     | '/dashboard/tags/$tagName'
     | '/dashboard/folders/'
     | '/dashboard/settings/'
+    | '/dashboard/stats/'
     | '/dashboard/tags/'
     | '/dashboard/bookmarks/$id/edit'
     | '/dashboard/folders/$id/edit'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/dashboard/tags/$tagName'
     | '/dashboard/folders'
     | '/dashboard/settings'
+    | '/dashboard/stats'
     | '/dashboard/tags'
     | '/dashboard/bookmarks/$id/edit'
     | '/dashboard/folders/$id/edit'
@@ -169,6 +181,7 @@ export interface FileRouteTypes {
     | '/(protected)/dashboard/tags/$tagName'
     | '/(protected)/dashboard/folders/'
     | '/(protected)/dashboard/settings/'
+    | '/(protected)/dashboard/stats/'
     | '/(protected)/dashboard/tags/'
     | '/(protected)/dashboard/bookmarks/$id/edit'
     | '/(protected)/dashboard/folders/$id/edit'
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/tags'
       fullPath: '/dashboard/tags/'
       preLoaderRoute: typeof protectedDashboardTagsIndexRouteImport
+      parentRoute: typeof protectedRouteRoute
+    }
+    '/(protected)/dashboard/stats/': {
+      id: '/(protected)/dashboard/stats/'
+      path: '/dashboard/stats'
+      fullPath: '/dashboard/stats/'
+      preLoaderRoute: typeof protectedDashboardStatsIndexRouteImport
       parentRoute: typeof protectedRouteRoute
     }
     '/(protected)/dashboard/settings/': {
@@ -276,6 +296,7 @@ interface protectedRouteRouteChildren {
   protectedDashboardTagsTagNameRoute: typeof protectedDashboardTagsTagNameRoute
   protectedDashboardFoldersIndexRoute: typeof protectedDashboardFoldersIndexRoute
   protectedDashboardSettingsIndexRoute: typeof protectedDashboardSettingsIndexRoute
+  protectedDashboardStatsIndexRoute: typeof protectedDashboardStatsIndexRoute
   protectedDashboardTagsIndexRoute: typeof protectedDashboardTagsIndexRoute
   protectedDashboardBookmarksIdEditRoute: typeof protectedDashboardBookmarksIdEditRoute
   protectedDashboardFoldersIdEditRoute: typeof protectedDashboardFoldersIdEditRoute
@@ -289,6 +310,7 @@ const protectedRouteRouteChildren: protectedRouteRouteChildren = {
   protectedDashboardTagsTagNameRoute: protectedDashboardTagsTagNameRoute,
   protectedDashboardFoldersIndexRoute: protectedDashboardFoldersIndexRoute,
   protectedDashboardSettingsIndexRoute: protectedDashboardSettingsIndexRoute,
+  protectedDashboardStatsIndexRoute: protectedDashboardStatsIndexRoute,
   protectedDashboardTagsIndexRoute: protectedDashboardTagsIndexRoute,
   protectedDashboardBookmarksIdEditRoute:
     protectedDashboardBookmarksIdEditRoute,
